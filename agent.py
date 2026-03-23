@@ -162,7 +162,7 @@ Always reference actual CV content. Never give generic advice."""
 
     llm = get_llm()
     tool = get_job_search_tool()
-    agent = create_openai_tools_agent(llm, [tool], prompt)
+    agent = create_tool_calling_agent(llm, [tool], prompt)
 
     return AgentExecutor(
         agent=agent, tools=[tool],
