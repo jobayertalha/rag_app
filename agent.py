@@ -7,7 +7,7 @@ market demand, career paths, skill gaps, resume recommendations.
 
 import os
 from langchain_groq import ChatGroq
-from langchain.agents import AgentExecutor, create_openai_tools_agent
+from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_community.utilities import SerpAPIWrapper
 from langchain.tools import Tool
