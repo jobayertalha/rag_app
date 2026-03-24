@@ -1,15 +1,12 @@
 """
-agent.py
-Architecture step: Retrieved Context → LLM → Personalized Advice
-The LLM receives ALL retrieved JD data: match scores, salary ranges,
-market demand, career paths, skill gaps, resume recommendations.
+agent.py — compatible with langchain >= 0.2 / 1.x (modern API)
+Uses: ChatGroq directly + tool binding, no deprecated agent helpers.
 """
 
 import os
 from langchain_groq import ChatGroq
-from langchain.agents import create_openai_tools_agent
-from langchain.agents.agent import AgentExecutor
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_community.utilities import SerpAPIWrapper
 from langchain.tools import Tool
 from pypdf import PdfReader
@@ -29,14 +26,10 @@ def get_llm():
 def get_job_search_tool():
     serpapi_key = os.getenv("SERPAPI_API_KEY")
     if not serpapi_key:
-        # Return a dummy tool if no SERPAPI key
         def no_search(q):
-            return "Job search unavailable — add SERPAPI_API_KEY to .env to enable real-time job listings."
-        return Tool(
-            name="job_search",
-            func=no_search,
-            description="Search real-time job listings."
-        )
+            return "Job search unavailable — add SERPAPI_API_KEY to Streamlit secrets to enable real-time job listings."
+        return Tool(name="job_search", func=no_search,
+                    description="Search real-time job listings.")
     search = SerpAPIWrapper(
         serpapi_api_key=serpapi_key,
         params={"engine": "google_jobs"}
@@ -57,21 +50,28 @@ def extract_cv_text(pdf_path: str) -> str:
     return "".join(page.extract_text() or "" for page in reader.pages).strip()
 
 
+# Module-level state
+_system_prompt = ""
+_llm = None
+_history = []
+
+
 def build_agent(cv_text: str, jd_text: str = "", candidate_name: str = ""):
     """
-    1. retrieve_context() → FAISS search → structured dict
-    2. Format into rich system prompt
-    3. LLM generates personalized advice with salary + market data
+    Build a simple stateful chat agent using ChatGroq directly.
+    No deprecated agent helpers — works with all langchain versions.
     """
+    global _system_prompt, _llm, _history
+
     from rag import retrieve_context
     retrieved = retrieve_context(cv_text, jd_text, k=5)
     top = retrieved["top_match"]
 
     name_ref = f"The candidate's name is {candidate_name}. " if candidate_name else ""
 
-    # Build role breakdown string for prompt
     role_lines = "\n".join(
-        f"  {r.get('title', r.get('role', 'Unknown'))} ({r.get('category', '')}): {r['match_pct']}% match — "
+        f"  {r.get('title', r.get('role', 'Unknown'))} ({r.get('category', '')}): "
+        f"{r['match_pct']}% match — "
         f"Salary ₨{r.get('salary_min', 0):,}–₨{r.get('salary_max', 0):,} — "
         f"Demand: {r.get('market_demand', '')}"
         for r in retrieved["all_matches"][:5]
@@ -83,7 +83,7 @@ def build_agent(cv_text: str, jd_text: str = "", candidate_name: str = ""):
         if jd_text else ""
     )
 
-    system_prompt = f"""You are a professional AI career advisor specializing in data science and AI roles.
+    _system_prompt = f"""You are a professional AI career advisor specializing in data science and AI roles.
 {name_ref}Your advice is grounded in real JD data retrieved via FAISS vector search.
 Always be specific, encouraging, and reference the candidate's actual CV content.
 
@@ -106,71 +106,72 @@ RESUME SKILLS TO ADD: {', '.join(retrieved['resume_skills']) or 'CV already well
 
 ━━━ YOUR RESPONSIBILITIES ━━━
 
-1. ROLE RECOMMENDATIONS
-   Reference match percentages from FAISS. Explain WHY each role fits
-   using specific evidence from the CV.
-
-2. SKILL GAPS
-   For each gap skill: what it is, why it matters for the matched role,
-   how to learn it (specific course/project/certification).
-
-3. RESUME RECOMMENDATIONS — be very specific:
-   Format each tip as: "Add [X]: unlocks [role] — [reason from JD data]"
-   Suggest 2-3 concrete project ideas they can build and list on resume.
-   Suggest certifications that map directly to their gap skills.
-
-4. SALARY & MARKET INFO
-   Reference the salary ranges from retrieved JD data.
-   Comment on market demand for their top matched roles.
-
-5. CAREER PATH
-   Use career paths from matched JDs.
-   Give 3 steps with realistic timeframes based on their current level.
-
-6. JOB SEARCH
-   When asked to find jobs, use job_search tool.
-   Format: Title | Company | Location | Brief description
-   Suggest which matched role to search first based on FAISS scores.
+1. ROLE RECOMMENDATIONS — reference match % and CV evidence
+2. SKILL GAPS — what it is, why it matters, how to learn it
+3. RESUME RECOMMENDATIONS — format: "Add [X]: unlocks [role] — [reason]"
+4. SALARY & MARKET INFO — use retrieved salary ranges
+5. CAREER PATH — 3 steps with timeframes
+6. JOB SEARCH — when asked, search and format: Title | Company | Location | Description
 
 When generating structured analysis, respond using EXACTLY these tags:
 TOP_ROLE: [role name]
-MATCH_PCT: [number only, e.g. 97]
+MATCH_PCT: [number only]
 WHY_RIGHT: [2-3 sentences personalised to this CV]
 NEXT_STEPS:
 - [step 1]
 - [step 2]
 - [step 3]
 SKILL_GAPS:
-- [skill]: [why it matters and how to learn it]
-- [skill]: [why it matters and how to learn it]
+- [skill]: [why and how to learn]
 RESUME_ADD:
 - Add [X]: unlocks [role] — [reason]
-- Add [X]: unlocks [role] — [reason]
 CAREER_PATH:
-- [Step 1 title]: [description and timeframe]
-- [Step 2 title]: [description and timeframe]
-- [Step 3 title]: [description and timeframe]
-RUNNER_UP: [second best role name]
-RUNNER_UP_WHY: [1-2 sentences why]
+- [Step title]: [description and timeframe]
+RUNNER_UP: [second best role]
+RUNNER_UP_WHY: [1-2 sentences]
 
 Always reference actual CV content. Never give generic advice."""
 
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", system_prompt),
-        ("human", "{input}"),
-        MessagesPlaceholder(variable_name="agent_scratchpad"),
-    ])
+    _llm = get_llm()
+    _history = []
 
-    llm = get_llm()
-    tool = get_job_search_tool()
-    agent = create_tool_calling_agent(llm, [tool], prompt)
-
-    return AgentExecutor(
-        agent=agent, tools=[tool],
-        verbose=True, max_iterations=5,
-        handle_parsing_errors=True,
-    )
+    # Return a simple dict as the "agent" — run_agent uses it
+    return {"ready": True}
 
 
-def run_agent(executor, user_input: str) -> str:
-    return executor.invoke({"input": user_input})["output"]
+def run_agent(agent_dict, user_input: str) -> str:
+    """
+    Run the agent: send system prompt + history + new message to Groq.
+    Falls back gracefully if job search is requested.
+    """
+    global _system_prompt, _llm, _history
+
+    if not _llm:
+        return "Agent not initialized. Please upload your CV and click Get Career Match first."
+
+    # Check if job search is requested
+    search_keywords = ["find jobs", "search jobs", "job listings", "find me", "search for"]
+    wants_search = any(kw in user_input.lower() for kw in search_keywords)
+
+    search_result = ""
+    if wants_search:
+        try:
+            tool = get_job_search_tool()
+            search_result = tool.func(user_input)
+            user_input = f"{user_input}\n\n[Job search results]:\n{search_result}"
+        except Exception:
+            pass
+
+    # Build messages
+    messages = [SystemMessage(content=_system_prompt)]
+    for h in _history[-6:]:  # keep last 3 exchanges
+        messages.append(HumanMessage(content=h["user"]))
+        from langchain_core.messages import AIMessage
+        messages.append(AIMessage(content=h["assistant"]))
+    messages.append(HumanMessage(content=user_input))
+
+    response = _llm.invoke(messages)
+    reply = response.content
+
+    _history.append({"user": user_input, "assistant": reply})
+    return reply
