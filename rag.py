@@ -113,10 +113,10 @@ def retrieve_context(cv_text: str, jd_text: str = "", k: int = 5) -> dict:
         roles = load_roles()
         build_index(roles)
 
-    # 1. Combine inputs — JD biases search toward that role type
-    query = cv_text
-    if jd_text:
-        query += f"\n\nTarget job the candidate is applying for:\n{jd_text}"
+     query = cv_text
+     if jd_text:
+    # Weight JD more heavily by repeating it
+        query = f"Target job description:\n{jd_text}\n\nCandidate CV:\n{cv_text}\n\nMatch this CV to the target job:\n{jd_text}"
 
     # 2+3. Embed + FAISS search
     index = load_index()
