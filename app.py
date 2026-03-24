@@ -563,8 +563,7 @@ if not st.session_state.name_entered:
     # Center the name input card
     col_l, col_c, col_r = st.columns([1, 2, 1])
     with col_c:
-        st.markdown("<div class='name-input-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='name-input-label'>👋 What's your name?</div>", unsafe_allow_html=True)
+      
         st.markdown("""
         <div class='name-input-card'>
              <div class='name-input-label'>👋 What's your name?</div>
