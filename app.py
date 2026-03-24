@@ -19,8 +19,8 @@ import os
 import re
 
 st.set_page_config(
-    page_title="AI Career Match",
-    page_icon="⚡",
+    page_title="Your CV Analyzer",
+    page_icon="🔍+🧠",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -538,8 +538,8 @@ def parse_analysis(text: str) -> dict:
 if not st.session_state.name_entered:
     st.markdown("""
     <div class='welcome-wrap'>
-        <div class='welcome-logo'>⚡</div>
-        <div class='welcome-title'>AI <span>Career Match</span></div>
+        <div class='welcome-logo'>🔍+🧠</div>
+        <div class='welcome-title'>Your <span>CV Analyzer</span></div>
         <div class='welcome-sub'>
             Upload your CV, get matched to your ideal AI/data role.<br>
             Powered by FAISS vector search + LLM analysis.
@@ -565,9 +565,14 @@ if not st.session_state.name_entered:
     with col_c:
         st.markdown("<div class='name-input-card'>", unsafe_allow_html=True)
         st.markdown("<div class='name-input-label'>👋 What's your name?</div>", unsafe_allow_html=True)
+        st.markdown("""
+        <div class='name-input-card'>
+             <div class='name-input-label'>👋 What's your name?</div>
+        </div>
+        """, unsafe_allow_html=True)
         name_val = st.text_input(
             "name",
-            placeholder="e.g. Syed Khan",
+            placeholder="e.g. Talha jobayer",
             label_visibility="collapsed",
             key="name_field"
         )
