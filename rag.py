@@ -24,7 +24,7 @@ EMBED_MODEL = "all-MiniLM-L6-v2"
 _index = None   # module-level cache
 _embedder = None
 
-def load_roles(path="data/jd_knowledge_base.json"):
+def load_roles(path="jd_knowledge_base.json"):
     # Try file first, fall back to embedded data
     if os.path.exists(path):
         with open(path) as f:
