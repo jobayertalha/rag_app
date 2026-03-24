@@ -8,7 +8,7 @@ from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_community.utilities import SerpAPIWrapper
-from langchain.tools import Tool
+from langchain_core.tools import Tool
 from pypdf import PdfReader
 from dotenv import load_dotenv
 
