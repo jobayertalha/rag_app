@@ -113,10 +113,15 @@ def retrieve_context(cv_text: str, jd_text: str = "", k: int = 5) -> dict:
         roles = load_roles()
         build_index(roles)
 
-     query = cv_text
-     if jd_text:
-    # Weight JD more heavily by repeating it
-        query = f"Target job description:\n{jd_text}\n\nCandidate CV:\n{cv_text}\n\nMatch this CV to the target job:\n{jd_text}"
+    # ✅ FIXED INDENTATION HERE
+    query = cv_text
+    if jd_text:
+        # Weight JD more heavily by repeating it
+        query = (
+            f"Target job description:\n{jd_text}\n\n"
+            f"Candidate CV:\n{cv_text}\n\n"
+            f"Match this CV to the target job:\n{jd_text}"
+        )
 
     # 2+3. Embed + FAISS search
     index = load_index()
@@ -128,34 +133,37 @@ def retrieve_context(cv_text: str, jd_text: str = "", k: int = 5) -> dict:
         role = dict(doc.metadata)
         role["match_pct"] = _score_to_pct(score)
         role["raw_score"] = round(float(score), 4)
-        # Ensure role name key exists
+
         if "role" not in role:
             role["role"] = role.get("title", "Unknown Role")
+
         all_matches.append(role)
 
     all_matches.sort(key=lambda x: x["match_pct"], reverse=True)
     top_match = all_matches[0] if all_matches else {}
 
-    # 5a. Skill gaps — skills in matched roles not found in CV
+    # 5a. Skill gaps
     cv_lower = cv_text.lower()
     required_skills = list(dict.fromkeys(
         sk for r in all_matches for sk in r.get("skills", [])
     ))
     skill_gaps = [sk for sk in required_skills if sk.lower() not in cv_lower]
 
-    # 5b. Resume skills — gap skills ranked by frequency across matched roles
+    # 5b. Resume skills
     skill_freq = {}
     for r in all_matches:
         for sk in r.get("skills", []):
             if sk.lower() not in cv_lower:
                 skill_freq[sk] = skill_freq.get(sk, 0) + 1
+
     resume_skills = sorted(skill_freq, key=skill_freq.get, reverse=True)[:8]
 
-    # 6. Format context string for LLM prompt
+    # 6. Format context string
     blocks = []
     for r in all_matches[:4]:
         sal_min = r.get("salary_min", 0)
         sal_max = r.get("salary_max", 0)
+
         blocks.append(
             f"Role: {r.get('title', r.get('role', 'Unknown'))} — {r.get('category', '')} ({r['match_pct']}% match)\n"
             f"Description: {r.get('description', '')}\n"
