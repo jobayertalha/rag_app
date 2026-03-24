@@ -824,19 +824,19 @@ else:
         if sal:
             st.markdown(f"""
             <div class='info-box salary'>
-                <div class='info-box-label'>💰 Salary (BD Market | Annually)</div>
+                <div class='info-box-label'>💰 Salary (BD Market | Approx. Annually)</div>
                 <div class='salary-grid'>
                     <div class='salary-item'>
                         <div class='salary-level'>Junior</div>
-                        <div class='salary-range'>₹{sal.get('junior','—')}</div>
+                        <div class='salary-range'>৳{sal.get('junior','—')}</div>
                     </div>
                     <div class='salary-item'>
                         <div class='salary-level'>Mid-Level</div>
-                        <div class='salary-range'>₹{sal.get('mid','—')}</div>
+                        <div class='salary-range'>৳{sal.get('mid','—')}</div>
                     </div>
                     <div class='salary-item'>
                         <div class='salary-level'>Senior</div>
-                        <div class='salary-range'>₹{sal.get('senior','—')}</div>
+                        <div class='salary-range'>৳{sal.get('senior','—')}</div>
                     </div>
                 </div>
             </div>
@@ -920,12 +920,8 @@ else:
                 </div>"""
             else:
                 steps_html += f"<div style='font-size:0.85rem;color:#94a3b8;margin-bottom:8px;display:flex;gap:10px;'><span style='color:#6366f1;'>→</span><span>{step}</span></div>"
-        st.markdown(f"""
-        <div class='detail-card'>
-            <div class='detail-card-title'>🗺️ Your Career Path</div>
-            {steps_html}
-        </div>
-        """, unsafe_allow_html=True)
+        career_html = f"<div class='detail-card'><div class='detail-card-title'>🗺️ Your Career Path</div>{steps_html}</div>"
+        st.markdown(career_html, unsafe_allow_html=True)
 
     # ── RUNNER-UP ─────────────────────────────────────────────────
     if runner_up:
