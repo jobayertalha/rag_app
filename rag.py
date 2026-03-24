@@ -24,10 +24,20 @@ EMBED_MODEL = "all-MiniLM-L6-v2"
 _index = None   # module-level cache
 _embedder = None
 
-
 def load_roles(path="data/jd_knowledge_base.json"):
-    with open(path) as f:
-        return json.load(f)
+    # Try file first, fall back to embedded data
+    if os.path.exists(path):
+        with open(path) as f:
+            return json.load(f)
+    # Embedded fallback — no file needed
+    import urllib.request
+    raise FileNotFoundError(
+        f"Missing: {path}\n"
+        "Fix: Add data/jd_knowledge_base.json to your GitHub repo.\n"
+        "Download it from the files shared in this chat."
+    )
+
+
 
 
 def get_embedder():
