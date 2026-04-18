@@ -7,6 +7,10 @@ import tempfile
 import os
 import re
 
+# Import at the top (not inside functions) - OPTIMIZED
+from agent import extract_cv_text, build_agent, run_agent
+from rag import retrieve_context
+
 st.set_page_config(
     page_title="CV Analyzer | AI Career Match",
     page_icon="📄",
@@ -346,7 +350,6 @@ def render_home():
                         tmp.write(uploaded_cv.read())
                         tmp_path = tmp.name
                     
-                    from agent import extract_cv_text
                     cv_text = extract_cv_text(tmp_path)
                     os.unlink(tmp_path)
                 
@@ -355,17 +358,14 @@ def render_home():
                 st.session_state.messages = []
                 
                 with st.spinner("🔍 Matching with FAISS..."):
-                    from rag import retrieve_context
                     st.session_state.retrieved = retrieve_context(cv_text, jd_input.strip() if jd_input else "", k=5)
                 
                 with st.spinner("🏢 Finding matching companies..."):
                     st.session_state.matched_companies = match_companies(cv_text, [])
                 
                 with st.spinner("🤖 Generating AI analysis..."):
-                    from agent import build_agent
                     st.session_state.agent = build_agent(cv_text, jd_input.strip() if jd_input else "", st.session_state.candidate_name)
                     
-                    from agent import run_agent
                     raw = run_agent(st.session_state.agent,
                         "Analyse this candidate's CV and give a full career match. "
                         "Follow EXACTLY these tags:\n"
@@ -825,7 +825,6 @@ def render_chat():
                     st.markdown(q)
                 with st.chat_message("assistant"):
                     with st.spinner("Thinking..."):
-                        from agent import run_agent
                         resp = run_agent(st.session_state.agent, q)
                         st.markdown(resp)
                         st.session_state.messages.append({"role": "assistant", "content": resp})
@@ -840,7 +839,6 @@ def render_chat():
             st.markdown(prompt)
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
-                from agent import run_agent
                 resp = run_agent(st.session_state.agent, prompt)
                 st.markdown(resp)
                 st.session_state.messages.append({"role": "assistant", "content": resp})
