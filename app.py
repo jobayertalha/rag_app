@@ -863,22 +863,25 @@ def main():
             st.markdown('<div class="card" style="text-align: center; padding: 1.5rem;">', unsafe_allow_html=True)
             st.markdown('<div style="font-family: Syne, sans-serif; font-size: 1.1rem; font-weight: 600; color: #cbd5e1; margin-bottom: 1rem;">👋 Welcome! What\'s your name?</div>', unsafe_allow_html=True)
             
-            # Simple text input (no form wrapper)
-            name_val = st.text_input(
-                "Name",
-                placeholder="Enter your full name...",
-                label_visibility="collapsed",
-                key="welcome_name_input"
-            )
-            
-            st.markdown("<div style='height: 0.75rem;'></div>", unsafe_allow_html=True)
-            
-            if st.button("✨ Start Your Career Analysis →", use_container_width=True, type="primary"):
-                if name_val and name_val.strip():
+            # Use form to capture Enter key
+            with st.form(key="name_entry_form"):
+                name_val = st.text_input(
+                    "Name",
+                    placeholder="e.g., Talha Jobayer, Pritom, etc.",
+                    label_visibility="collapsed",
+                    key="welcome_name_input"
+                )
+                
+                st.markdown("<div style='height: 0.75rem;'></div>", unsafe_allow_html=True)
+                
+                # Submit button inside form
+                submitted = st.form_submit_button("✨ Start Your Career Analysis →", use_container_width=True, type="primary")
+                
+                if submitted and name_val and name_val.strip():
                     st.session_state.candidate_name = name_val.strip()
                     st.session_state.name_entered = True
                     st.rerun()
-                else:
+                elif submitted:
                     st.error("Please enter your name to continue")
             
             st.markdown('<p style="color: #475569; font-size: 0.7rem; text-align: center; margin-top: 1rem;">🔒 Your data stays private</p>', unsafe_allow_html=True)
