@@ -23,26 +23,6 @@ def get_llm():
     )
 
 
-def get_job_search_tool():
-    serpapi_key = os.getenv("SERPAPI_API_KEY")
-    if not serpapi_key:
-        def no_search(q):
-            return "Job search unavailable — add SERPAPI_API_KEY to enable real-time job listings."
-        return Tool(name="job_search", func=no_search,
-                    description="Search real-time job listings.")
-    search = SerpAPIWrapper(
-        serpapi_api_key=serpapi_key,
-        params={"engine": "google_jobs"}
-    )
-    return Tool(
-        name="job_search",
-        func=search.run,
-        description=(
-            "Search real-time job listings from Google Jobs. "
-            "Input: job title + location. "
-            "Examples: 'ML Engineer Pakistan', 'Data Scientist Remote'"
-        )
-    )
 
 
 def extract_cv_text(pdf_path: str) -> str:
