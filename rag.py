@@ -1,6 +1,7 @@
 """
-rag.py — Fast focused extraction with REALISTIC match percentages.
-Now uses semantic overlap + skill matching for accurate CV-JD comparison.
+rag.py — Fast CV-JD Matching with AI/ML Focused Scoring
+Checks: Experience, Projects, Certificates, Skills, Responsibilities
+Computationally efficient with keyword-based + semantic hybrid
 """
 
 import json
@@ -14,6 +15,49 @@ EMBED_MODEL = "all-MiniLM-L6-v2"
 _index = None
 _embedder = None
 _index_lock = threading.Lock()
+
+# ============================================================
+# AI/ML KEYWORDS FOR FAST SCORING
+# ============================================================
+
+# Core AI/ML skills (high weight)
+CORE_AI_ML_SKILLS = {
+    'python', 'machine learning', 'deep learning', 'tensorflow', 'pytorch',
+    'langchain', 'rag', 'llm', 'gpt', 'bert', 'transformer', 'nlp',
+    'computer vision', 'cv', 'yolo', 'opencv', 'scikit-learn', 'keras',
+    'pandas', 'numpy', 'matplotlib', 'seaborn', 'jupyter', 'colab'
+}
+
+# Project keywords that indicate AI/ML work
+PROJECT_KEYWORDS = {
+    'chatbot', 'llm', 'rag', 'recommendation', 'prediction', 'classification',
+    'detection', 'segmentation', 'generative', 'sentiment', 'nlp', 'cv',
+    'computer vision', 'object detection', 'face recognition', 'ocr',
+    'time series', 'forecasting', 'clustering', 'anomaly detection'
+}
+
+# Certificate keywords
+CERT_KEYWORDS = {
+    'machine learning', 'deep learning', 'tensorflow', 'pytorch', 'data science',
+    'ai', 'artificial intelligence', 'nlp', 'computer vision', 'llm',
+    'langchain', 'rag', 'aws machine learning', 'azure ai', 'gcp ai'
+}
+
+# Experience keywords (roles that indicate AI/ML work)
+EXPERIENCE_KEYWORDS = {
+    'data scientist', 'machine learning engineer', 'ml engineer', 'ai engineer',
+    'deep learning engineer', 'nlp engineer', 'computer vision engineer',
+    'ai researcher', 'ml researcher', 'data science intern', 'ai intern',
+    'llm engineer', 'prompt engineer', 'ai developer'
+}
+
+# Job responsibility keywords (from JD)
+RESPONSIBILITY_KEYWORDS = {
+    'build machine learning', 'train model', 'deploy model', 'llm',
+    'rag pipeline', 'langchain', 'vector database', 'fine-tune',
+    'feature engineering', 'eda', 'model evaluation', 'hyperparameter',
+    'neural network', 'cnn', 'rnn', 'lstm', 'transformer', 'attention'
+}
 
 
 def load_roles(path="jd_knowledge_base.json"):
@@ -73,144 +117,208 @@ def load_index():
     return _index
 
 
-def calculate_semantic_overlap(cv_text: str, jd_text: str, role_skills: list) -> float:
+# ============================================================
+# FAST CV SECTION EXTRACTION
+# ============================================================
+
+def extract_section(cv_text: str, section_name: str) -> str:
+    """Extract a specific section from CV (experience, projects, certificates)."""
+    patterns = [
+        rf'(?i){section_name}[\s:]*\n(.*?)(?=\n[A-Z][A-Z\s]+:|\n\n|\Z)',
+        rf'(?i){section_name}[\s:]*\n(.*?)(?=\n\w+[\s:]*\n|\Z)',
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, cv_text, re.DOTALL)
+        if match:
+            return match.group(1).strip()[:2000]
+    return ""
+
+
+def extract_experience(cv_text: str) -> str:
+    """Extract work experience section."""
+    return extract_section(cv_text, "experience|work experience|employment|work history")
+
+
+def extract_projects(cv_text: str) -> str:
+    """Extract projects section."""
+    return extract_section(cv_text, "projects|personal projects|academic projects")
+
+
+def extract_certificates(cv_text: str) -> str:
+    """Extract certificates section."""
+    return extract_section(cv_text, "certificates|certifications|courses|training")
+
+
+def extract_skills(cv_text: str) -> str:
+    """Extract skills section."""
+    return extract_section(cv_text, "skills|technical skills|core competencies")
+
+
+# ============================================================
+# SCORING FUNCTIONS
+# ============================================================
+
+def score_ai_ml_readiness(cv_text: str) -> dict:
     """
-    Calculate TRUE semantic overlap between CV and job requirements.
-    Uses skill matching, keyword extraction, and contextual analysis.
+    Score CV for AI/ML readiness based on:
+    - Experience (30%)
+    - Projects (25%)
+    - Certificates (20%)
+    - Skills (25%)
     """
+    experience = extract_experience(cv_text).lower()
+    projects = extract_projects(cv_text).lower()
+    certificates = extract_certificates(cv_text).lower()
+    skills = extract_skills(cv_text).lower()
+    full_cv = cv_text.lower()
+    
+    # Experience Score (30%)
+    exp_score = 0
+    exp_matches = 0
+    for keyword in EXPERIENCE_KEYWORDS:
+        if keyword in experience or keyword in full_cv:
+            exp_matches += 1
+    exp_score = min(1.0, exp_matches / 4) * 30  # 4+ matches = 30%
+    
+    # Projects Score (25%)
+    proj_score = 0
+    proj_matches = 0
+    for keyword in PROJECT_KEYWORDS:
+        if keyword in projects or keyword in full_cv:
+            proj_matches += 1
+    proj_score = min(1.0, proj_matches / 5) * 25  # 5+ matches = 25%
+    
+    # Certificates Score (20%)
+    cert_score = 0
+    cert_matches = 0
+    for keyword in CERT_KEYWORDS:
+        if keyword in certificates or keyword in full_cv:
+            cert_matches += 1
+    cert_score = min(1.0, cert_matches / 4) * 20  # 4+ matches = 20%
+    
+    # Skills Score (25%)
+    skill_score = 0
+    skill_matches = 0
+    for keyword in CORE_AI_ML_SKILLS:
+        if keyword in skills or keyword in full_cv:
+            skill_matches += 1
+    skill_score = min(1.0, skill_matches / 10) * 25  # 10+ matches = 25%
+    
+    total_score = exp_score + proj_score + cert_score + skill_score
+    
+    # Determine readiness level
+    if total_score < 30:
+        level = "Not Ready"
+        recommendation = "Focus on building foundational AI/ML skills. Consider other roles like Data Analyst or Business Analyst first."
+    elif total_score < 60:
+        level = "Building"
+        recommendation = "You have good fundamentals. Build more projects, get certifications, and gain practical experience."
+    else:
+        level = "Ready"
+        recommendation = "You're ready to apply for AI/ML roles! Your CV shows strong alignment with the field."
+    
+    return {
+        "total_score": round(total_score, 1),
+        "level": level,
+        "recommendation": recommendation,
+        "breakdown": {
+            "experience": round(exp_score, 1),
+            "projects": round(proj_score, 1),
+            "certificates": round(cert_score, 1),
+            "skills": round(skill_score, 1)
+        },
+        "stats": {
+            "ai_skills_found": skill_matches,
+            "projects_found": proj_matches,
+            "certificates_found": cert_matches,
+            "experience_matches": exp_matches
+        }
+    }
+
+
+def score_jd_alignment(cv_text: str, jd_text: str) -> float:
+    """
+    Score how well CV matches JD responsibilities.
+    Focuses ONLY on responsibilities/skills from JD.
+    """
+    if not jd_text:
+        return 0.5  # Neutral if no JD provided
+    
     cv_lower = cv_text.lower()
     jd_lower = jd_text.lower()
     
-    # Skill matching (60% of score)
-    skills_found = 0
-    for skill in role_skills:
-        skill_lower = skill.lower()
-        if skill_lower in cv_lower:
-            skills_found += 1
-        # Check for variations
-        elif " " in skill_lower and skill_lower.replace(" ", "") in cv_lower:
-            skills_found += 0.5
+    # Extract responsibilities section from JD
+    resp_text = extract_section(jd_text, "responsibilities|what you|key responsibilities|role")
+    if not resp_text:
+        resp_text = jd_text[:1500]
+    resp_lower = resp_text.lower()
     
-    skill_score = min(1.0, skills_found / max(len(role_skills), 1))
+    # Count keyword matches
+    matches = 0
+    total_keywords = 0
     
-    # Keyword extraction from JD (requirements focus)
-    jd_keywords = set()
-    requirement_patterns = [
-        r'(?:experience with|knowledge of|proficiency in|familiarity with|expertise in)\s+([a-z][a-z\s]+?)(?=\.|,|\n|and)',
-        r'(?:must have|required|essential|preferred)\s+([a-z][a-z\s]+?)(?=\.|,|\n)'
-    ]
-    for pattern in requirement_patterns:
-        matches = re.findall(pattern, jd_lower, re.IGNORECASE)
-        for match in matches:
-            words = match.strip().split()[:3]
-            jd_keywords.add(' '.join(words))
+    for keyword in RESPONSIBILITY_KEYWORDS:
+        if keyword in resp_lower:
+            total_keywords += 1
+            if keyword in cv_lower:
+                matches += 1
     
-    # CV keyword presence
-    if jd_keywords:
-        keyword_matches = sum(1 for kw in jd_keywords if kw in cv_lower)
-        keyword_score = keyword_matches / max(len(jd_keywords), 1)
+    # Also check for general skill matches
+    for skill in CORE_AI_ML_SKILLS:
+        if skill in jd_lower:
+            total_keywords += 0.5
+            if skill in cv_lower:
+                matches += 0.5
+    
+    if total_keywords == 0:
+        return 0.5
+    
+    alignment_score = min(1.0, matches / total_keywords)
+    return alignment_score
+
+
+def calculate_final_match(cv_text: str, jd_text: str, role_skills: list) -> dict:
+    """
+    Calculate final match percentage with practical scoring.
+    - Base score from AI/ML readiness (60%)
+    - JD alignment boost (40% if JD provided)
+    """
+    # Get AI/ML readiness score
+    readiness = score_ai_ml_readiness(cv_text)
+    base_score = readiness["total_score"]
+    
+    # Get JD alignment if JD provided
+    jd_alignment = score_jd_alignment(cv_text, jd_text) if jd_text else 0.5
+    
+    if jd_text:
+        # Weighted: 60% readiness, 40% JD alignment
+        final_score = (base_score * 0.6) + (jd_alignment * 40)
     else:
-        keyword_score = 0
+        # No JD: just use readiness score with small adjustment
+        final_score = base_score
     
-    # Weighted score: 60% skills, 30% keywords, 10% length normalization
-    final_score = (skill_score * 0.6) + (keyword_score * 0.3)
+    # Adjust based on skill overlap with role
+    cv_lower = cv_text.lower()
+    skill_overlap = 0
+    for skill in role_skills[:8]:
+        if skill.lower() in cv_lower:
+            skill_overlap += 1
+    skill_boost = (skill_overlap / max(len(role_skills[:8]), 1)) * 10
+    final_score = min(92, final_score + skill_boost)
     
-    # Small bonus for longer CV (more experienced candidates)
-    cv_length_bonus = min(0.05, len(cv_text) / 20000 * 0.05)
-    final_score = min(0.95, final_score + cv_length_bonus)
-    
-    return final_score
+    return {
+        "match_pct": round(final_score),
+        "readiness": readiness,
+        "jd_alignment": round(jd_alignment * 100, 1) if jd_text else None
+    }
 
 
-def extract_cv_focus(cv_text: str) -> str:
-    """
-    Extract high-signal content from CV: skills, experience, projects, certifications.
-    Removes noise like dates, emails, phone numbers.
-    """
-    lines = cv_text.split('\n')
-    focus_lines = []
-    
-    # Important sections to keep
-    keep_patterns = [
-        r'(?i)(?:skill|technical|experience|project|certification|education|achievement)',
-        r'(?i)(?:python|sql|tensorflow|pytorch|langchain|rag|llm|ml|ai|data|analytics)',
-        r'(?i)(?:docker|kubernetes|aws|gcp|azure|mlflow|huggingface|fastapi)',
-    ]
-    
-    # Noise patterns to skip
-    skip_patterns = [
-        r'\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b',  # dates
-        r'\b\+?\d[\d\s\-]{8,}\b',                # phone numbers
-        r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',  # emails
-        r'(?i)^(?:page|ref|reference|available upon request)',
-    ]
-    
-    for line in lines:
-        line_stripped = line.strip()
-        if not line_stripped or len(line_stripped) < 3:
-            continue
-        
-        # Check if line contains any keep pattern
-        should_keep = any(re.search(p, line_stripped) for p in keep_patterns)
-        
-        # Skip noise lines
-        is_noise = any(re.search(p, line_stripped) for p in skip_patterns)
-        
-        if should_keep and not is_noise:
-            focus_lines.append(line_stripped[:200])  # Cap line length
-    
-    result = '\n'.join(focus_lines)
-    
-    # Cap total length for performance
-    if len(result) > 3000:
-        result = result[:3000]
-    
-    return result
-
-
-def extract_jd_focus(jd_text: str) -> str:
-    """Extract only requirements and responsibilities from JD."""
-    if not jd_text:
-        return ""
-    
-    lines = jd_text.split('\n')
-    focus_lines = []
-    capture = False
-    
-    # Section headers that indicate requirements
-    capture_keywords = [
-        'requirement', 'qualification', 'responsibilities', 'what you',
-        'must have', 'required', 'essential', 'skills', 'experience',
-        'need', 'looking for', 'ideal candidate', 'about you'
-    ]
-    
-    # Skip these sections
-    skip_keywords = [
-        'benefit', 'perk', 'salary', 'compensation', 'equal opportunity',
-        'diversity', 'culture', 'about us', 'company overview'
-    ]
-    
-    for line in lines:
-        line_lower = line.lower().strip()
-        
-        # Check for skip sections
-        if any(kw in line_lower for kw in skip_keywords):
-            capture = False
-            continue
-        
-        # Check for capture sections
-        if any(kw in line_lower for kw in capture_keywords):
-            capture = True
-            focus_lines.append(line)
-        elif capture and len(line.strip()) > 5:
-            focus_lines.append(line)
-    
-    result = '\n'.join(focus_lines)
-    return result[:2000] if len(result) > 2000 else result
-
+# ============================================================
+# MAIN RETRIEVAL FUNCTION
+# ============================================================
 
 def retrieve_context(cv_text: str, jd_text: str = "", k: int = 5) -> dict:
-    """Enhanced retrieval with realistic match percentages."""
+    """Fast retrieval with practical scoring."""
     
     # Auto-build index if missing
     if not os.path.exists("faiss_index"):
@@ -218,81 +326,68 @@ def retrieve_context(cv_text: str, jd_text: str = "", k: int = 5) -> dict:
         roles = load_roles()
         build_index(roles)
 
-    # Extract focused signals
-    cv_focused = extract_cv_focus(cv_text)
-    jd_focused = extract_jd_focus(jd_text)
-
-    # Build query
-    if jd_focused:
-        query = f"Candidate has: {cv_focused}\n\nJob requires: {jd_focused}"
-    else:
-        query = cv_focused
-
-    # FAISS search
+    # Get AI/ML readiness score
+    readiness = score_ai_ml_readiness(cv_text)
+    
+    # Load index for role matching
     index = load_index()
+    
+    # Build query for FAISS
+    if jd_text:
+        # Extract JD responsibilities for query
+        jd_focus = extract_section(jd_text, "responsibilities|requirements|qualifications")
+        if not jd_focus:
+            jd_focus = jd_text[:1000]
+        query = f"Candidate AI/ML readiness: {readiness['total_score']}%\n\nJob requirements: {jd_focus}"
+    else:
+        cv_focus = extract_section(cv_text, "skills|experience|projects")
+        if not cv_focus:
+            cv_focus = cv_text[:1500]
+        query = f"Candidate skills and experience: {cv_focus}"
+    
+    # FAISS search
     results = index.similarity_search_with_score(query, k=k)
-
+    
     all_matches = []
     for doc, faiss_score in results:
         role = dict(doc.metadata)
         
-        # Calculate true semantic overlap
-        semantic_score = calculate_semantic_overlap(
-            cv_focused, 
-            jd_focused if jd_focused else role.get("jd_text", ""), 
-            role.get("skills", [])
-        )
+        # Calculate final match percentage
+        match_result = calculate_final_match(cv_text, jd_text, role.get("skills", []))
         
-        # Convert FAISS distance to similarity (0-1)
-        faiss_similarity = 1 / (1 + faiss_score)
-        
-        # Blend: 30% FAISS, 70% semantic (semantic is more reliable)
-        blended_score = (faiss_similarity * 0.3) + (semantic_score * 0.7)
-        
-        # Convert to percentage (0-100)
-        match_pct = int(blended_score * 100)
-        
-        # Ensure realistic ranges
-        if match_pct > 92:
-            match_pct = 92  # Cap at 92% - no perfect matches
-        elif match_pct < 5:
-            match_pct = max(3, match_pct)
-        
-        role["match_pct"] = match_pct
-        role["semantic_score"] = round(semantic_score, 4)
+        role["match_pct"] = match_result["match_pct"]
+        role["readiness_score"] = match_result["readiness"]["total_score"]
+        role["readiness_level"] = match_result["readiness"]["level"]
         
         if "role" not in role:
             role["role"] = role.get("title", "Unknown Role")
         all_matches.append(role)
-
+    
     # Sort by match percentage
     all_matches.sort(key=lambda x: x["match_pct"], reverse=True)
     top_match = all_matches[0] if all_matches else {}
-
-    # Calculate skill gaps (only significant ones)
-    cv_lower = cv_focused.lower()
+    
+    # Calculate skill gaps
+    cv_lower = cv_text.lower()
     required_skills = list(dict.fromkeys(
         sk for r in all_matches[:3] for sk in r.get("skills", [])
     ))
     
-    # Only show skills that are actually missing and important
     skill_gaps = []
     for sk in required_skills:
         sk_lower = sk.lower()
         if sk_lower not in cv_lower and sk_lower.replace(" ", "") not in cv_lower:
-            # Check if skill appears in any form
             if not any(variant in cv_lower for variant in [sk_lower, sk_lower.replace("-", ""), sk_lower.replace(" ", "")]):
                 skill_gaps.append(sk)
     
-    # Resume skills to add (top missing skills from best matches)
+    # Resume skills to add
     skill_freq = {}
     for r in all_matches[:3]:
         for sk in r.get("skills", []):
             if sk.lower() not in cv_lower:
                 skill_freq[sk] = skill_freq.get(sk, 0) + (r["match_pct"] / 100)
-    
     resume_skills = sorted(skill_freq, key=skill_freq.get, reverse=True)[:6]
-
+    
     # Build context for LLM
     blocks = []
     for r in all_matches[:4]:
@@ -305,7 +400,7 @@ def retrieve_context(cv_text: str, jd_text: str = "", k: int = 5) -> dict:
             f"Market demand: {r.get('market_demand', '')}\n"
             f"Career path: {r.get('career_path', '')}\n"
         )
-
+    
     return {
         "top_match": top_match,
         "all_matches": all_matches,
@@ -313,6 +408,7 @@ def retrieve_context(cv_text: str, jd_text: str = "", k: int = 5) -> dict:
         "skill_gaps": skill_gaps[:6],
         "resume_skills": resume_skills,
         "raw_context": "\n\n---\n\n".join(blocks),
-        "cv_focused": cv_focused[:1500],
+        "readiness": readiness,
+        "cv_focused": cv_text[:1500],
         "jd_provided": bool(jd_text),
     }
