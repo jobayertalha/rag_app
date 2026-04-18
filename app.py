@@ -1,5 +1,5 @@
 """
-app.py — CV Analyzer with Smart Tabs & Company Matching
+app.py — CV Analyzer with Dual Mode (CV Analysis + JD Matching)
 """
 
 import streamlit as st
@@ -60,6 +60,7 @@ st.markdown("""
     background: linear-gradient(135deg, #a855f7, #ec4899);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    cursor: pointer;
 }
 .nav-links {
     display: flex;
@@ -91,6 +92,10 @@ st.markdown("""
     color: #64748b;
     padding-left: 1rem;
     border-left: 1px solid #2d2d5a;
+    cursor: pointer;
+}
+.user-name:hover {
+    color: #a855f7;
 }
 
 /* Cards */
@@ -136,6 +141,45 @@ st.markdown("""
     -webkit-text-fill-color: transparent;
 }
 
+/* Mode Selector */
+.mode-selector {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    background: #0f0f20;
+    border: 1px solid #1e1e3a;
+    border-radius: 16px;
+    padding: 0.5rem;
+}
+.mode-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+.mode-btn.active {
+    background: linear-gradient(135deg, #7c3aed, #db2777);
+}
+.mode-btn:not(.active):hover {
+    background: rgba(168, 85, 247, 0.1);
+}
+.mode-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+.mode-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+.mode-desc {
+    font-size: 0.7rem;
+    color: #64748b;
+}
+
 /* Analysis Tabs */
 .analysis-tabs {
     display: flex;
@@ -178,14 +222,20 @@ st.markdown("""
     border-color: #7c3aed;
     transform: translateX(4px);
 }
-.salary-badge {
-    display: inline-block;
-    background: rgba(245, 158, 11, 0.15);
-    border: 1px solid rgba(245, 158, 11, 0.3);
-    color: #fbbf24;
-    font-size: 0.7rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
+
+/* JD Match Result */
+.jd-match-card {
+    background: linear-gradient(135deg, #0f0f20 0%, #1a0f35 100%);
+    border: 1px solid #2d2060;
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+.jd-match-score {
+    font-size: 4rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -195,6 +245,8 @@ st.markdown("""
 # ============================================================
 if "page" not in st.session_state:
     st.session_state.page = "home"
+if "analysis_mode" not in st.session_state:
+    st.session_state.analysis_mode = "cv_only"  # cv_only or jd_match
 if "analysis_tab" not in st.session_state:
     st.session_state.analysis_tab = "overview"
 if "messages" not in st.session_state:
@@ -254,12 +306,10 @@ def match_companies(cv_text: str, all_matches: list) -> list:
         
         for role in roles:
             if "company" in role and role.get("company"):
-                # Calculate match score
                 required_skills = role.get("skills", [])
                 skills_found = sum(1 for s in required_skills if s.lower() in cv_lower)
                 match_score = (skills_found / max(len(required_skills), 1)) * 100
                 
-                # Get salary info
                 salary = role.get("salary", {})
                 salary_range = ""
                 if salary.get("junior") and salary.get("junior") != "0":
@@ -275,13 +325,70 @@ def match_companies(cv_text: str, all_matches: list) -> list:
                     "location": role.get("location", "Dhaka"),
                     "category": role.get("category", "Entry-level"),
                     "skills": required_skills[:5],
-                    "description": role.get("description", "")[:150]
                 })
         
         companies.sort(key=lambda x: x["match_score"], reverse=True)
         return companies[:6]
     except:
         return []
+
+
+def calculate_jd_match_score(cv_text: str, jd_text: str) -> dict:
+    """Calculate how well CV matches a specific JD."""
+    cv_lower = cv_text.lower()
+    jd_lower = jd_text.lower()
+    
+    # Extract keywords from JD
+    jd_keywords = set()
+    keyword_patterns = [
+        r'(?:experience with|knowledge of|proficiency in|familiarity with)\s+([a-z][a-z\s]+?)(?=\.|,|\n)',
+        r'(?:must have|required|essential|preferred)\s+([a-z][a-z\s]+?)(?=\.|,|\n)',
+        r'\b(python|sql|tensorflow|pytorch|langchain|rag|llm|nlp|computer vision|docker|kubernetes|aws|gcp|azure|mlflow|scikit-learn|pandas|numpy|git|linux)\b'
+    ]
+    
+    for pattern in keyword_patterns:
+        matches = re.findall(pattern, jd_lower, re.IGNORECASE)
+        for match in matches:
+            words = match.strip().split()[:3]
+            jd_keywords.add(' '.join(words))
+    
+    # Add individual skills
+    for word in jd_lower.split():
+        if len(word) > 3 and word not in ['and', 'the', 'for', 'with', 'from', 'have', 'your', 'will']:
+            jd_keywords.add(word)
+    
+    # Calculate match
+    found_keywords = 0
+    for kw in jd_keywords:
+        if kw in cv_lower or kw.replace(" ", "") in cv_lower:
+            found_keywords += 1
+    
+    match_pct = int((found_keywords / max(len(jd_keywords), 1)) * 100)
+    
+    # Find matching companies for this JD
+    matching_companies = []
+    try:
+        from rag import load_roles
+        roles = load_roles()
+        for role in roles:
+            role_jd = role.get("jd_text", "").lower()
+            if any(kw in role_jd for kw in jd_keywords):
+                matching_companies.append({
+                    "name": role.get("company", "Unknown"),
+                    "role": role.get("title", role.get("role")),
+                    "salary": role.get("salary", {}),
+                    "location": role.get("location", "Dhaka")
+                })
+    except:
+        pass
+    
+    return {
+        "match_pct": min(95, match_pct),
+        "matched_keywords": list(jd_keywords)[:15],
+        "found_count": found_keywords,
+        "total_keywords": len(jd_keywords),
+        "matching_companies": matching_companies[:4]
+    }
 
 
 def render_navbar():
@@ -292,12 +399,15 @@ def render_navbar():
     col1, col2, col3 = st.columns([2, 3, 1])
     
     with col1:
-        st.markdown('<div class="nav-logo">📄 CV Analyzer</div>', unsafe_allow_html=True)
+        if st.button("📄 CV Analyzer", key="logo_home", use_container_width=False):
+            st.session_state.page = "home"
+            st.session_state.analysis_mode = "cv_only"
+            st.rerun()
     
     with col2:
         cols = st.columns([1, 1, 1, 1, 1])
-        pages = ["🏠 Home", "📊 Analysis", "💬 Chat"]
-        page_keys = ["home", "analyze", "chat"]
+        pages = ["🏠 Home", "📊 Analysis", "💬 Chat", "🎯 Career Rec"]
+        page_keys = ["home", "analyze", "chat", "career"]
         
         for idx, (label, key) in enumerate(zip(pages, page_keys)):
             with cols[idx]:
@@ -308,20 +418,113 @@ def render_navbar():
                     st.rerun()
     
     with col3:
-        st.markdown(f'<div class="user-name">👋 {first_name}</div>', unsafe_allow_html=True)
+        if st.button(f"👋 {first_name}", key="user_menu", use_container_width=False):
+            # Reset to name entry
+            st.session_state.name_entered = False
+            st.session_state.cv_text = None
+            st.session_state.analysis_raw = None
+            st.session_state.retrieved = None
+            st.rerun()
     
     st.markdown("<hr style='margin: 0.5rem 0 1rem 0; border-color: #1a1a30;'>", unsafe_allow_html=True)
 
 
-def render_home():
-    """Home page with upload section."""
+def render_mode_selector():
+    """Render mode selector for CV analysis vs JD matching."""
     st.markdown("""
-    <div style='text-align:center; padding: 1rem 0 2rem 0;'>
-        <div style='font-family: Syne, sans-serif; font-size: 2.5rem; font-weight: 800;'>
-            Match Your CV to <span style='background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>AI/Data Roles</span>
+    <div class='mode-selector'>
+        <div style='flex: 1; text-align: center;'>
+    """, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        is_active = st.session_state.analysis_mode == "cv_only"
+        if st.button(
+            "📄 CV Analysis\n\nFind your best AI/ML role based on your CV",
+            key="mode_cv",
+            use_container_width=True,
+            type="primary" if is_active else "secondary"
+        ):
+            st.session_state.analysis_mode = "cv_only"
+            st.rerun()
+    
+    with col2:
+        is_active = st.session_state.analysis_mode == "jd_match"
+        if st.button(
+            "🎯 JD Match\n\nMatch your CV against a specific job description",
+            key="mode_jd",
+            use_container_width=True,
+            type="primary" if is_active else "secondary"
+        ):
+            st.session_state.analysis_mode = "jd_match"
+            st.rerun()
+    
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+def render_home():
+    """Home page with dual mode selection."""
+    # Mode selector
+    render_mode_selector()
+    
+    if st.session_state.analysis_mode == "cv_only":
+        render_cv_analysis_mode()
+    else:
+        render_jd_match_mode()
+
+
+def render_cv_analysis_mode():
+    """Mode 1: CV Analysis against knowledge base."""
+    st.markdown("""
+    <div style='text-align:center; padding: 0.5rem 0 1rem 0;'>
+        <div style='font-family: Syne, sans-serif; font-size: 2rem; font-weight: 800;'>
+            🎯 Find Your <span style='background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>Ideal AI Role</span>
         </div>
         <p style='color: #64748b; margin-top: 0.5rem;'>
-            Upload your CV and get personalized career matches using AI + vector search
+            We'll analyze your CV and match it with real job postings from Bangladesh
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns([1, 1], gap="large")
+    
+    with col1:
+        st.markdown('<div class="card"><div class="card-title">📄 Upload Your CV</div>', unsafe_allow_html=True)
+        uploaded_cv = st.file_uploader("PDF file", type=["pdf"], label_visibility="collapsed", key="cv_uploader_cv")
+        if uploaded_cv:
+            st.success(f"✅ {uploaded_cv.name}")
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown('<div class="card"><div class="card-title">📊 What We Analyze</div>', unsafe_allow_html=True)
+        st.markdown("""
+        - ✅ Your technical skills
+        - ✅ Project experience
+        - ✅ Certifications
+        - ✅ Work experience in AI/ML
+        - ✅ Career readiness score
+        """)
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+    with col_btn2:
+        if st.button("⚡ Analyze My CV", use_container_width=True, type="primary"):
+            if uploaded_cv:
+                process_cv_analysis(uploaded_cv, "")
+            else:
+                st.warning("⚠️ Please upload your CV first")
+
+
+def render_jd_match_mode():
+    """Mode 2: CV vs Specific JD Matching."""
+    st.markdown("""
+    <div style='text-align:center; padding: 0.5rem 0 1rem 0;'>
+        <div style='font-family: Syne, sans-serif; font-size: 2rem; font-weight: 800;'>
+            🎯 JD <span style='background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>Match Score</span>
+        </div>
+        <p style='color: #64748b; margin-top: 0.5rem;'>
+            See how well your CV matches a specific job description
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -329,84 +532,186 @@ def render_home():
     col1, col2 = st.columns(2, gap="large")
     
     with col1:
-        st.markdown('<div class="card"><div class="card-title">📄 Upload Your CV</div>', unsafe_allow_html=True)
-        uploaded_cv = st.file_uploader("PDF file", type=["pdf"], label_visibility="collapsed", key="cv_uploader")
+        st.markdown('<div class="card"><div class="card-title">📄 Your CV</div>', unsafe_allow_html=True)
+        uploaded_cv = st.file_uploader("Upload CV (PDF)", type=["pdf"], label_visibility="collapsed", key="cv_uploader_jd")
         if uploaded_cv:
             st.success(f"✅ {uploaded_cv.name}")
         st.markdown('</div>', unsafe_allow_html=True)
     
     with col2:
-        st.markdown('<div class="card"><div class="card-title">📝 Job Description (Optional)</div>', unsafe_allow_html=True)
-        jd_input = st.text_area("Paste JD here", height=150, placeholder="Paste a job description to bias the match toward a specific role...", label_visibility="collapsed", key="jd_input")
+        st.markdown('<div class="card"><div class="card-title">📝 Job Description</div>', unsafe_allow_html=True)
+        jd_input = st.text_area(
+            "Paste JD here", 
+            height=200, 
+            placeholder="Paste the job description from LinkedIn, Indeed, etc...",
+            label_visibility="collapsed", 
+            key="jd_input_match"
+        )
         st.markdown('</div>', unsafe_allow_html=True)
     
-    # Analyze button
     col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
     with col_btn2:
-        if st.button("⚡ Analyze My CV", use_container_width=True, type="primary"):
-            if uploaded_cv:
-                with st.spinner("📖 Reading CV..."):
-                    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-                        tmp.write(uploaded_cv.read())
-                        tmp_path = tmp.name
-                    
-                    cv_text = extract_cv_text(tmp_path)
-                    os.unlink(tmp_path)
-                
-                st.session_state.cv_text = cv_text
-                st.session_state.jd_text = jd_input.strip() if jd_input else ""
-                st.session_state.messages = []
-                
-                with st.spinner("🔍 Matching with FAISS..."):
-                    st.session_state.retrieved = retrieve_context(cv_text, jd_input.strip() if jd_input else "", k=5)
-                
-                with st.spinner("🏢 Finding matching companies..."):
-                    st.session_state.matched_companies = match_companies(cv_text, [])
-                
-                with st.spinner("🤖 Generating AI analysis..."):
-                    st.session_state.agent = build_agent(cv_text, jd_input.strip() if jd_input else "", st.session_state.candidate_name)
-                    
-                    raw = run_agent(st.session_state.agent,
-                        "Analyse this candidate's CV and give a full career match. "
-                        "Follow EXACTLY these tags:\n"
-                        "TOP_ROLE, MATCH_PCT, WHY_RIGHT, NEXT_STEPS, "
-                        "SKILL_GAPS, RESUME_ADD, CAREER_PATH, RUNNER_UP, RUNNER_UP_WHY\n"
-                        "Be specific — reference actual CV skills throughout."
-                    )
-                    st.session_state.analysis_raw = raw
-                
-                st.session_state.page = "analyze"
-                st.session_state.analysis_tab = "overview"
-                st.success("✅ Analysis complete!")
-                st.rerun()
-            else:
+        if st.button("🎯 Calculate JD Match", use_container_width=True, type="primary"):
+            if uploaded_cv and jd_input.strip():
+                process_jd_match(uploaded_cv, jd_input)
+            elif not uploaded_cv:
                 st.warning("⚠️ Please upload your CV first")
+            else:
+                st.warning("⚠️ Please paste a Job Description")
+
+
+def process_cv_analysis(uploaded_cv, jd_text):
+    """Process CV analysis against knowledge base."""
+    with st.spinner("📖 Reading CV..."):
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+            tmp.write(uploaded_cv.read())
+            tmp_path = tmp.name
+        
+        cv_text = extract_cv_text(tmp_path)
+        os.unlink(tmp_path)
     
-    # Features section
-    st.markdown("""
-    <div style='display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 2rem;'>
-        <div class='card' style='text-align: center;'>
-            <div style='font-size: 2rem;'>🎯</div>
-            <div style='font-weight: 600; color: #cbd5e1;'>Smart Matching</div>
-            <div style='font-size: 0.75rem; color: #64748b;'>FAISS vector search</div>
-        </div>
-        <div class='card' style='text-align: center;'>
-            <div style='font-size: 2rem;'>🏢</div>
-            <div style='font-weight: 600; color: #cbd5e1;'>Company Match</div>
-            <div style='font-size: 0.75rem; color: #64748b;'>Real BD companies</div>
-        </div>
-        <div class='card' style='text-align: center;'>
-            <div style='font-size: 2rem;'>💰</div>
-            <div style='font-weight: 600; color: #cbd5e1;'>Salary Insights</div>
-            <div style='font-size: 0.75rem; color: #64748b;'>Market benchmarks</div>
-        </div>
-        <div class='card' style='text-align: center;'>
-            <div style='font-size: 2rem;'>💬</div>
-            <div style='font-weight: 600; color: #cbd5e1;'>AI Chat</div>
-            <div style='font-size: 0.75rem; color: #64748b;'>Ask anything</div>
-        </div>
+    st.session_state.cv_text = cv_text
+    st.session_state.jd_text = ""
+    st.session_state.messages = []
+    
+    with st.spinner("🔍 Matching with FAISS..."):
+        st.session_state.retrieved = retrieve_context(cv_text, "", k=5)
+    
+    with st.spinner("🏢 Finding matching companies..."):
+        st.session_state.matched_companies = match_companies(cv_text, [])
+    
+    with st.spinner("🤖 Generating AI analysis..."):
+        st.session_state.agent = build_agent(cv_text, "", st.session_state.candidate_name)
+        
+        raw = run_agent(st.session_state.agent,
+            "Analyse this candidate's CV and give a full career match. "
+            "Follow EXACTLY these tags:\n"
+            "TOP_ROLE, MATCH_PCT, WHY_RIGHT, NEXT_STEPS, "
+            "SKILL_GAPS, RESUME_ADD, CAREER_PATH, RUNNER_UP, RUNNER_UP_WHY\n"
+            "Be specific — reference actual CV skills throughout."
+        )
+        st.session_state.analysis_raw = raw
+    
+    st.session_state.page = "analyze"
+    st.session_state.analysis_tab = "overview"
+    st.session_state.analysis_mode = "cv_only"
+    st.success("✅ Analysis complete!")
+    st.rerun()
+
+
+def process_jd_match(uploaded_cv, jd_text):
+    """Process CV vs JD matching."""
+    with st.spinner("📖 Reading CV..."):
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+            tmp.write(uploaded_cv.read())
+            tmp_path = tmp.name
+        
+        cv_text = extract_cv_text(tmp_path)
+        os.unlink(tmp_path)
+    
+    st.session_state.cv_text = cv_text
+    st.session_state.jd_text = jd_text
+    st.session_state.messages = []
+    
+    with st.spinner("🎯 Calculating JD match score..."):
+        jd_match_result = calculate_jd_match_score(cv_text, jd_text)
+        st.session_state.jd_match_result = jd_match_result
+    
+    with st.spinner("🏢 Finding matching companies..."):
+        st.session_state.matched_companies = match_companies(cv_text, [])
+    
+    st.session_state.page = "jd_result"
+    st.success("✅ JD Match complete!")
+    st.rerun()
+
+
+def render_jd_result():
+    """Display JD matching results."""
+    if not hasattr(st.session_state, 'jd_match_result'):
+        st.info("No JD match result found. Please go back and try again.")
+        if st.button("← Back to Home"):
+            st.session_state.page = "home"
+            st.rerun()
+        return
+    
+    result = st.session_state.jd_match_result
+    match_pct = result["match_pct"]
+    
+    # Determine color
+    if match_pct < 30:
+        color = "#ef4444"
+        status = "Low Match"
+        advice = "Your CV needs significant updates to match this role."
+    elif match_pct < 60:
+        color = "#f59e0b"
+        status = "Partial Match"
+        advice = "You have some relevant skills. Focus on filling the gaps."
+    elif match_pct < 80:
+        color = "#10b981"
+        status = "Good Match"
+        advice = "You're a strong candidate for this role!"
+    else:
+        color = "#06b6d4"
+        status = "Excellent Match!"
+        advice = "You're highly qualified for this position. Apply now!"
+    
+    st.markdown(f"""
+    <div class='jd-match-card'>
+        <div style='font-size: 0.8rem; color: {color}; text-transform: uppercase; letter-spacing: 0.1em;'>JD Match Score</div>
+        <div class='jd-match-score' style='color: {color};'>{match_pct}%</div>
+        <div style='font-size: 1.2rem; font-weight: 600; color: #f1f5f9;'>{status}</div>
+        <p style='color: #94a3b8; margin-top: 0.5rem;'>{advice}</p>
     </div>
     """, unsafe_allow_html=True)
+    
+    # Match details
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown(f"""
+        <div class='card'>
+            <div class='card-title'>📊 Match Details</div>
+            <div style='font-size: 0.9rem;'>
+                <div>✅ Keywords matched: <strong style='color: #10b981;'>{result['found_count']}</strong> / {result['total_keywords']}</div>
+                <div style='margin-top: 0.5rem;'>🎯 Match rate: <strong style='color: {color};'>{match_pct}%</strong></div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        if result.get("matching_companies"):
+            st.markdown("### 🏢 Similar Companies Hiring")
+            for comp in result["matching_companies"][:3]:
+                salary_info = ""
+                if comp.get("salary") and comp["salary"].get("junior"):
+                    salary_info = f"💰 ৳{comp['salary']['junior']}/month"
+                st.markdown(f"""
+                <div class='company-card'>
+                    <div style='font-weight: 700;'>{comp['name']}</div>
+                    <div style='font-size: 0.75rem; color: #a855f7;'>{comp['role']}</div>
+                    <div style='font-size: 0.7rem; color: #64748b;'>{salary_info} 📍 {comp['location']}</div>
+                </div>
+                """, unsafe_allow_html=True)
+    
+    # Keyword match breakdown
+    st.markdown("### 🔑 Keywords Matched")
+    matched_kw = [kw for kw in result['matched_keywords'] if kw in st.session_state.cv_text.lower()]
+    missing_kw = [kw for kw in result['matched_keywords'] if kw not in st.session_state.cv_text.lower()]
+    
+    if matched_kw:
+        matched_html = "".join(f"<span class='skill-chip add-chip'>✅ {kw}</span>" for kw in matched_kw[:10])
+        st.markdown(f"**Found in your CV:**<br>{matched_html}", unsafe_allow_html=True)
+    
+    if missing_kw:
+        missing_html = "".join(f"<span class='skill-chip gap-chip'>❌ {kw}</span>" for kw in missing_kw[:10])
+        st.markdown(f"**Missing from your CV:**<br>{missing_html}", unsafe_allow_html=True)
+    
+    st.markdown("---")
+    col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+    with col_btn2:
+        if st.button("← New JD Match", use_container_width=True):
+            st.session_state.page = "home"
+            st.session_state.analysis_mode = "jd_match"
+            st.rerun()
 
 
 def render_score_card(score: float, level: str, recommendation: str):
@@ -482,7 +787,6 @@ def render_analysis_tabs():
 
 def render_overview_tab(retrieved, all_matches, top_match, parsed, readiness):
     """Overview tab - hero section + role breakdown."""
-    # Hero Section
     top_role = parsed.get("top_role") or top_match.get("title", top_match.get("role", "AI Professional"))
     match_pct = parsed.get("match_pct") or str(top_match.get("match_pct", 0))
     
@@ -498,7 +802,6 @@ def render_overview_tab(retrieved, all_matches, top_match, parsed, readiness):
     </div>
     """, unsafe_allow_html=True)
     
-    # Score card
     if readiness:
         render_score_card(
             readiness.get("total_score", 0),
@@ -506,7 +809,6 @@ def render_overview_tab(retrieved, all_matches, top_match, parsed, readiness):
             readiness.get("recommendation", "")
         )
     
-    # All matches grid
     if all_matches:
         st.markdown("### 📊 Role Breakdown")
         cols = st.columns(min(len(all_matches), 4))
@@ -531,7 +833,6 @@ def render_overview_tab(retrieved, all_matches, top_match, parsed, readiness):
                 </div>
                 """, unsafe_allow_html=True)
     
-    # Runner up
     runner_up = parsed.get("runner_up") or (all_matches[1].get("title") if len(all_matches) > 1 else "")
     if runner_up:
         runner_up_pct = all_matches[1].get("match_pct", 0) if len(all_matches) > 1 else 0
@@ -547,7 +848,6 @@ def render_companies_tab():
         return
     
     st.markdown("### 🏢 Top Matching Companies in Bangladesh")
-    st.markdown("*Based on real job postings from LinkedIn (2026)*")
     
     for comp in companies[:5]:
         match_color = "#10b981" if comp["match_score"] > 60 else "#f59e0b" if comp["match_score"] > 30 else "#ef4444"
@@ -560,16 +860,16 @@ def render_companies_tab():
                     <div>
                         <div style='font-weight: 800; color: #f1f5f9; font-size: 1rem;'>{comp['name']}</div>
                         <div style='font-size: 0.75rem; color: #a855f7;'>{comp['role']} • {comp['category']}</div>
-                        <div style='font-size: 0.7rem; color: #64748b; margin-top: 0.25rem;'>📍 {comp['location']}</div>
+                        <div style='font-size: 0.7rem; color: #64748b;'>📍 {comp['location']}</div>
                     </div>
                     <div style='text-align: right;'>
                         <div style='font-size: 1.3rem; font-weight: 800; color: {match_color};'>{comp['match_score']}%</div>
                         <div style='font-size: 0.65rem; color: #64748b;'>Match</div>
                     </div>
                 </div>
+            </div>
             """, unsafe_allow_html=True)
             
-            # Skills
             if comp.get("skills"):
                 skills_html = "".join(f"<span class='skill-chip'>{s[:20]}</span>" for s in comp["skills"][:4])
                 st.markdown(f"<div style='margin-top: 0.5rem;'>{skills_html}</div>", unsafe_allow_html=True)
@@ -580,8 +880,8 @@ def render_companies_tab():
             if comp.get("salary_range") and comp["salary_range"]:
                 st.markdown(f"""
                 <div style='background: #0f0f20; border: 1px solid #1e1e3a; border-radius: 12px; padding: 0.8rem; text-align: center; height: 100%;'>
-                    <div style='font-size: 0.65rem; color: #fbbf24;'>💰 Est. Salary</div>
-                    <div style='font-size: 0.8rem; font-weight: 700; color: #fbbf24;'>{comp['salary_range']}</div>
+                    <div style='font-size: 0.65rem; color: #fbbf24;'>💰 Salary</div>
+                    <div style='font-size: 0.75rem; font-weight: 700; color: #fbbf24;'>{comp['salary_range']}</div>
                     <div style='font-size: 0.6rem; color: #64748b;'>per month</div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -592,23 +892,12 @@ def render_companies_tab():
                     <div style='font-size: 0.7rem; color: #a855f7;'>Growth opportunity</div>
                 </div>
                 """, unsafe_allow_html=True)
-    
-    st.markdown("---")
-    st.markdown("""
-    <div style='background: #0f0f20; border: 1px solid #1e1e3a; border-radius: 12px; padding: 1rem; margin-top: 1rem;'>
-        <div style='font-size: 0.75rem; color: #64748b;'>
-            💡 <strong>Pro Tip:</strong> These matches are based on your skills alignment with real job postings from LinkedIn Bangladesh (2026). 
-            Click on the job links in the chat to apply directly!
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
 
 
 def render_salary_tab(retrieved, all_matches):
     """Salary tab - salary insights and benchmarks."""
     st.markdown("### 💰 Salary Insights")
     
-    # Extract salary data from matches
     salaries = []
     for role in all_matches[:4]:
         if role.get("salary_min") and role.get("salary_max"):
@@ -620,7 +909,6 @@ def render_salary_tab(retrieved, all_matches):
     
     if salaries:
         st.markdown("#### 📊 Market Salary Ranges (BDT/month)")
-        
         for sal in salaries:
             st.markdown(f"""
             <div style='margin-bottom: 1rem;'>
@@ -635,14 +923,12 @@ def render_salary_tab(retrieved, all_matches):
             """, unsafe_allow_html=True)
     
     st.markdown("#### 📈 Salary by Experience Level")
-    
     col1, col2, col3 = st.columns(3)
     with col1:
         st.markdown("""
         <div class='card' style='text-align: center;'>
             <div style='font-size: 0.7rem; color: #64748b;'>🎓 Intern/Junior</div>
             <div style='font-size: 1.2rem; font-weight: 800; color: #f59e0b;'>15k - 35k</div>
-            <div style='font-size: 0.65rem; color: #64748b;'>BDT/month</div>
         </div>
         """, unsafe_allow_html=True)
     with col2:
@@ -650,7 +936,6 @@ def render_salary_tab(retrieved, all_matches):
         <div class='card' style='text-align: center;'>
             <div style='font-size: 0.7rem; color: #64748b;'>👨‍💻 Mid-Level</div>
             <div style='font-size: 1.2rem; font-weight: 800; color: #10b981;'>40k - 70k</div>
-            <div style='font-size: 0.65rem; color: #64748b;'>BDT/month</div>
         </div>
         """, unsafe_allow_html=True)
     with col3:
@@ -658,11 +943,8 @@ def render_salary_tab(retrieved, all_matches):
         <div class='card' style='text-align: center;'>
             <div style='font-size: 0.7rem; color: #64748b;'>🚀 Senior</div>
             <div style='font-size: 1.2rem; font-weight: 800; color: #06b6d4;'>70k - 150k+</div>
-            <div style='font-size: 0.65rem; color: #64748b;'>BDT/month</div>
         </div>
         """, unsafe_allow_html=True)
-    
-    st.info("💡 **Note:** Salaries are based on real job postings from Bangladesh market (2026). International remote roles may pay higher.")
 
 
 def render_skills_tab(parsed, retrieved):
@@ -682,7 +964,7 @@ def render_skills_tab(parsed, retrieved):
                 </div>
                 """, unsafe_allow_html=True)
         else:
-            st.success("✅ No major skill gaps! Your CV is well-aligned.")
+            st.success("✅ No major skill gaps!")
     
     with col2:
         resume_skills = parsed.get("resume_add") or retrieved.get("resume_skills", [])
@@ -697,17 +979,15 @@ def render_skills_tab(parsed, retrieved):
     
     st.markdown("---")
     st.markdown("#### 📚 Learning Resources")
-    
     resource_cols = st.columns(3)
     resources = [
-        ("🐍 Python", "https://www.python.org/about/gettingstarted/"),
+        ("🐍 Python", "https://www.python.org/"),
         ("🤗 Hugging Face", "https://huggingface.co/learn"),
         ("📊 Kaggle", "https://www.kaggle.com/learn"),
         ("🔷 PyTorch", "https://pytorch.org/tutorials/"),
         ("🧠 Fast.ai", "https://www.fast.ai/"),
         ("🎓 DeepLearning.AI", "https://www.deeplearning.ai/")
     ]
-    
     for idx, (name, url) in enumerate(resources):
         with resource_cols[idx % 3]:
             st.markdown(f"[{name}]({url})", unsafe_allow_html=True)
@@ -736,15 +1016,14 @@ def render_path_tab(parsed):
     
     st.markdown("---")
     st.markdown("#### 🎯 Quick Action Items")
-    
-    action_cols = st.columns(2)
-    with action_cols[0]:
+    col1, col2 = st.columns(2)
+    with col1:
         st.markdown("""
         - 📝 Update LinkedIn profile
         - 🔗 Build portfolio projects
         - 📚 Take relevant certifications
         """)
-    with action_cols[1]:
+    with col2:
         st.markdown("""
         - 🤝 Network with industry professionals
         - 📊 Contribute to open source
@@ -755,7 +1034,7 @@ def render_path_tab(parsed):
 def render_analysis():
     """Display analysis results with smart tabs."""
     if not st.session_state.cv_text:
-        st.info("👈 Please upload your CV on the Home page first")
+        st.info("Please analyze your CV first on the Home page")
         if st.button("Go to Home"):
             st.session_state.page = "home"
             st.rerun()
@@ -767,10 +1046,8 @@ def render_analysis():
     readiness = retrieved.get("readiness", {})
     parsed = parse_analysis(st.session_state.analysis_raw or "") if st.session_state.analysis_raw else {}
     
-    # Render smart tabs
     render_analysis_tabs()
     
-    # Render selected tab
     if st.session_state.analysis_tab == "overview":
         render_overview_tab(retrieved, all_matches, top_match, parsed, readiness)
     elif st.session_state.analysis_tab == "companies":
@@ -783,10 +1060,88 @@ def render_analysis():
         render_path_tab(parsed)
 
 
+def render_career_rec():
+    """Career Recommendations page."""
+    st.markdown("""
+    <div style='text-align: center; margin-bottom: 2rem;'>
+        <div style='font-size: 1.5rem; font-weight: 700; color: #f1f5f9;'>🎯 Career Recommendations</div>
+        <p style='color: #64748b;'>Personalized advice based on your CV analysis</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    if not st.session_state.cv_text:
+        st.info("Please analyze your CV first on the Home page")
+        if st.button("Go to Home →"):
+            st.session_state.page = "home"
+            st.rerun()
+        return
+    
+    retrieved = st.session_state.retrieved or {}
+    readiness = retrieved.get("readiness", {})
+    all_matches = retrieved.get("all_matches", [])
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        <div class='card'>
+            <div class='card-title'>📊 Your Readiness Score</div>
+        """, unsafe_allow_html=True)
+        
+        score = readiness.get("total_score", 0)
+        if score < 30:
+            st.warning(f"🔴 **Score: {score}%** - Focus on foundational skills")
+            st.markdown("""
+            **Recommended next steps:**
+            - Complete Python basics
+            - Take ML fundamentals courses
+            - Build 2-3 small projects
+            """)
+        elif score < 60:
+            st.warning(f"🟡 **Score: {score}%** - Building momentum")
+            st.markdown("""
+            **Recommended next steps:**
+            - Take advanced ML courses
+            - Build portfolio projects
+            - Get relevant certifications
+            """)
+        else:
+            st.success(f"🟢 **Score: {score}%** - Ready for job search!")
+            st.markdown("""
+            **Recommended next steps:**
+            - Update LinkedIn profile
+            - Start applying to matching companies
+            - Prepare for technical interviews
+            """)
+        st.markdown("</div>", unsafe_allow_html=True)
+    
+    with col2:
+        if all_matches:
+            st.markdown("""
+            <div class='card'>
+                <div class='card-title'>🎯 Best Matched Roles</div>
+            """, unsafe_allow_html=True)
+            for role in all_matches[:3]:
+                st.markdown(f"""
+                <div style='margin-bottom: 0.75rem;'>
+                    <div style='font-weight: 600; color: #cbd5e1;'>{role.get('title', role.get('role'))}</div>
+                    <div style='font-size: 0.8rem; color: #a855f7;'>{role.get('match_pct', 0)}% match</div>
+                </div>
+                """, unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+    
+    st.markdown("---")
+    col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+    with col_btn2:
+        if st.button("📊 View Full Analysis →", use_container_width=True, type="primary"):
+            st.session_state.page = "analyze"
+            st.rerun()
+
+
 def render_chat():
     """Chat interface."""
     if not st.session_state.agent:
-        st.info("👈 Please analyze your CV first on the Home page")
+        st.info(" Please analyze your CV first on the Home page")
         if st.button("Go to Home"):
             st.session_state.page = "home"
             st.rerun()
@@ -799,12 +1154,10 @@ def render_chat():
     </div>
     """, unsafe_allow_html=True)
     
-    # Display chat history
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
     
-    # Quick questions
     st.markdown("#### Quick Questions")
     q_cols = st.columns(3)
     questions = [
@@ -830,7 +1183,6 @@ def render_chat():
     
     st.markdown("---")
     
-    # Chat input
     if prompt := st.chat_input("Ask anything about your career..."):
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
@@ -863,7 +1215,6 @@ def main():
             st.markdown('<div class="card" style="text-align: center; padding: 1.5rem;">', unsafe_allow_html=True)
             st.markdown('<div style="font-family: Syne, sans-serif; font-size: 1.1rem; font-weight: 600; color: #cbd5e1; margin-bottom: 1rem;">👋 Welcome! What\'s your name?</div>', unsafe_allow_html=True)
             
-            # Use form to capture Enter key
             with st.form(key="name_entry_form"):
                 name_val = st.text_input(
                     "Name",
@@ -871,10 +1222,7 @@ def main():
                     label_visibility="collapsed",
                     key="welcome_name_input"
                 )
-                
                 st.markdown("<div style='height: 0.75rem;'></div>", unsafe_allow_html=True)
-                
-                # Submit button inside form
                 submitted = st.form_submit_button("✨ Start Your Career Analysis →", use_container_width=True, type="primary")
                 
                 if submitted and name_val and name_val.strip():
@@ -897,6 +1245,10 @@ def main():
         render_analysis()
     elif st.session_state.page == "chat":
         render_chat()
+    elif st.session_state.page == "jd_result":
+        render_jd_result()
+    elif st.session_state.page == "career":
+        render_career_rec()
 
 
 if __name__ == "__main__":
