@@ -152,6 +152,36 @@ def extract_certificates(cv_text: str) -> str:
 def extract_skills(cv_text: str) -> str:
     """Extract skills section."""
     return extract_section(cv_text, "skills|technical skills|core competencies")
+    def match_companies(cv_text: str, role_match: dict) -> list:
+    """Match CV to real companies from JD dataset."""
+    cv_lower = cv_text.lower()
+    companies = []
+    
+    # Load real companies from JD knowledge base
+    roles = load_roles()
+    
+    for role in roles:
+        if "company" in role and role.get("company"):
+            company_data = {
+                "name": role["company"],
+                "role": role.get("title", role.get("role")),
+                "match_score": 0,
+                "salary_range": role.get("salary", {}),
+                "location": role.get("location", "Dhaka"),
+                "requirements": role.get("requirements", "")[:200]
+            }
+            
+            # Calculate match score based on skills overlap
+            required_skills = role.get("skills", [])
+            skills_found = sum(1 for s in required_skills if s.lower() in cv_lower)
+            match_score = (skills_found / max(len(required_skills), 1)) * 100
+            
+            company_data["match_score"] = round(match_score, 1)
+            companies.append(company_data)
+    
+    # Sort by match score and return top 5
+    companies.sort(key=lambda x: x["match_score"], reverse=True)
+    return companies[:5]
 
 
 # ============================================================
