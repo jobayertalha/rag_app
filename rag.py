@@ -130,36 +130,43 @@ def load_index():
 
 
 def extract_section(cv_text: str, section_name: str) -> str:
-    """Extract a specific section from CV."""
+    """Extract a specific section from CV. Returns empty string if not found."""
     patterns = [
         rf'(?i){section_name}[\s:]*\n(.*?)(?=\n[A-Z][A-Z\s]+:|\n\n|\Z)',
         rf'(?i){section_name}[\s:]*\n(.*?)(?=\n\w+[\s:]*\n|\Z)',
     ]
     for pattern in patterns:
         match = re.search(pattern, cv_text, re.DOTALL)
-        if match:
+        if match and match.group(1):
             return match.group(1).strip()[:2000]
-    return ""
+    return ""  # Return empty string if no match
 
 
 def extract_experience(cv_text: str) -> str:
-    return extract_section(cv_text, "experience|work experience|employment|work history")
+    result = extract_section(cv_text, "experience|work experience|employment|work history")
+    return result if result else ""
 
 
 def extract_projects(cv_text: str) -> str:
-    return extract_section(cv_text, "projects|personal projects|academic projects")
+    result = extract_section(cv_text, "projects|personal projects|academic projects")
+    return result if result else ""
 
 
 def extract_certificates(cv_text: str) -> str:
-    return extract_section(cv_text, "certificates|certifications|courses|training")
+    result = extract_section(cv_text, "certificates|certifications|courses|training")
+    return result if result else ""
 
 
 def extract_skills(cv_text: str) -> str:
-    return extract_section(cv_text, "skills|technical skills|core competencies")
+    result = extract_section(cv_text, "skills|technical skills|core competencies")
+    return result if result else ""
 
 
 def extract_cv_focus(cv_text: str) -> str:
     """Extract high-signal content from CV."""
+    if not cv_text:
+        return ""
+    
     lines = cv_text.split('\n')
     focus_lines = []
     
@@ -191,6 +198,15 @@ def extract_cv_focus(cv_text: str) -> str:
 
 def score_ai_ml_readiness(cv_text: str) -> dict:
     """Score CV for AI/ML readiness based on real BD job market."""
+    if not cv_text:
+        return {
+            "total_score": 0,
+            "level": "Not Ready",
+            "recommendation": "Please upload your CV to get analysis.",
+            "breakdown": {"experience": 0, "projects": 0, "certificates": 0, "skills": 0},
+            "stats": {"ai_skills_found": 0, "projects_found": 0, "certificates_found": 0, "experience_matches": 0}
+        }
+    
     experience = extract_experience(cv_text).lower()
     projects = extract_projects(cv_text).lower()
     certificates = extract_certificates(cv_text).lower()
@@ -262,6 +278,9 @@ def score_ai_ml_readiness(cv_text: str) -> dict:
 
 def calculate_match_with_role(cv_text: str, role: dict) -> int:
     """Calculate match percentage with a specific role."""
+    if not cv_text:
+        return 0
+    
     cv_lower = cv_text.lower()
     role_skills = role.get("skills", [])
     
@@ -284,6 +303,19 @@ def calculate_match_with_role(cv_text: str, role: dict) -> int:
 
 def retrieve_context(cv_text: str, jd_text: str = "", k: int = 5) -> dict:
     """Fast retrieval with real BD job market matching."""
+    
+    if not cv_text:
+        return {
+            "top_match": {},
+            "all_matches": [],
+            "similar_roles": [],
+            "skill_gaps": [],
+            "resume_skills": [],
+            "raw_context": "",
+            "readiness": score_ai_ml_readiness(""),
+            "cv_focused": "",
+            "jd_provided": False,
+        }
     
     # Load index
     index = load_index()
