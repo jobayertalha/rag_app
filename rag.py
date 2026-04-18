@@ -1,6 +1,6 @@
 """
 rag.py — CV-JD Matching with Real BD Job Market Data (2026)
-Optimized: No torchvision issues, fast keyword-based scoring
+Optimized: Realistic scoring, filters irrelevant experience
 """
 
 import json
@@ -31,20 +31,20 @@ PROJECT_KEYWORDS = {
     'chatbot', 'llm', 'rag', 'recommendation', 'prediction', 'classification',
     'detection', 'segmentation', 'generative', 'sentiment', 'nlp', 'cv',
     'computer vision', 'object detection', 'face recognition', 'ocr',
-    'time series', 'forecasting', 'clustering', 'anomaly detection'
+    'time series', 'forecasting', 'clustering', 'anomaly detection', 'kaggle'
 }
 
 CERT_KEYWORDS = {
     'machine learning', 'deep learning', 'tensorflow', 'pytorch', 'data science',
     'ai', 'artificial intelligence', 'nlp', 'computer vision', 'llm',
-    'langchain', 'rag', 'aws', 'azure', 'gcp', 'huggingface'
+    'langchain', 'rag', 'aws', 'azure', 'gcp', 'huggingface', 'coursera'
 }
 
 EXPERIENCE_KEYWORDS = {
     'data scientist', 'machine learning engineer', 'ml engineer', 'ai engineer',
     'deep learning engineer', 'nlp engineer', 'computer vision engineer',
     'ai researcher', 'data science intern', 'ai intern', 'llm engineer',
-    'prompt engineer', 'ai developer', 'data analyst'
+    'prompt engineer', 'ai developer', 'data analyst', 'data engineer'
 }
 
 
@@ -62,7 +62,6 @@ def load_roles(path="jd_knowledge_base.json"):
         if os.path.exists(p):
             with open(p, 'r', encoding='utf-8') as f:
                 return json.load(f)
-    # Return default roles if file not found
     return get_default_roles()
 
 
@@ -123,7 +122,6 @@ def load_index():
                         allow_dangerous_deserialization=True
                     )
                 else:
-                    # Build index if it doesn't exist
                     roles = load_roles()
                     _index = build_index(roles)
     return _index
@@ -139,7 +137,7 @@ def extract_section(cv_text: str, section_name: str) -> str:
         match = re.search(pattern, cv_text, re.DOTALL)
         if match and match.group(1):
             return match.group(1).strip()[:2000]
-    return ""  # Return empty string if no match
+    return ""
 
 
 def extract_experience(cv_text: str) -> str:
@@ -196,15 +194,51 @@ def extract_cv_focus(cv_text: str) -> str:
     return result[:3000] if len(result) > 3000 else result
 
 
+def filter_relevant_experience(cv_text: str) -> tuple:
+    """
+    Extract ONLY AI/ML related experience from CV.
+    Returns (relevant_experience_text, has_relevant_experience, matched_keywords)
+    """
+    experience = extract_experience(cv_text)
+    if not experience:
+        return "", False, []
+    
+    lines = experience.split('\n')
+    relevant_lines = []
+    matched_keywords = set()
+    
+    ai_keywords = [
+        'machine learning', 'data science', 'ai', 'artificial intelligence',
+        'data analyst', 'ml', 'deep learning', 'nlp', 'computer vision',
+        'llm', 'rag', 'langchain', 'tensorflow', 'pytorch', 'keras',
+        'scikit-learn', 'pandas', 'data analysis', 'data visualization',
+        'sql', 'python', 'analytics', 'business intelligence', 'data engineer',
+        'etl', 'data pipeline', 'model deployment', 'mlops'
+    ]
+    
+    for line in lines:
+        line_lower = line.lower()
+        for kw in ai_keywords:
+            if kw in line_lower:
+                relevant_lines.append(line)
+                matched_keywords.add(kw)
+                break
+    
+    relevant_text = '\n'.join(relevant_lines) if relevant_lines else ""
+    has_relevant = len(relevant_text) > 50  # At least some meaningful content
+    
+    return relevant_text, has_relevant, list(matched_keywords)[:5]
+
+
 def score_ai_ml_readiness(cv_text: str) -> dict:
-    """Score CV for AI/ML readiness based on real BD job market."""
+    """Score CV for AI/ML readiness - ONLY counts relevant experience."""
     if not cv_text:
         return {
             "total_score": 0,
             "level": "Not Ready",
             "recommendation": "Please upload your CV to get analysis.",
             "breakdown": {"experience": 0, "projects": 0, "certificates": 0, "skills": 0},
-            "stats": {"ai_skills_found": 0, "projects_found": 0, "certificates_found": 0, "experience_matches": 0}
+            "stats": {"ai_skills_found": 0, "projects_found": 0, "certificates_found": 0, "has_ai_experience": False}
         }
     
     experience = extract_experience(cv_text).lower()
@@ -213,16 +247,26 @@ def score_ai_ml_readiness(cv_text: str) -> dict:
     skills = extract_skills(cv_text).lower()
     full_cv = cv_text.lower()
     
-    # Experience Score (30%)
-    exp_score = 0
-    exp_matches = 0
-    for keyword in EXPERIENCE_KEYWORDS:
-        if keyword in experience or keyword in full_cv:
-            exp_matches += 1
-    exp_score = min(1.0, exp_matches / 3) * 30
+    # Check if experience contains AI/ML keywords
+    has_ai_experience = any(kw in experience for kw in [
+        'machine learning', 'data science', 'ai', 'artificial intelligence',
+        'data analyst', 'ml engineer', 'data scientist', 'deep learning',
+        'nlp', 'computer vision', 'llm', 'rag', 'langchain', 'tensorflow',
+        'pytorch', 'keras', 'scikit-learn', 'pandas', 'data analysis',
+        'data engineer', 'business intelligence', 'analytics'
+    ])
+    
+    # Experience Score (30%) - Only counts if relevant
+    if has_ai_experience:
+        exp_matches = 0
+        for keyword in EXPERIENCE_KEYWORDS:
+            if keyword in experience:
+                exp_matches += 1
+        exp_score = min(1.0, exp_matches / 3) * 30
+    else:
+        exp_score = 0  # No AI/ML experience = 0 points
     
     # Projects Score (25%)
-    proj_score = 0
     proj_matches = 0
     for keyword in PROJECT_KEYWORDS:
         if keyword in projects or keyword in full_cv:
@@ -230,7 +274,6 @@ def score_ai_ml_readiness(cv_text: str) -> dict:
     proj_score = min(1.0, proj_matches / 4) * 25
     
     # Certificates Score (20%)
-    cert_score = 0
     cert_matches = 0
     for keyword in CERT_KEYWORDS:
         if keyword in certificates or keyword in full_cv:
@@ -238,7 +281,6 @@ def score_ai_ml_readiness(cv_text: str) -> dict:
     cert_score = min(1.0, cert_matches / 3) * 20
     
     # Skills Score (25%)
-    skill_score = 0
     skill_matches = 0
     for keyword in CORE_AI_ML_SKILLS:
         if keyword in skills or keyword in full_cv:
@@ -247,12 +289,20 @@ def score_ai_ml_readiness(cv_text: str) -> dict:
     
     total_score = exp_score + proj_score + cert_score + skill_score
     
+    # Reality check: If no AI experience AND low skill score, cap at 25%
+    if not has_ai_experience and skill_matches < 4:
+        total_score = min(total_score, 25)
+    
+    # Determine level
     if total_score < 30:
         level = "Not Ready"
-        recommendation = "Focus on building foundational AI/ML skills. Consider Data Analyst roles first."
+        if not has_ai_experience:
+            recommendation = "Your CV lacks AI/ML work experience. Build projects or get relevant internships first."
+        else:
+            recommendation = "Focus on building foundational AI/ML skills and more projects."
     elif total_score < 60:
         level = "Building"
-        recommendation = "You have good fundamentals. Build more projects and get certifications."
+        recommendation = "You have foundational skills. Build more AI projects and gain practical experience."
     else:
         level = "Ready"
         recommendation = "You're ready to apply for AI/ML roles in Bangladesh!"
@@ -271,7 +321,7 @@ def score_ai_ml_readiness(cv_text: str) -> dict:
             "ai_skills_found": skill_matches,
             "projects_found": proj_matches,
             "certificates_found": cert_matches,
-            "experience_matches": exp_matches
+            "has_ai_experience": has_ai_experience
         }
     }
 
@@ -297,12 +347,19 @@ def calculate_match_with_role(cv_text: str, role: dict) -> int:
     
     match_pct = int((skills_found / len(role_skills)) * 100)
     
+    # Get relevant experience check
+    _, has_ai_exp, _ = filter_relevant_experience(cv_text)
+    
+    # If no AI experience, reduce match percentage significantly
+    if not has_ai_exp:
+        match_pct = int(match_pct * 0.6)  # 40% reduction
+    
     # Cap at 92% (no perfect match)
     return min(92, max(5, match_pct))
 
 
 def retrieve_context(cv_text: str, jd_text: str = "", k: int = 5) -> dict:
-    """Fast retrieval with real BD job market matching."""
+    """Fast retrieval with real BD job market matching and realistic scoring."""
     
     if not cv_text:
         return {
@@ -317,18 +374,34 @@ def retrieve_context(cv_text: str, jd_text: str = "", k: int = 5) -> dict:
             "jd_provided": False,
         }
     
+    # Filter relevant experience first
+    relevant_exp, has_ai_experience, matched_keywords = filter_relevant_experience(cv_text)
+    
     # Load index
     index = load_index()
     
     # Get AI/ML readiness score
     readiness = score_ai_ml_readiness(cv_text)
     
-    # Prepare query for FAISS
+    # Override readiness if no AI experience
+    if not has_ai_experience and readiness["total_score"] > 25:
+        readiness["total_score"] = min(readiness["total_score"], 25)
+        readiness["level"] = "Not Ready"
+        readiness["recommendation"] = "Your CV lacks AI/ML work experience. Focus on building AI projects or getting relevant internships first."
+    
+    # Prepare query for FAISS - prioritize relevant experience
     cv_focused = extract_cv_focus(cv_text)
-    if jd_text:
-        query = f"Candidate: {cv_focused}\nJob: {jd_text[:1000]}"
+    
+    # Build better query that emphasizes relevant experience
+    if relevant_exp:
+        enhanced_query = f"Relevant AI/ML Experience: {relevant_exp[:500]}\n\nFull CV: {cv_focused}"
     else:
-        query = cv_focused
+        enhanced_query = cv_focused
+    
+    if jd_text:
+        query = f"Candidate: {enhanced_query}\nJob Requirements: {jd_text[:1000]}"
+    else:
+        query = enhanced_query
     
     # FAISS search
     results = index.similarity_search_with_score(query, k=k)
@@ -337,8 +410,15 @@ def retrieve_context(cv_text: str, jd_text: str = "", k: int = 5) -> dict:
     for doc, _ in results:
         role = dict(doc.metadata)
         
-        # Calculate match percentage
+        # Calculate match percentage (now accounts for AI experience)
         match_pct = calculate_match_with_role(cv_text, role)
+        
+        # Additional penalty if role requires AI experience but CV has none
+        role_requires_ai = any(kw in role.get("jd_text", "").lower() for kw in 
+                               ['machine learning', 'deep learning', 'ai', 'llm', 'nlp', 'computer vision'])
+        
+        if role_requires_ai and not has_ai_experience:
+            match_pct = int(match_pct * 0.5)  # 50% penalty for AI roles with no experience
         
         role["match_pct"] = match_pct
         role["readiness_score"] = readiness["total_score"]
@@ -372,14 +452,20 @@ def retrieve_context(cv_text: str, jd_text: str = "", k: int = 5) -> dict:
                 skill_freq[sk] = skill_freq.get(sk, 0) + (r["match_pct"] / 100)
     resume_skills = sorted(skill_freq, key=skill_freq.get, reverse=True)[:6]
     
-    # Build context for LLM
+    # Build context for LLM with emphasis on relevant experience
     blocks = []
     for r in all_matches[:4]:
         sal_min = r.get("salary_min", 0)
         sal_max = r.get("salary_max", 0)
         company = r.get("company", "Various")
+        
+        # Add warning if CV lacks AI experience for this role
+        warning = ""
+        if not has_ai_experience and "AI" in r.get("title", ""):
+            warning = "\n⚠️ NOTE: This role requires AI/ML experience which is not present in candidate's CV."
+        
         blocks.append(
-            f"Company: {company}\n"
+            f"Company: {company}{warning}\n"
             f"Role: {r.get('title', r.get('role', 'Unknown'))} ({r['match_pct']}% match)\n"
             f"Required skills: {', '.join(r.get('skills', []))}\n"
             f"Salary: ৳{sal_min:,}–৳{sal_max:,}/month\n"
@@ -396,4 +482,6 @@ def retrieve_context(cv_text: str, jd_text: str = "", k: int = 5) -> dict:
         "readiness": readiness,
         "cv_focused": cv_focused[:1500],
         "jd_provided": bool(jd_text),
+        "has_ai_experience": has_ai_experience,  # Add this for UI to show warnings
+        "matched_experience_keywords": matched_keywords
     }
