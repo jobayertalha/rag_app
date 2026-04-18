@@ -140,6 +140,41 @@ def extract_section(cv_text: str, section_name: str) -> str:
     return ""
 
 
+
+def match_cv_with_jd(cv_text: str, jd_text: str) -> dict:
+    """
+    Match CV with specific JD using FAISS semantic search.
+    Returns match score and similar roles from knowledge base.
+    """
+    if not cv_text or not jd_text:
+        return {"match_pct": 0, "similar_roles": []}
+    
+    # Load index
+    index = load_index()
+    
+    # Search for JDs similar to the provided one
+    results = index.similarity_search_with_score(jd_text, k=5)
+    
+    all_matches = []
+    for doc, score in results:
+        role = dict(doc.metadata)
+        # Calculate match with CV
+        cv_lower = cv_text.lower()
+        role_skills = role.get("skills", [])
+        skills_found = sum(1 for s in role_skills if s.lower() in cv_lower)
+        match_pct = int((skills_found / max(len(role_skills), 1)) * 100)
+        
+        role["match_pct"] = min(95, match_pct)
+        all_matches.append(role)
+    
+    all_matches.sort(key=lambda x: x["match_pct"], reverse=True)
+    
+    return {
+        "match_pct": all_matches[0]["match_pct"] if all_matches else 0,
+        "similar_roles": all_matches[:4],
+        "recommended_companies": [{"name": r.get("company"), "role": r.get("title"), "salary": r.get("salary")} 
+                                   for r in all_matches[:3] if r.get("company")]
+    }
 def extract_experience(cv_text: str) -> str:
     result = extract_section(cv_text, "experience|work experience|employment|work history")
     return result if result else ""
