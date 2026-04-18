@@ -1,12 +1,12 @@
 """
 agent.py — compatible with langchain >= 0.2 / 1.x (modern API)
-Uses: ChatGroq directly + tool binding, no deprecated agent helpers.
 """
 
 import os
+from collections import deque
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langchain_community.utilities import SerpAPIWrapper
 from langchain_core.tools import Tool
 from pypdf import PdfReader
@@ -27,7 +27,7 @@ def get_job_search_tool():
     serpapi_key = os.getenv("SERPAPI_API_KEY")
     if not serpapi_key:
         def no_search(q):
-            return "Job search unavailable — add SERPAPI_API_KEY to Streamlit secrets to enable real-time job listings."
+            return "Job search unavailable — add SERPAPI_API_KEY to enable real-time job listings."
         return Tool(name="job_search", func=no_search,
                     description="Search real-time job listings.")
     search = SerpAPIWrapper(
@@ -50,17 +50,13 @@ def extract_cv_text(pdf_path: str) -> str:
     return "".join(page.extract_text() or "" for page in reader.pages).strip()
 
 
-# Module-level state
+# Module-level state with bounded history
 _system_prompt = ""
 _llm = None
-_history = []
+_history = deque(maxlen=20)  # Keep last 20 exchanges
 
 
 def build_agent(cv_text: str, jd_text: str = "", candidate_name: str = ""):
-    """
-    Build a simple stateful chat agent using ChatGroq directly.
-    No deprecated agent helpers — works with all langchain versions.
-    """
     global _system_prompt, _llm, _history
 
     from rag import retrieve_context
@@ -88,7 +84,7 @@ def build_agent(cv_text: str, jd_text: str = "", candidate_name: str = ""):
 Always be specific, encouraging, and reference the candidate's actual CV content.
 
 ━━━ CANDIDATE CV ━━━
-{cv_text}
+{cv_text[:3000]}
 {jd_section}
 ━━━ FAISS RETRIEVED MATCHES ━━━
 
@@ -97,9 +93,6 @@ Why this fits: {top.get('why_good_fit', '')}
 
 ALL ROLE MATCHES:
 {role_lines}
-
-FULL CONTEXT:
-{retrieved['raw_context']}
 
 SKILL GAPS (missing from CV): {', '.join(retrieved['skill_gaps']) or 'None — strong alignment'}
 RESUME SKILLS TO ADD: {', '.join(retrieved['resume_skills']) or 'CV already well-aligned'}
@@ -133,17 +126,11 @@ RUNNER_UP_WHY: [1-2 sentences]
 Always reference actual CV content. Never give generic advice."""
 
     _llm = get_llm()
-    _history = []
-
-    # Return a simple dict as the "agent" — run_agent uses it
+    _history.clear()
     return {"ready": True}
 
 
 def run_agent(agent_dict, user_input: str) -> str:
-    """
-    Run the agent: send system prompt + history + new message to Groq.
-    Falls back gracefully if job search is requested.
-    """
     global _system_prompt, _llm, _history
 
     if not _llm:
@@ -164,14 +151,22 @@ def run_agent(agent_dict, user_input: str) -> str:
 
     # Build messages
     messages = [SystemMessage(content=_system_prompt)]
-    for h in _history[-6:]:  # keep last 3 exchanges
+    for h in list(_history)[-6:]:
         messages.append(HumanMessage(content=h["user"]))
-        from langchain_core.messages import AIMessage
         messages.append(AIMessage(content=h["assistant"]))
     messages.append(HumanMessage(content=user_input))
 
-    response = _llm.invoke(messages)
-    reply = response.content
+    try:
+        response = _llm.invoke(messages)
+        reply = response.content
+    except Exception as e:
+        error_msg = str(e)
+        if "rate_limit" in error_msg.lower() or "429" in error_msg:
+            return "⚠️ The AI service is currently busy. Please wait a few seconds and try again."
+        elif "api_key" in error_msg.lower():
+            return "⚠️ API configuration error. Please check your Groq API key."
+        else:
+            return f"⚠️ Sorry, I encountered an error: {error_msg[:200]}"
 
     _history.append({"user": user_input, "assistant": reply})
     return reply
