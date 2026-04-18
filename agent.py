@@ -1,13 +1,11 @@
 """
-agent.py — compatible with langchain >= 0.2 / 1.x (modern API)
+agent.py — Groq API only, no SerpAPI required
 """
 
 import os
 from collections import deque
 from langchain_groq import ChatGroq
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
-from langchain_community.utilities import SerpAPIWrapper
 from langchain_core.tools import Tool
 from pypdf import PdfReader
 from dotenv import load_dotenv
@@ -23,6 +21,24 @@ def get_llm():
     )
 
 
+def get_job_search_tool():
+    """Simple job search placeholder (no external API required)."""
+    def search_advice(query):
+        return (
+            "🔍 **Job Search Tips:**\n\n"
+            "1. Use LinkedIn Jobs (linkedin.com/jobs)\n"
+            "2. Check Indeed (indeed.com)\n"
+            "3. Try Glassdoor (glassdoor.com)\n"
+            "4. Look at company career pages\n"
+            "5. Network on LinkedIn with recruiters\n\n"
+            f"*Search for: {query}*\n"
+            "Note: Live job listings require SerpAPI. Add SERPAPI_API_KEY to enable real-time search."
+        )
+    return Tool(
+        name="job_search",
+        func=search_advice,
+        description="Provide job search guidance instead of live listings."
+    )
 
 
 def extract_cv_text(pdf_path: str) -> str:
@@ -33,7 +49,7 @@ def extract_cv_text(pdf_path: str) -> str:
 # Module-level state with bounded history
 _system_prompt = ""
 _llm = None
-_history = deque(maxlen=20)  # Keep last 20 exchanges
+_history = deque(maxlen=20)
 
 
 def build_agent(cv_text: str, jd_text: str = "", candidate_name: str = ""):
@@ -84,7 +100,7 @@ RESUME SKILLS TO ADD: {', '.join(retrieved['resume_skills']) or 'CV already well
 3. RESUME RECOMMENDATIONS — format: "Add [X]: unlocks [role] — [reason]"
 4. SALARY & MARKET INFO — use retrieved salary ranges
 5. CAREER PATH — 3 steps with timeframes
-6. JOB SEARCH — when asked, search and format: Title | Company | Location | Description
+6. JOB SEARCH — when asked, provide job search guidance and tips
 
 When generating structured analysis, respond using EXACTLY these tags:
 TOP_ROLE: [role name]
@@ -125,7 +141,7 @@ def run_agent(agent_dict, user_input: str) -> str:
         try:
             tool = get_job_search_tool()
             search_result = tool.func(user_input)
-            user_input = f"{user_input}\n\n[Job search results]:\n{search_result}"
+            user_input = f"{user_input}\n\n[Job search guidance]:\n{search_result}"
         except Exception:
             pass
 
@@ -142,9 +158,9 @@ def run_agent(agent_dict, user_input: str) -> str:
     except Exception as e:
         error_msg = str(e)
         if "rate_limit" in error_msg.lower() or "429" in error_msg:
-            return "⚠️ The AI service is currently busy. Please wait a few seconds and try again."
+            return "⚠️ The Groq API is currently busy. Please wait a few seconds and try again."
         elif "api_key" in error_msg.lower():
-            return "⚠️ API configuration error. Please check your Groq API key."
+            return "⚠️ Groq API key is missing or invalid. Please check your configuration."
         else:
             return f"⚠️ Sorry, I encountered an error: {error_msg[:200]}"
 
