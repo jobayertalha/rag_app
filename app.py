@@ -475,8 +475,6 @@ def render_analysis_tabs():
     cols = st.columns(len(tabs))
     for idx, (label, key) in enumerate(tabs):
         with cols[idx]:
-            is_active = st.session_state.analysis_tab == key
-            btn_style = "active" if is_active else ""
             if st.button(label, key=f"tab_{key}", use_container_width=True):
                 st.session_state.analysis_tab = key
                 st.rerun()
@@ -850,45 +848,42 @@ def render_chat():
 # ============================================================
 def main():
     # Name entry screen
-   # ============================================================
-# NAME ENTRY SCREEN
-# ============================================================
-if not st.session_state.name_entered:
-    st.markdown("""
-    <div style='text-align: center; padding: 3rem 0;'>
-        <div style='font-family: Syne, sans-serif; font-size: 3rem; font-weight: 800;'>
-            CV <span style='background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>Analyzer</span>
+    if not st.session_state.name_entered:
+        st.markdown("""
+        <div style='text-align: center; padding: 3rem 0;'>
+            <div style='font-family: Syne, sans-serif; font-size: 3rem; font-weight: 800;'>
+                CV <span style='background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>Analyzer</span>
+            </div>
+            <p style='color: #64748b; margin: 1rem 0;'>AI-powered career matching for data & AI roles</p>
         </div>
-        <p style='color: #64748b; margin: 1rem 0;'>AI-powered career matching for data & AI roles</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2, col3 = st.columns([1, 1.5, 1])
-    with col2:
-        st.markdown('<div class="card" style="text-align: center; padding: 1.5rem;">', unsafe_allow_html=True)
-        st.markdown('<div style="font-family: Syne, sans-serif; font-size: 1.1rem; font-weight: 600; color: #cbd5e1; margin-bottom: 1rem;">👋 Welcome! What\'s your name?</div>', unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
         
-        # Simple text input (no form wrapper)
-        name_val = st.text_input(
-            "Name",
-            placeholder="Enter your full name...",
-            label_visibility="collapsed",
-            key="welcome_name_input"
-        )
-        
-        st.markdown("<div style='height: 0.75rem;'></div>", unsafe_allow_html=True)
-        
-        if st.button("✨ Start Your Career Analysis →", use_container_width=True, type="primary"):
-            if name_val and name_val.strip():
-                st.session_state.candidate_name = name_val.strip()
-                st.session_state.name_entered = True
-                st.rerun()
-            else:
-                st.error("Please enter your name to continue")
-        
-        st.markdown('<p style="color: #475569; font-size: 0.7rem; text-align: center; margin-top: 1rem;">🔒 Your data stays private</p>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-    st.stop()
+        col1, col2, col3 = st.columns([1, 1.5, 1])
+        with col2:
+            st.markdown('<div class="card" style="text-align: center; padding: 1.5rem;">', unsafe_allow_html=True)
+            st.markdown('<div style="font-family: Syne, sans-serif; font-size: 1.1rem; font-weight: 600; color: #cbd5e1; margin-bottom: 1rem;">👋 Welcome! What\'s your name?</div>', unsafe_allow_html=True)
+            
+            # Simple text input (no form wrapper)
+            name_val = st.text_input(
+                "Name",
+                placeholder="Enter your full name...",
+                label_visibility="collapsed",
+                key="welcome_name_input"
+            )
+            
+            st.markdown("<div style='height: 0.75rem;'></div>", unsafe_allow_html=True)
+            
+            if st.button("✨ Start Your Career Analysis →", use_container_width=True, type="primary"):
+                if name_val and name_val.strip():
+                    st.session_state.candidate_name = name_val.strip()
+                    st.session_state.name_entered = True
+                    st.rerun()
+                else:
+                    st.error("Please enter your name to continue")
+            
+            st.markdown('<p style="color: #475569; font-size: 0.7rem; text-align: center; margin-top: 1rem;">🔒 Your data stays private</p>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+        st.stop()
     
     # Render navbar and page content
     render_navbar()
