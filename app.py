@@ -1,5 +1,6 @@
 """
-app.py — CV Analyzer with Clean Single Navigation Bar
+app.py — CV Analyzer
+Flow: Welcome (name) → Home → Analyze CV | Match with JD
 """
 
 import streamlit as st
@@ -7,549 +8,918 @@ import tempfile
 import os
 import re
 
-from agent import extract_cv_text, build_agent, run_agent
-from rag import retrieve_context, load_roles
-
 st.set_page_config(
-    page_title="CV Analyzer | AI Career Match",
+    page_title="CV Analyzer",
     page_icon="📄",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="collapsed",
 )
 
-# ============================================================
-# CSS - Clean minimal design
-# ============================================================
 st.markdown("""
 <style>
-/* Hide Streamlit default elements */
-#MainMenu {visibility: hidden;}
-header {visibility: hidden;}
-.stDeployButton {display: none;}
-footer {visibility: hidden;}
-.stApp { background: linear-gradient(135deg, #0a0a14 0%, #0f0f20 100%); }
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
 
-* { font-family: 'DM Sans', sans-serif; }
-
-/* Navigation - Single clean bar */
-.single-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(15, 15, 32, 0.95);
-    border-bottom: 1px solid #2d2d5a;
-    padding: 0.5rem 2rem;
-    margin-bottom: 1.5rem;
+/* ── RESET & BASE ── */
+html, body, [class*="css"] {
+    font-family: 'DM Sans', sans-serif;
+    background-color: #07070f;
+    color: #e2e8f0;
 }
-.nav-left { display: flex; gap: 0.25rem; align-items: center; flex-wrap: wrap; }
-.nav-right { position: relative; }
-.nav-item {
+.stApp { background-color: #07070f; }
+h1, h2, h3 { font-family: 'Syne', sans-serif; }
+
+/* Hide Streamlit default header, sidebar toggle, footer */
+#MainMenu, footer, header { visibility: hidden; }
+[data-testid="collapsedControl"] { display: none !important; }
+[data-testid="stSidebar"] { display: none !important; }
+section[data-testid="stMain"] > div { padding-top: 0 !important; }
+.block-container { padding-top: 0 !important; padding-bottom: 2rem; max-width: 1100px; }
+
+/* ── TOP NAV ── */
+.topnav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    height: 58px;
+    background: rgba(10,10,22,0.95);
+    border-bottom: 1px solid #16163a;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    backdrop-filter: blur(12px);
+}
+.topnav-brand {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #a855f7;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+}
+.topnav-links { display: flex; align-items: center; gap: 4px; }
+.topnav-btn {
     background: transparent;
     border: none;
-    color: #94a3b8;
-    font-size: 0.85rem;
+    color: #64748b;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
     font-weight: 500;
-    padding: 0.4rem 1rem;
+    padding: 6px 14px;
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.15s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 }
-.nav-item:hover { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
-.nav-logo {
+.topnav-btn:hover { color: #a5b4fc; background: #13133a; }
+.topnav-btn.active { color: #a5b4fc; background: #13133a; }
+.topnav-user {
+    font-size: 0.82rem;
+    color: #94a3b8;
+    background: #13132a;
+    border: 1px solid #1e1e3a;
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-weight: 500;
+}
+
+/* ── WELCOME SCREEN ── */
+.welcome-wrap {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(120,40,200,0.13) 0%, transparent 70%),
+                radial-gradient(ellipse 60% 50% at 80% 100%, rgba(219,39,119,0.08) 0%, transparent 70%),
+                #07070f;
+    padding: 2rem;
+}
+.welcome-logo {
     font-family: 'Syne', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: 3.2rem;
+    font-weight: 800;
+    color: #f1f5f9;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+.welcome-logo span {
     background: linear-gradient(135deg, #a855f7, #ec4899);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
-.user-btn {
-    background: transparent;
-    border: 1px solid #2d2d5a;
-    color: #94a3b8;
-    padding: 0.3rem 1rem;
+.welcome-sub {
+    color: #475569;
+    font-size: 0.95rem;
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+.welcome-card {
+    background: #0d0d1e;
+    border: 1px solid #1e1e40;
     border-radius: 20px;
-    font-size: 0.8rem;
+    padding: 2.2rem 2.2rem 1.8rem;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+}
+.welcome-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #cbd5e1;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+/* ── HOME PAGE ── */
+.home-hero {
+    text-align: center;
+    padding: 4rem 2rem 2.5rem;
+}
+.home-greeting {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: #f1f5f9;
+    margin-bottom: 0.5rem;
+}
+.home-greeting span { color: #a855f7; }
+.home-sub {
+    color: #64748b;
+    font-size: 1rem;
+    margin-bottom: 0;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+.option-card {
+    background: #0d0d1e;
+    border: 1px solid #1e1e3a;
+    border-radius: 20px;
+    padding: 2.2rem 1.8rem 1.8rem;
+    text-align: center;
     cursor: pointer;
+    transition: all 0.22s ease;
+    position: relative;
+    overflow: hidden;
 }
-.user-btn:hover { background: rgba(168, 85, 247, 0.1); border-color: #a855f7; }
-
-/* Dropdown menu */
-.dropdown-menu {
+.option-card::before {
+    content: '';
     position: absolute;
-    top: 40px;
-    right: 0;
-    background: #0f0f20;
-    border: 1px solid #2d2d5a;
-    border-radius: 12px;
-    padding: 0.5rem;
-    min-width: 160px;
-    z-index: 1000;
+    inset: 0;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(168,85,247,0.06), rgba(236,72,153,0.04));
+    opacity: 0;
+    transition: opacity 0.22s;
 }
-.dropdown-text { padding: 0.3rem 0.8rem; font-size: 0.7rem; color: #64748b; }
-.dropdown-name { padding: 0.3rem 0.8rem; font-size: 0.8rem; font-weight: 600; color: #cbd5e1; }
-.dropdown-divider { height: 1px; background: #2d2d5a; margin: 0.3rem 0; }
-.dropdown-signout { padding: 0.5rem 0.8rem; font-size: 0.8rem; color: #ef4444; cursor: pointer; border-radius: 8px; }
-.dropdown-signout:hover { background: rgba(239, 68, 68, 0.1); }
+.option-card:hover::before { opacity: 1; }
+.option-card:hover { border-color: #6d28d9; transform: translateY(-3px); box-shadow: 0 12px 40px rgba(109,40,217,0.18); }
+.option-card.jd:hover { border-color: #db2777; box-shadow: 0 12px 40px rgba(219,39,119,0.18); }
+.option-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+.option-title { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700; color: #f1f5f9; margin-bottom: 0.5rem; }
+.option-desc { font-size: 0.82rem; color: #64748b; line-height: 1.65; margin-bottom: 1rem; }
+.option-tags { font-size: 0.72rem; color: #7c3aed; font-weight: 500; }
+.option-tags.jd { color: #db2777; }
 
-/* Cards */
-.card { background: #0f0f20; border: 1px solid #1e1e3a; border-radius: 16px; padding: 1.2rem; margin-bottom: 1rem; }
-.skill-chip { display: inline-block; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); color: #a5b4fc; font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 6px; margin: 0.2rem; }
-.gap-chip { background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.3); color: #fca5a5; }
-.add-chip { background: rgba(34, 197, 94, 0.15); border-color: rgba(34, 197, 94, 0.3); color: #86efac; }
-.hero-match { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center; }
+/* ── ANALYSIS PAGE ── */
+.page-header {
+    padding: 2rem 2rem 1rem;
+    border-bottom: 1px solid #12122a;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.page-header h2 { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 700; color: #f1f5f9; margin: 0; }
+.page-header p { font-size: 0.82rem; color: #475569; margin: 2px 0 0; }
 
-/* Mode selector */
-.mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.5rem 0; }
-.mode-card { background: #0f0f20; border: 1px solid #1e1e3a; border-radius: 20px; padding: 1.5rem; text-align: center; transition: all 0.3s; }
-.mode-card:hover { border-color: #7c3aed; transform: translateY(-2px); }
-.mode-icon { font-size: 2rem; margin-bottom: 0.5rem; }
-.mode-title { font-size: 1.1rem; font-weight: 700; color: #f1f5f9; }
-.mode-desc { font-size: 0.7rem; color: #64748b; margin-top: 0.3rem; }
+.upload-zone {
+    background: #0d0d1e;
+    border: 2px dashed #1e1e3a;
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    transition: border-color 0.2s;
+}
+.upload-zone:hover { border-color: #7c3aed; }
 
-/* JD Match */
-.jd-match-card { background: linear-gradient(135deg, #0f0f20 0%, #1a0f35 100%); border: 1px solid #2d2060; border-radius: 20px; padding: 1.5rem; text-align: center; margin-bottom: 1rem; }
-.jd-match-score { font-size: 3rem; font-weight: 800; }
+/* ── RESULT CARDS ── */
+.hero-card {
+    background: linear-gradient(140deg, #13132a, #1a0f35, #160f2a);
+    border: 1px solid #2d2060;
+    border-radius: 22px;
+    padding: 2.5rem 2rem 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+.hero-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #7c3aed, #db2777);
+    color: #fff; font-size: 0.62rem; font-weight: 700;
+    padding: 4px 14px; border-radius: 20px; margin-bottom: 1rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+}
+.hero-emoji { font-size: 2.4rem; margin-bottom: 0.4rem; }
+.hero-title { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: #f1f5f9; margin-bottom: 0.2rem; }
+.hero-match {
+    font-family: 'Syne', sans-serif; font-size: 3.5rem; font-weight: 800;
+    background: linear-gradient(135deg, #a855f7, #ec4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 0.75rem; line-height: 1.1;
+}
+.hero-desc { font-size: 0.9rem; color: #94a3b8; max-width: 520px; margin: 0 auto 1.2rem; line-height: 1.7; }
+.skill-chip { display: inline-block; font-size: 0.7rem; background: rgba(99,102,241,0.12); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.25); border-radius: 6px; padding: 3px 10px; margin: 3px; }
 
-/* Welcome */
-.welcome-card { background: #0f0f20; border: 1px solid #1e1e3a; border-radius: 24px; padding: 2rem; text-align: center; max-width: 400px; margin: 2rem auto; }
+.section-header { font-size: 0.7rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.12em; margin: 1.5rem 0 0.75rem; }
+
+.breakdown-card { background: #0f0f20; border: 1px solid #1a1a30; border-radius: 14px; padding: 1.1rem 1rem; height: 100%; }
+.breakdown-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 0.6rem; }
+.breakdown-role { font-size: 0.78rem; font-weight: 600; color: #94a3b8; line-height: 1.3; }
+.breakdown-pct { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1; }
+.breakdown-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.breakdown-chip { font-size: 0.62rem; background: #13132a; color: #64748b; border-radius: 4px; padding: 2px 6px; border: 1px solid #1a1a30; }
+
+.detail-card { background: #0f0f20; border: 1px solid #1a1a30; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; }
+.detail-card-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: #f1f5f9; margin-bottom: 0.75rem; }
+.detail-card-desc { font-size: 0.875rem; color: #94a3b8; line-height: 1.7; margin-bottom: 1rem; }
+
+.info-box { border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 0.75rem; }
+.info-box-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.info-box-content { font-size: 0.85rem; line-height: 1.65; color: #cbd5e1; }
+.info-box.next-steps { background: #0d1a2e; border: 1px solid #1a3a5c; }
+.info-box.next-steps .info-box-label { color: #60a5fa; }
+.info-box.salary { background: #0a1a0e; border: 1px solid #14532d; }
+.info-box.salary .info-box-label { color: #4ade80; }
+.info-box.demand { background: #0d0d20; border: 1px solid #1e1e4a; }
+.info-box.demand .info-box-label { color: #818cf8; }
+.info-box.resume { background: #0a1a0e; border: 1px solid #14532d; }
+.info-box.resume .info-box-label { color: #86efac; }
+.info-box.gaps { background: #1a0a0a; border: 1px solid #4c1010; }
+.info-box.gaps .info-box-label { color: #fca5a5; }
+
+.salary-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 6px; }
+.salary-item { background: #060e07; border-radius: 8px; padding: 0.6rem 0.7rem; border: 1px solid #0f2a14; }
+.salary-level { font-size: 0.62rem; color: #4ade80; font-weight: 700; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.08em; }
+.salary-range { font-size: 0.78rem; color: #bbf7d0; font-weight: 600; }
+
+.gap-badge { display: inline-block; font-size: 0.68rem; background: #1a0808; color: #fca5a5; border: 1px solid #4c1010; border-radius: 6px; padding: 3px 10px; margin: 2px; }
+.add-badge { display: inline-block; font-size: 0.68rem; background: #071a09; color: #86efac; border: 1px solid #0f4018; border-radius: 6px; padding: 3px 10px; margin: 2px; }
+
+.runner-up { background: #0d0d1a; border: 1px solid #1e1e3a; border-radius: 12px; padding: 1rem 1.2rem; font-size: 0.85rem; color: #94a3b8; line-height: 1.7; margin-top: 0.75rem; }
+.runner-up strong { color: #fbbf24; font-family: 'Syne', sans-serif; }
+
+/* JD match specific */
+.match-score-big {
+    font-family: 'Syne', sans-serif; font-size: 5rem; font-weight: 800; line-height: 1;
+    background: linear-gradient(135deg, #ec4899, #a855f7);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.jd-match-card {
+    background: linear-gradient(140deg, #160d1e, #130d20);
+    border: 1px solid #4a1a4a;
+    border-radius: 22px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+.match-label { font-size: 0.75rem; color: #94a3b8; margin-top: 0.25rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; }
+
+/* Streamlit overrides */
+.stTextInput > div > div > input {
+    background: #13132a !important; border: 1px solid #1e1e3a !important;
+    color: #e2e8f0 !important; border-radius: 10px !important; padding: 0.6rem 0.9rem !important;
+}
+.stTextInput > div > div > input:focus { border-color: #7c3aed !important; box-shadow: none !important; }
+.stTextArea > div > div > textarea { background: #0f0f20 !important; border: 1px solid #1a1a30 !important; color: #cbd5e1 !important; border-radius: 10px !important; }
+.stFileUploader { background: transparent !important; }
+[data-testid="stChatInput"] textarea { background: #0f0f20 !important; border: 1px solid #1e1e3a !important; color: #e2e8f0 !important; border-radius: 10px !important; }
+
+div.stButton > button {
+    background: linear-gradient(135deg, #7c3aed, #db2777) !important;
+    color: #fff !important; border: none !important; border-radius: 10px !important;
+    font-weight: 600 !important; font-family: 'DM Sans', sans-serif !important;
+    font-size: 0.88rem !important; padding: 0.55rem 1.4rem !important;
+    cursor: pointer !important; transition: opacity 0.2s !important;
+}
+div.stButton > button:hover { opacity: 0.85 !important; }
+div.stButton > button[kind="secondary"] {
+    background: #13132a !important;
+    color: #a5b4fc !important;
+    border: 1px solid #1e1e3a !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
-# ============================================================
-# SESSION STATE
-# ============================================================
-if "page" not in st.session_state:
-    st.session_state.page = "home"
-if "analysis_submode" not in st.session_state:
-    st.session_state.analysis_submode = None
-if "analysis_tab" not in st.session_state:
-    st.session_state.analysis_tab = "overview"
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-if "agent" not in st.session_state:
-    st.session_state.agent = None
-if "cv_text" not in st.session_state:
-    st.session_state.cv_text = None
-if "analysis_raw" not in st.session_state:
-    st.session_state.analysis_raw = None
-if "retrieved" not in st.session_state:
-    st.session_state.retrieved = None
-if "candidate_name" not in st.session_state:
-    st.session_state.candidate_name = ""
-if "name_entered" not in st.session_state:
-    st.session_state.name_entered = False
-if "matched_companies" not in st.session_state:
-    st.session_state.matched_companies = []
-if "jd_match_result" not in st.session_state:
-    st.session_state.jd_match_result = None
-if "show_dropdown" not in st.session_state:
-    st.session_state.show_dropdown = False
+
+# ── Session state ──────────────────────────────────────────────────
+for k, v in {
+    "page": "welcome",        # welcome | home | analyze | jd_match
+    "candidate_name": "",
+    "cv_text": None,
+    "jd_text": "",
+    "messages": [],
+    "messages_jd": [],
+    "agent": None,
+    "agent_jd": None,
+    "retrieved": None,
+    "analysis_raw": None,
+    "jd_analysis_raw": None,
+    "jd_retrieved": None,
+    "prefill": None,
+}.items():
+    if k not in st.session_state:
+        st.session_state[k] = v
 
 
 def parse_analysis(text: str) -> dict:
     def get(tag):
         m = re.search(rf"{tag}:\s*(.+?)(?=\n[A-Z_]+:|$)", text, re.DOTALL)
         return m.group(1).strip() if m else ""
+
     def get_list(tag):
         m = re.search(rf"{tag}:\s*((?:\n- .+)+)", text)
         if not m:
             return []
         return [l.lstrip("- ").strip() for l in m.group(1).strip().split("\n") if l.strip().startswith("-")]
+
     return {
-        "top_role": get("TOP_ROLE"),
-        "match_pct": get("MATCH_PCT"),
-        "why_right": get("WHY_RIGHT"),
-        "next_steps": get_list("NEXT_STEPS"),
-        "skill_gaps": get_list("SKILL_GAPS"),
-        "resume_add": get_list("RESUME_ADD"),
-        "career_path": get_list("CAREER_PATH"),
-        "runner_up": get("RUNNER_UP"),
+        "top_role":      get("TOP_ROLE"),
+        "match_pct":     get("MATCH_PCT"),
+        "why_right":     get("WHY_RIGHT"),
+        "next_steps":    get_list("NEXT_STEPS"),
+        "skill_gaps":    get_list("SKILL_GAPS"),
+        "resume_add":    get_list("RESUME_ADD"),
+        "career_path":   get_list("CAREER_PATH"),
+        "runner_up":     get("RUNNER_UP"),
+        "runner_up_why": get("RUNNER_UP_WHY"),
     }
 
 
-def match_companies(cv_text: str, _) -> list:
-    cv_lower = cv_text.lower()
-    companies = []
-    try:
-        roles = load_roles()
-        for role in roles:
-            if role.get("company"):
-                skills = role.get("skills", [])
-                found = sum(1 for s in skills if s.lower() in cv_lower)
-                score = (found / max(len(skills), 1)) * 100
-                salary = role.get("salary", {})
-                salary_str = f"৳{salary['junior']}" if salary.get("junior") and salary['junior'] != "0" else ""
-                companies.append({
-                    "name": role["company"],
-                    "role": role.get("title", role.get("role")),
-                    "match_score": round(score, 1),
-                    "salary_range": salary_str,
-                    "location": role.get("location", "Dhaka"),
-                })
-        companies.sort(key=lambda x: x["match_score"], reverse=True)
-        return companies[:6]
-    except:
-        return []
+def go(page): st.session_state.page = page; st.rerun()
 
 
-def calculate_jd_match_score(cv_text: str, jd_text: str) -> dict:
-    cv_lower = cv_text.lower()
-    jd_lower = jd_text.lower()
-    
-    keywords = set()
-    for skill in ['python', 'sql', 'tensorflow', 'pytorch', 'langchain', 'rag', 'llm', 'nlp', 'docker', 'kubernetes', 'aws', 'gcp', 'azure', 'pandas', 'numpy', 'scikit-learn', 'git', 'linux']:
-        if skill in jd_lower:
-            keywords.add(skill)
-    
-    found = [kw for kw in keywords if kw in cv_lower]
-    missing = [kw for kw in keywords if kw not in cv_lower]
-    match_pct = int((len(found) / max(len(keywords), 1)) * 100)
-    
-    return {
-        "match_pct": min(95, match_pct),
-        "matched_keywords": found[:15],
-        "missing_keywords": missing[:15],
-        "found_count": len(found),
-        "total_keywords": len(keywords),
-    }
-
-
-def render_navbar():
-    """Single navigation bar - NO DUPLICATES"""
+# ══════════════════════════════════════════════════════════════════
+# TOP NAV (shown on all pages except welcome)
+# ══════════════════════════════════════════════════════════════════
+def render_nav():
+    page = st.session_state.page
     name = st.session_state.candidate_name
-    first_name = name.split()[0] if name else "Guest"
-    
-    # Using HTML for clean nav bar
-    st.markdown(f'''
-    <div class="single-nav">
-        <div class="nav-left">
-            <button class="nav-item nav-logo" onclick="parent.postMessage({{type: 'streamlit:setComponentValue', value: 'home'}}, '*')">📄 CV Analyzer</button>
-            <button class="nav-item" onclick="parent.postMessage({{type: 'streamlit:setComponentValue', value: 'home'}}, '*')">🏠 Home</button>
-            <button class="nav-item" onclick="parent.postMessage({{type: 'streamlit:setComponentValue', value: 'analyze'}}, '*')">📊 Analysis</button>
-            <button class="nav-item" onclick="parent.postMessage({{type: 'streamlit:setComponentValue', value: 'chat'}}, '*')">💬 Chat</button>
-            <button class="nav-item" onclick="parent.postMessage({{type: 'streamlit:setComponentValue', value: 'career'}}, '*')">🎯 Career Rec</button>
-        </div>
-        <div class="nav-right">
-            <button class="user-btn" id="userBtn" onclick="parent.postMessage({{type: 'streamlit:setComponentValue', value: 'toggle_dropdown'}}, '*')">👋 {first_name} ▼</button>
-        </div>
-    </div>
-    ''', unsafe_allow_html=True)
-    
-    # Handle button clicks via Streamlit
-    col1, col2, col3, col4, col5, col6 = st.columns([1.2, 0.8, 0.8, 0.8, 0.8, 0.8])
-    with col1:
-        if st.button("📄 CV Analyzer", key="nav_logo", use_container_width=True):
-            st.session_state.page = "home"
-            st.session_state.analysis_submode = None
-            st.rerun()
-    with col2:
-        if st.button("🏠 Home", key="nav_home", use_container_width=True):
-            st.session_state.page = "home"
-            st.session_state.analysis_submode = None
-            st.rerun()
-    with col3:
-        if st.button("📊 Analysis", key="nav_analysis", use_container_width=True):
-            if st.session_state.cv_text:
-                st.session_state.page = "analyze"
-            else:
-                st.warning("Please analyze your CV first on Home page")
-            st.rerun()
-    with col4:
-        if st.button("💬 Chat", key="nav_chat", use_container_width=True):
-            if st.session_state.agent:
-                st.session_state.page = "chat"
-            else:
-                st.warning("Please analyze your CV first")
-            st.rerun()
-    with col5:
-        if st.button("🎯 Career Rec", key="nav_career", use_container_width=True):
-            if st.session_state.cv_text:
-                st.session_state.page = "career"
-            else:
-                st.warning("Please analyze your CV first")
-            st.rerun()
-    with col6:
-        if st.button(f"👋 {first_name}", key="nav_user", use_container_width=True):
-            st.session_state.show_dropdown = not st.session_state.show_dropdown
-            st.rerun()
-    
-    # Dropdown menu
-    if st.session_state.show_dropdown:
-        st.markdown(f'''
-        <div class="dropdown-menu">
-            <div class="dropdown-text">Signed in as</div>
-            <div class="dropdown-name">{name}</div>
-            <div class="dropdown-divider"></div>
-            <div class="dropdown-signout" onclick="parent.postMessage({{type: 'streamlit:setComponentValue', value: 'signout'}}, '*')">🚪 Sign Out / Change Name</div>
-        </div>
-        ''', unsafe_allow_html=True)
-        
-        if st.button("Confirm Sign Out", key="signout_confirm"):
-            st.session_state.name_entered = False
-            st.session_state.cv_text = None
-            st.session_state.analysis_raw = None
-            st.session_state.retrieved = None
-            st.session_state.agent = None
-            st.session_state.messages = []
-            st.session_state.show_dropdown = False
-            st.rerun()
-    
-    st.markdown("<hr style='margin: 0.5rem 0; border-color: #1a1a30;'>", unsafe_allow_html=True)
+    first = name.split()[0].capitalize() if name and name != "there" else "User"
 
+    home_active   = "active" if page == "home"     else ""
+    anal_active   = "active" if page == "analyze"  else ""
+    jd_active     = "active" if page == "jd_match" else ""
 
-def render_welcome():
-    st.markdown("""
-    <div style='text-align: center; padding: 2rem 0;'>
-        <div style='font-family: Syne, sans-serif; font-size: 3rem; font-weight: 800;'>CV <span style='background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>Analyzer</span></div>
-        <p style='color: #64748b;'>AI-powered career matching for data & AI roles</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2, col3 = st.columns([1, 1.2, 1])
-    with col2:
-        st.markdown('<div class="welcome-card">', unsafe_allow_html=True)
-        st.markdown('<div style="font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem;">👋 Welcome!</div>', unsafe_allow_html=True)
-        with st.form(key="name_form"):
-            name = st.text_input("Your name", placeholder="Talha Jobayer", label_visibility="collapsed")
-            if st.form_submit_button("✨ Start Analysis →", use_container_width=True, type="primary"):
-                if name and name.strip():
-                    st.session_state.candidate_name = name.strip()
-                    st.session_state.name_entered = True
-                    st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
-
-
-def render_home():
-    name = st.session_state.candidate_name
-    first_name = name.split()[0]
-    
-    st.markdown(f"<h2 style='text-align: center;'>Hello, {first_name}! 👋</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #64748b;'>Ready to analyze your CV?</p>", unsafe_allow_html=True)
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("""
-        <div class='mode-card'>
-            <div class='mode-icon'>📄</div>
-            <div class='mode-title'>Analyze My CV</div>
-            <div class='mode-desc'>Get matched with AI/ML roles from our knowledge base</div>
-            <div class='mode-desc' style='color: #a855f7;'>Skills | Roles | Salary | Career Path</div>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button("📄 Analyze My CV", key="home_cv", use_container_width=True):
-            st.session_state.analysis_submode = "cv_analysis"
-            st.rerun()
-    
-    with col2:
-        st.markdown("""
-        <div class='mode-card'>
-            <div class='mode-icon'>🎯</div>
-            <div class='mode-title'>Match with Job Description</div>
-            <div class='mode-desc'>Paste a JD and see how well your CV matches</div>
-            <div class='mode-desc' style='color: #10b981;'>Match % | Missing Skills | Companies</div>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button("🎯 Match with JD", key="home_jd", use_container_width=True):
-            st.session_state.analysis_submode = "jd_match"
-            st.rerun()
-    
-    if st.session_state.analysis_submode == "cv_analysis":
-        st.markdown("---")
-        uploaded = st.file_uploader("Upload your CV (PDF)", type=["pdf"], key="cv_upload")
-        if uploaded and st.button("🚀 Start Analysis", type="primary", use_container_width=True):
-            process_cv_analysis(uploaded)
-    
-    elif st.session_state.analysis_submode == "jd_match":
-        st.markdown("---")
-        col_a, col_b = st.columns(2)
-        with col_a:
-            uploaded = st.file_uploader("Your CV (PDF)", type=["pdf"], key="jd_cv_upload")
-        with col_b:
-            jd_text = st.text_area("Job Description", height=150, placeholder="Paste the job description here...")
-        if uploaded and jd_text and st.button("🎯 Calculate Match", type="primary", use_container_width=True):
-            process_jd_match(uploaded, jd_text)
-
-
-def process_cv_analysis(uploaded):
-    with st.spinner("Processing..."):
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-            tmp.write(uploaded.read())
-            cv_text = extract_cv_text(tmp.name)
-            os.unlink(tmp.name)
-        
-        st.session_state.cv_text = cv_text
-        st.session_state.retrieved = retrieve_context(cv_text, "", k=5)
-        st.session_state.matched_companies = match_companies(cv_text, [])
-        st.session_state.agent = build_agent(cv_text, "", st.session_state.candidate_name)
-        raw = run_agent(st.session_state.agent, "Analyse this CV. Follow tags: TOP_ROLE, MATCH_PCT, WHY_RIGHT, NEXT_STEPS, SKILL_GAPS, RESUME_ADD, CAREER_PATH, RUNNER_UP")
-        st.session_state.analysis_raw = raw
-    
-    st.session_state.page = "analyze"
-    st.rerun()
-
-
-def process_jd_match(uploaded, jd_text):
-    with st.spinner("Processing..."):
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-            tmp.write(uploaded.read())
-            cv_text = extract_cv_text(tmp.name)
-            os.unlink(tmp.name)
-        
-        st.session_state.cv_text = cv_text
-        st.session_state.jd_match_result = calculate_jd_match_score(cv_text, jd_text)
-        st.session_state.matched_companies = match_companies(cv_text, [])
-    
-    st.session_state.page = "jd_result"
-    st.rerun()
-
-
-def render_jd_result():
-    r = st.session_state.jd_match_result
-    if not r:
-        st.warning("No result")
-        return
-    
-    pct = r["match_pct"]
-    color = "#ef4444" if pct < 30 else "#f59e0b" if pct < 60 else "#10b981" if pct < 80 else "#06b6d4"
-    status = ["Low Match", "Partial Match", "Good Match", "Excellent Match!"][[30,60,80,100].index(min([x for x in [30,60,80,100] if x > pct]))]
-    
     st.markdown(f"""
-    <div class='jd-match-card'>
-        <div style='color:{color};'>JD Match Score</div>
-        <div class='jd-match-score' style='color:{color};'>{pct}%</div>
-        <div style='color:#f1f5f9;'>{status}</div>
+    <div class='topnav'>
+        <div class='topnav-brand'>📄 CV Analyzer</div>
+        <div class='topnav-links' id='navlinks'></div>
+        <div class='topnav-user'>👤 {first}</div>
     </div>
     """, unsafe_allow_html=True)
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric("Keywords Found", f"{r['found_count']}/{r['total_keywords']}")
-    with col2:
-        if st.session_state.matched_companies:
-            st.markdown("**🏢 Companies to target**")
-            for c in st.session_state.matched_companies[:3]:
-                st.markdown(f"- {c['name']} ({c['match_score']}%)")
-    
-    if r.get("missing_keywords"):
-        st.markdown("**❌ Add these to your CV**")
-        st.markdown(" ".join(f"<span class='skill-chip gap-chip'>{kw}</span>" for kw in r["missing_keywords"][:8]), unsafe_allow_html=True)
-    
-    if st.button("← New Match", use_container_width=True):
-        st.session_state.page = "home"
-        st.session_state.analysis_submode = "jd_match"
-        st.rerun()
+
+    # Use Streamlit buttons inside columns for navigation
+    nav_cols = st.columns([2, 1, 1, 1, 2])
+    with nav_cols[1]:
+        if st.button("🏠 Home", key="nav_home"):
+            go("home")
+    with nav_cols[2]:
+        if st.button("📊 Analysis", key="nav_analyze"):
+            go("analyze")
+    with nav_cols[3]:
+        if st.button("🎯 JD Match", key="nav_jd"):
+            go("jd_match")
 
 
-def render_analysis():
-    if not st.session_state.cv_text:
-        st.warning("Please analyze your CV first")
-        return
-    
-    r = st.session_state.retrieved or {}
-    matches = r.get("all_matches", [])
-    top = r.get("top_match", {})
-    readiness = r.get("readiness", {})
-    parsed = parse_analysis(st.session_state.analysis_raw or "") if st.session_state.analysis_raw else {}
-    
-    t1, t2, t3, t4, t5 = st.tabs(["📊 Overview", "🏢 Companies", "💰 Salary", "🔧 Skills", "🗺️ Path"])
-    
-    with t1:
-        st.markdown(f"<div class='hero-match'>{parsed.get('match_pct', top.get('match_pct', 0))}% Match</div>", unsafe_allow_html=True)
-        st.markdown(f"<h3 style='text-align:center;'>{parsed.get('top_role', top.get('title', 'AI Professional'))}</h3>", unsafe_allow_html=True)
-        st.markdown(f"<p style='text-align:center;color:#94a3b8;'>{parsed.get('why_right', 'Great alignment!')}</p>", unsafe_allow_html=True)
-        score = readiness.get("total_score", 0)
-        if score < 30:
-            st.warning(f"🔴 Readiness: {score}% - Build fundamentals")
-        elif score < 60:
-            st.warning(f"🟡 Readiness: {score}% - Keep going")
-        else:
-            st.success(f"🟢 Readiness: {score}% - Ready to apply!")
-    
-    with t2:
-        for c in st.session_state.matched_companies[:5]:
-            st.markdown(f"**{c['name']}** - {c['role']} ({c['match_score']}%)\n📍 {c['location']}")
-            if c.get("salary_range"):
-                st.caption(f"💰 {c['salary_range']}/month")
-    
-    with t3:
-        for role in matches[:4]:
-            if role.get("salary_min"):
-                st.metric(role.get("title"), f"৳{role['salary_min']:,} - ৳{role['salary_max']:,}")
-    
-    with t4:
-        gaps = parsed.get("skill_gaps") or r.get("skill_gaps", [])
-        for g in gaps[:6]:
-            st.markdown(f"<span class='skill-chip gap-chip'>{g}</span>", unsafe_allow_html=True)
-        recs = parsed.get("resume_add") or r.get("resume_skills", [])
-        for sk in recs[:6]:
-            st.markdown(f"<span class='skill-chip add-chip'>+ {sk}</span>", unsafe_allow_html=True)
-    
-    with t5:
-        path = parsed.get("career_path", [])
-        for i, p in enumerate(path[:5]):
-            st.markdown(f"{i+1}. {p}")
+# ══════════════════════════════════════════════════════════════════
+# PAGE: WELCOME
+# ══════════════════════════════════════════════════════════════════
+if st.session_state.page == "welcome":
+    st.markdown("""
+    <div class='welcome-wrap'>
+        <div class='welcome-logo'>Your CV <span>Analyzer</span></div>
+        <div class='welcome-sub'>Powered by FAISS vector search + LLM analysis</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    _, col, _ = st.columns([1, 1.2, 1])
+    with col:
+        st.markdown("""
+        <div class='welcome-card'>
+            <div class='welcome-label'>👋 Welcome! What's your name?</div>
+        </div>
+        """, unsafe_allow_html=True)
+        name_val = st.text_input("Your name", placeholder="e.g. Talha Jobayer",
+                                  label_visibility="collapsed", key="name_field")
+        st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+        if st.button("Get Started →", use_container_width=True):
+            n = name_val.strip()
+            st.session_state.candidate_name = n if n else "there"
+            go("home")
+    st.stop()
 
 
-def render_chat():
-    if not st.session_state.agent:
-        st.warning("Please analyze your CV first")
-        return
-    
-    for msg in st.session_state.messages:
-        with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
-    
-    if prompt := st.chat_input("Ask about your career..."):
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
-        with st.chat_message("assistant"):
-            with st.spinner("Thinking..."):
-                resp = run_agent(st.session_state.agent, prompt)
-                st.markdown(resp)
-                st.session_state.messages.append({"role": "assistant", "content": resp})
-        st.rerun()
+# ══════════════════════════════════════════════════════════════════
+# NAV (all non-welcome pages)
+# ══════════════════════════════════════════════════════════════════
+render_nav()
 
 
-def render_career_rec():
-    if not st.session_state.cv_text:
-        st.warning("Please analyze your CV first")
-        return
-    
-    r = st.session_state.retrieved or {}
-    score = r.get("readiness", {}).get("total_score", 0)
-    
-    if score < 30:
-        st.warning("🔴 **Focus on Fundamentals**\n\n- Complete Python basics\n- Take ML courses\n- Build 2-3 projects")
-    elif score < 60:
-        st.warning("🟡 **Building Momentum**\n\n- Take advanced courses\n- Build portfolio\n- Get certifications")
-    else:
-        st.success("🟢 **Ready for Job Search!**\n\n- Update LinkedIn\n- Apply to matching companies\n- Prepare for interviews")
+# ══════════════════════════════════════════════════════════════════
+# PAGE: HOME
+# ══════════════════════════════════════════════════════════════════
+if st.session_state.page == "home":
+    name = st.session_state.candidate_name
+    first = name.split()[0].capitalize() if name and name != "there" else "there"
+
+    st.markdown(f"""
+    <div class='home-hero'>
+        <div class='home-greeting'>Hello, <span>{first}!</span> 👋</div>
+        <div class='home-sub'>Ready to analyze your CV?</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    _, mid, _ = st.columns([1, 6, 1])
+    with mid:
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.markdown("""
+            <div class='option-card' style='cursor:default;'>
+                <div class='option-icon'>📄</div>
+                <div class='option-title'>Analyze My CV</div>
+                <div class='option-desc'>Get matched with AI/ML roles from our curated knowledge base using FAISS vector search.</div>
+                <div class='option-tags'>Skills | Roles | Salary | Career Path</div>
+            </div>
+            """, unsafe_allow_html=True)
+            st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
+            if st.button("📄 Analyze My CV", use_container_width=True, key="home_analyze"):
+                go("analyze")
+
+        with col2:
+            st.markdown("""
+            <div class='option-card jd' style='cursor:default;'>
+                <div class='option-icon'>🎯</div>
+                <div class='option-title'>Match with Job Description</div>
+                <div class='option-desc'>Paste a JD and see exactly how well your CV matches. Uncover skill gaps and alignment score.</div>
+                <div class='option-tags jd'>Match % | Missing Skills | Companies</div>
+            </div>
+            """, unsafe_allow_html=True)
+            st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
+            if st.button("🎯 Match with JD", use_container_width=True, key="home_jd"):
+                go("jd_match")
+
+    st.stop()
 
 
-# ============================================================
-# MAIN
-# ============================================================
-def main():
-    if not st.session_state.name_entered:
-        render_welcome()
-        return
-    
-    render_navbar()
-    
-    if st.session_state.page == "home":
-        render_home()
-    elif st.session_state.page == "analyze":
-        render_analysis()
-    elif st.session_state.page == "chat":
-        render_chat()
-    elif st.session_state.page == "jd_result":
-        render_jd_result()
-    elif st.session_state.page == "career":
-        render_career_rec()
+# ══════════════════════════════════════════════════════════════════
+# PAGE: ANALYZE CV
+# ══════════════════════════════════════════════════════════════════
+if st.session_state.page == "analyze":
+    st.markdown("""
+    <div class='page-header'>
+        <div>
+            <h2>📊 Analyze My CV</h2>
+            <p>Upload your CV and get matched to AI/data roles from our knowledge base</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Upload section (only show if no results yet)
+    if not st.session_state.cv_text or not st.session_state.analysis_raw:
+        _, col_mid, _ = st.columns([1, 4, 1])
+        with col_mid:
+            st.markdown("""
+            <div class='upload-zone'>
+                <div style='font-size:2rem;margin-bottom:0.5rem;'>📎</div>
+                <div style='font-size:0.88rem;color:#64748b;margin-bottom:1rem;'>Upload your CV (PDF)</div>
+            </div>
+            """, unsafe_allow_html=True)
+            uploaded_cv = st.file_uploader("Upload CV PDF", type=["pdf"],
+                                            label_visibility="collapsed", key="cv_upload")
+            st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
+
+            if uploaded_cv:
+                if st.button("⚡ Get Career Match", use_container_width=True, key="analyze_btn"):
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                        tmp.write(uploaded_cv.read()); tmp_path = tmp.name
+                    with st.spinner("Reading CV..."):
+                        from agent import extract_cv_text
+                        cv_text = extract_cv_text(tmp_path)
+                        os.unlink(tmp_path)
+                    st.session_state.cv_text = cv_text
+                    st.session_state.messages = []
+
+                    with st.spinner("Matching CV → FAISS knowledge base..."):
+                        from rag import retrieve_context
+                        st.session_state.retrieved = retrieve_context(cv_text, "", k=5)
+
+                    with st.spinner("Building AI agent..."):
+                        from agent import build_agent
+                        st.session_state.agent = build_agent(
+                            cv_text, "", st.session_state.candidate_name)
+
+                    with st.spinner("Generating career analysis..."):
+                        from agent import run_agent
+                        raw = run_agent(st.session_state.agent,
+                            "Analyse this candidate's CV and give a full career match. "
+                            "Follow EXACTLY these tags:\n"
+                            "TOP_ROLE, MATCH_PCT, WHY_RIGHT, NEXT_STEPS, "
+                            "SKILL_GAPS, RESUME_ADD, CAREER_PATH, RUNNER_UP, RUNNER_UP_WHY\n"
+                            "Be specific — reference actual CV skills throughout."
+                        )
+                        st.session_state.analysis_raw = raw
+                    st.rerun()
+            else:
+                st.markdown("<div style='text-align:center;color:#334155;font-size:0.82rem;padding:1rem 0;'>Upload a PDF to get started</div>", unsafe_allow_html=True)
+
+    # ── Results ────────────────────────────────────────────────────
+    if st.session_state.cv_text and st.session_state.analysis_raw:
+        retrieved = st.session_state.retrieved or {}
+        similar   = retrieved.get("similar_roles", [])
+        top       = retrieved.get("top_role") or (similar[0] if similar else {})
+        parsed    = parse_analysis(st.session_state.analysis_raw)
+
+        top_role_name = parsed.get("top_role") or top.get("title", top.get("role", ""))
+        match_pct     = parsed.get("match_pct") or str(top.get("match_pct", ""))
+        why_right     = parsed.get("why_right") or top.get("description", "")
+        next_steps    = parsed.get("next_steps") or []
+        resume_add    = parsed.get("resume_add") or []
+        career_path   = parsed.get("career_path") or []
+        runner_up     = parsed.get("runner_up") or (similar[1].get("title", "") if len(similar) > 1 else "")
+        runner_up_pct = similar[1]["match_pct"] if len(similar) > 1 else 0
+        runner_up_why = parsed.get("runner_up_why") or ""
+
+        # Refresh button
+        col_r1, col_r2 = st.columns([5, 1])
+        with col_r2:
+            if st.button("↺ New CV", key="new_cv"):
+                st.session_state.cv_text = None
+                st.session_state.analysis_raw = None
+                st.session_state.retrieved = None
+                st.session_state.agent = None
+                st.session_state.messages = []
+                st.rerun()
+
+        # Hero card
+        top_emoji = top.get("emoji", "🧠")
+        skills_html = "".join(f"<span class='skill-chip'>{s}</span>" for s in top.get("skills", [])[:6])
+        st.markdown(f"""
+        <div class='hero-card'>
+            <div class='hero-badge'>✦ Top Match</div>
+            <div class='hero-emoji'>{top_emoji}</div>
+            <div class='hero-title'>{top_role_name}</div>
+            <div class='hero-match'>{match_pct}% Match</div>
+            <div class='hero-desc'>{why_right}</div>
+            <div style='margin-top:0.75rem;'>{skills_html}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Breakdown
+        if similar:
+            st.markdown("<div class='section-header'>📊 Full Breakdown</div>", unsafe_allow_html=True)
+            cols = st.columns(min(len(similar), 4))
+            for i, role in enumerate(similar[:4]):
+                color = role.get("color", "#6366f1")
+                emoji = role.get("emoji", "⚡")
+                chips = "".join(f"<span class='breakdown-chip'>{s}</span>" for s in role.get("skills", [])[:4])
+                with cols[i]:
+                    st.markdown(f"""
+                    <div class='breakdown-card'>
+                        <div class='breakdown-card-header'><span>{emoji}</span><span class='breakdown-role'>{role.get('title', role.get('role', ''))}</span></div>
+                        <div class='breakdown-pct' style='color:{color};'>{role['match_pct']}%</div>
+                        <div class='breakdown-chips'>{chips}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+        # Why right
+        if top:
+            display_role = top_role_name or top.get("title", "This Role")
+            next_html = "".join(f"<div>• {s}</div>" for s in next_steps if s)
+            st.markdown(f"""
+            <div style='margin-top:1.5rem;'></div>
+            <div class='detail-card'>
+                <div class='detail-card-title'>💡 Why {display_role} is Right for You</div>
+                <div class='detail-card-desc'>{why_right}</div>
+                {f"<div class='info-box next-steps'><div class='info-box-label'>📋 Next Steps</div><div class='info-box-content'>{next_html}</div></div>" if next_html else ""}
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Salary
+        sal = top.get("salary", {})
+        if sal:
+            st.markdown(f"""
+            <div class='detail-card'>
+                <div class='info-box salary'>
+                    <div class='info-box-label'>💰 Salary (BDT | Approx. Annually)</div>
+                    <div class='salary-grid'>
+                        <div class='salary-item'><div class='salary-level'>Junior</div><div class='salary-range'>~৳{sal.get('junior','—')}</div></div>
+                        <div class='salary-item'><div class='salary-level'>Mid-Level</div><div class='salary-range'>~৳{sal.get('mid','—')}</div></div>
+                        <div class='salary-item'><div class='salary-level'>Senior</div><div class='salary-range'>~৳{sal.get('senior','—')}</div></div>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Market demand
+        demand = top.get("market_demand", "")
+        if demand:
+            demand_color = {"Extremely High": "#f472b6", "Very High": "#4ade80", "High": "#818cf8", "Medium-High": "#fb923c", "Medium": "#94a3b8"}.get(demand, "#818cf8")
+            st.markdown(f"""
+            <div class='detail-card'>
+                <div class='info-box demand'>
+                    <div class='info-box-label'>📈 Market Demand</div>
+                    <div class='info-box-content' style='font-weight:700;color:{demand_color};font-size:1rem;'>{demand}</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Skill gaps
+        gaps = retrieved.get("skill_gaps", [])
+        parsed_gaps = parsed.get("skill_gaps") or []
+        if gaps or parsed_gaps:
+            badges = "".join(f"<span class='gap-badge'>{g}</span>" for g in gaps[:8])
+            gap_items = ""
+            for item in parsed_gaps:
+                if ":" in item:
+                    p = item.split(":", 1)
+                    gap_items += f"<div style='font-size:0.83rem;color:#fca5a5;margin:5px 0;'>• <strong style='color:#f87171;'>{p[0]}:</strong>{p[1]}</div>"
+                else:
+                    gap_items += f"<div style='font-size:0.83rem;color:#fca5a5;margin:5px 0;'>• {item}</div>"
+            st.markdown(f"""
+            <div class='detail-card'>
+                <div class='detail-card-title'>🔴 Skill Gaps to Bridge</div>
+                <div style='margin-bottom:0.75rem;'>{badges}</div>
+                {gap_items}
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Resume recommendations
+        rskills = retrieved.get("resume_skills", [])
+        resume_items = parsed.get("resume_add") or []
+        if rskills or resume_items:
+            badges_r = "".join(f"<span class='add-badge'>+ {s}</span>" for s in rskills)
+            items_html = ""
+            for item in resume_items:
+                if ":" in item:
+                    p = item.split(":", 1)
+                    items_html += f"<div class='info-box resume' style='margin:5px 0;'><span style='font-weight:700;color:#86efac;'>{p[0]}:</span>{p[1]}</div>"
+                else:
+                    items_html += f"<div class='info-box resume' style='margin:5px 0;'>{item}</div>"
+            st.markdown(f"""
+            <div class='detail-card'>
+                <div class='detail-card-title'>✅ Resume Recommendations</div>
+                <div style='margin-bottom:0.75rem;'>{badges_r}</div>
+                {items_html}
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Career path
+        cp_items = career_path or []
+        if not cp_items and top.get("career_path"):
+            cp_items = [top["career_path"]]
+        if cp_items:
+            steps_parts = []
+            for step in cp_items:
+                if ":" in step:
+                    p = step.split(":", 1)
+                    steps_parts.append(
+                        "<div style='display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;'>"
+                        "<div style='width:8px;height:8px;border-radius:50%;background:#6366f1;margin-top:5px;flex-shrink:0;'></div>"
+                        f"<div style='font-size:0.85rem;'><span style='color:#a5b4fc;font-weight:700;'>{p[0]}:</span><span style='color:#94a3b8;'>{p[1]}</span></div></div>"
+                    )
+                else:
+                    steps_parts.append(f"<div style='font-size:0.85rem;color:#94a3b8;margin-bottom:8px;display:flex;gap:10px;'><span style='color:#6366f1;'>→</span><span>{step}</span></div>")
+            st.markdown(f"<div class='detail-card'><div class='detail-card-title'>🗺️ Your Career Path</div>{''.join(steps_parts)}</div>", unsafe_allow_html=True)
+
+        # Runner-up
+        if runner_up:
+            st.markdown(f"""
+            <div class='runner-up'>
+                🥈 <strong>Runner-up: {runner_up} ({runner_up_pct}%)</strong><br>
+                <span style='color:#64748b;font-size:0.83rem;'>{runner_up_why}</span>
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Chat
+        st.markdown("<div style='height:2rem'></div>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header'>💬 Ask a Follow-up Question</div>", unsafe_allow_html=True)
+
+        for msg in st.session_state.messages:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"])
+
+        user_input = st.chat_input("Ask about roles, skills, salaries, or your career path...", key="chat_analyze")
+        if user_input:
+            st.session_state.messages.append({"role": "user", "content": user_input})
+            with st.chat_message("user"):
+                st.markdown(user_input)
+            with st.chat_message("assistant"):
+                with st.spinner("Thinking..."):
+                    try:
+                        from agent import run_agent
+                        resp = run_agent(st.session_state.agent, user_input)
+                        st.markdown(resp)
+                        st.session_state.messages.append({"role": "assistant", "content": resp})
+                    except Exception as e:
+                        err = f"❌ Error: {str(e)}"
+                        st.error(err)
+
+    st.stop()
 
 
-if __name__ == "__main__":
-    main()
+# ══════════════════════════════════════════════════════════════════
+# PAGE: MATCH WITH JD
+# ══════════════════════════════════════════════════════════════════
+if st.session_state.page == "jd_match":
+    st.markdown("""
+    <div class='page-header'>
+        <div>
+            <h2>🎯 Match with Job Description</h2>
+            <p>Upload your CV and paste a JD to see your exact match score and skill gaps</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if not st.session_state.jd_analysis_raw:
+        _, col_mid, _ = st.columns([1, 4, 1])
+        with col_mid:
+            st.markdown("<div style='font-size:0.78rem;color:#475569;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.4rem;'>Upload Your CV (PDF)</div>", unsafe_allow_html=True)
+            uploaded_cv_jd = st.file_uploader("CV PDF", type=["pdf"],
+                                               label_visibility="collapsed", key="cv_upload_jd")
+
+            st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
+            st.markdown("<div style='font-size:0.78rem;color:#475569;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.4rem;'>Paste Job Description</div>", unsafe_allow_html=True)
+            jd_input = st.text_area("Job Description", height=180,
+                                     placeholder="Paste the full job description from LinkedIn, Indeed, Glassdoor...",
+                                     label_visibility="collapsed", key="jd_textarea")
+
+            st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
+
+            if uploaded_cv_jd and jd_input.strip():
+                if st.button("🎯 Analyse JD Match", use_container_width=True, key="jd_match_btn"):
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                        tmp.write(uploaded_cv_jd.read()); tmp_path = tmp.name
+                    with st.spinner("Reading CV..."):
+                        from agent import extract_cv_text
+                        cv_text = extract_cv_text(tmp_path)
+                        os.unlink(tmp_path)
+                    st.session_state.cv_text = cv_text
+                    st.session_state.jd_text = jd_input.strip()
+                    st.session_state.messages_jd = []
+
+                    with st.spinner("Matching against JD..."):
+                        from rag import retrieve_context
+                        st.session_state.jd_retrieved = retrieve_context(
+                            cv_text, jd_input.strip(), k=5)
+
+                    with st.spinner("Building AI agent..."):
+                        from agent import build_agent
+                        st.session_state.agent_jd = build_agent(
+                            cv_text, jd_input.strip(), st.session_state.candidate_name)
+
+                    with st.spinner("Generating JD match analysis..."):
+                        from agent import run_agent
+                        raw = run_agent(st.session_state.agent_jd,
+                            "Analyse how well this candidate's CV matches the specific Job Description provided. "
+                            "Give a match score focused on this JD. Follow EXACTLY these tags:\n"
+                            "TOP_ROLE, MATCH_PCT, WHY_RIGHT, NEXT_STEPS, "
+                            "SKILL_GAPS, RESUME_ADD, CAREER_PATH, RUNNER_UP, RUNNER_UP_WHY\n"
+                            "Focus on the JD requirements specifically."
+                        )
+                        st.session_state.jd_analysis_raw = raw
+                    st.rerun()
+            else:
+                if not uploaded_cv_jd:
+                    st.markdown("<div style='text-align:center;color:#334155;font-size:0.82rem;padding:0.5rem 0;'>⬆ Upload your CV PDF to get started</div>", unsafe_allow_html=True)
+                elif not jd_input.strip():
+                    st.markdown("<div style='text-align:center;color:#334155;font-size:0.82rem;padding:0.5rem 0;'>📝 Paste a job description above</div>", unsafe_allow_html=True)
+
+    # ── JD Results ────────────────────────────────────────────────
+    if st.session_state.jd_analysis_raw:
+        retrieved = st.session_state.jd_retrieved or {}
+        similar   = retrieved.get("similar_roles", [])
+        top       = retrieved.get("top_role") or (similar[0] if similar else {})
+        parsed    = parse_analysis(st.session_state.jd_analysis_raw)
+
+        top_role_name = parsed.get("top_role") or top.get("title", top.get("role", ""))
+        match_pct     = parsed.get("match_pct") or str(top.get("match_pct", ""))
+        why_right     = parsed.get("why_right") or top.get("description", "")
+        next_steps    = parsed.get("next_steps") or []
+        resume_add    = parsed.get("resume_add") or []
+        career_path   = parsed.get("career_path") or []
+
+        col_r1, col_r2 = st.columns([5, 1])
+        with col_r2:
+            if st.button("↺ New Match", key="new_jd"):
+                st.session_state.jd_analysis_raw = None
+                st.session_state.jd_retrieved = None
+                st.session_state.agent_jd = None
+                st.session_state.messages_jd = []
+                st.rerun()
+
+        # JD Match hero card
+        top_emoji = top.get("emoji", "🎯")
+        skills_html = "".join(f"<span class='skill-chip'>{s}</span>" for s in top.get("skills", [])[:6])
+        st.markdown(f"""
+        <div class='jd-match-card'>
+            <div class='hero-badge' style='background:linear-gradient(135deg,#db2777,#a855f7);'>🎯 JD Match Score</div>
+            <div class='hero-emoji'>{top_emoji}</div>
+            <div class='hero-title'>{top_role_name}</div>
+            <div class='match-score-big'>{match_pct}%</div>
+            <div class='match-label'>Match with Job Description</div>
+            <div class='hero-desc' style='margin-top:1rem;'>{why_right}</div>
+            <div style='margin-top:0.75rem;'>{skills_html}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Skill gaps from JD
+        gaps = retrieved.get("skill_gaps", [])
+        parsed_gaps = parsed.get("skill_gaps") or []
+        if gaps or parsed_gaps:
+            badges = "".join(f"<span class='gap-badge'>{g}</span>" for g in gaps[:8])
+            gap_items = ""
+            for item in parsed_gaps:
+                if ":" in item:
+                    p = item.split(":", 1)
+                    gap_items += f"<div style='font-size:0.83rem;color:#fca5a5;margin:5px 0;'>• <strong style='color:#f87171;'>{p[0]}:</strong>{p[1]}</div>"
+                else:
+                    gap_items += f"<div style='font-size:0.83rem;color:#fca5a5;margin:5px 0;'>• {item}</div>"
+            st.markdown(f"""
+            <div class='detail-card'>
+                <div class='detail-card-title'>🔴 Missing Skills for This JD</div>
+                <div style='margin-bottom:0.75rem;'>{badges}</div>
+                {gap_items}
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Resume tips for JD
+        rskills = retrieved.get("resume_skills", [])
+        resume_items = parsed.get("resume_add") or []
+        if rskills or resume_items:
+            badges_r = "".join(f"<span class='add-badge'>+ {s}</span>" for s in rskills)
+            items_html = ""
+            for item in resume_items:
+                if ":" in item:
+                    p = item.split(":", 1)
+                    items_html += f"<div class='info-box resume' style='margin:5px 0;'><span style='font-weight:700;color:#86efac;'>{p[0]}:</span>{p[1]}</div>"
+                else:
+                    items_html += f"<div class='info-box resume' style='margin:5px 0;'>{item}</div>"
+            st.markdown(f"""
+            <div class='detail-card'>
+                <div class='detail-card-title'>✅ Resume Tips for This JD</div>
+                <div style='margin-bottom:0.75rem;'>{badges_r}</div>
+                {items_html}
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Next steps
+        if next_steps:
+            next_html = "".join(f"<div>• {s}</div>" for s in next_steps if s)
+            st.markdown(f"""
+            <div class='detail-card'>
+                <div class='info-box next-steps'>
+                    <div class='info-box-label'>📋 Steps to Land This Role</div>
+                    <div class='info-box-content'>{next_html}</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Chat for JD
+        st.markdown("<div style='height:2rem'></div>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header'>💬 Ask About This JD</div>", unsafe_allow_html=True)
+
+        for msg in st.session_state.messages_jd:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"])
+
+        user_input_jd = st.chat_input("Ask about the JD requirements, how to improve your match...", key="chat_jd")
+        if user_input_jd:
+            st.session_state.messages_jd.append({"role": "user", "content": user_input_jd})
+            with st.chat_message("user"):
+                st.markdown(user_input_jd)
+            with st.chat_message("assistant"):
+                with st.spinner("Thinking..."):
+                    try:
+                        from agent import run_agent
+                        resp = run_agent(st.session_state.agent_jd, user_input_jd)
+                        st.markdown(resp)
+                        st.session_state.messages_jd.append({"role": "assistant", "content": resp})
+                    except Exception as e:
+                        err = f"❌ Error: {str(e)}"
+                        st.error(err)
+
+    st.stop()
