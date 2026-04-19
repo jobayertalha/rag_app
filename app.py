@@ -9,7 +9,7 @@ import re
 
 # Import at the top (not inside functions) - OPTIMIZED
 from agent import extract_cv_text, build_agent, run_agent
-from rag import retrieve_context
+from rag import retrieve_context, load_roles
 
 st.set_page_config(
     page_title="CV Analyzer | AI Career Match",
@@ -33,29 +33,29 @@ st.markdown("""
     background: linear-gradient(135deg, #0a0a14 0%, #0f0f20 100%);
 }
 
+/* Hide default Streamlit elements */
+#MainMenu {visibility: hidden;}
+header {visibility: hidden;}
+.stDeployButton {display: none;}
+
 /* Navigation Bar */
-.nav-bar {
+.top-nav {
     background: rgba(15, 15, 32, 0.95);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid #2d2d5a;
     padding: 0.75rem 2rem;
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     z-index: 1000;
-    margin-bottom: 1.5rem;
-}
-.nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
 }
 .nav-logo {
     font-family: 'Syne', sans-serif;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: 700;
     background: linear-gradient(135deg, #a855f7, #ec4899);
     -webkit-background-clip: text;
@@ -64,11 +64,10 @@ st.markdown("""
 }
 .nav-links {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.25rem;
     align-items: center;
-    flex-wrap: wrap;
 }
-.nav-btn {
+.nav-link {
     background: transparent;
     border: none;
     color: #94a3b8;
@@ -79,23 +78,29 @@ st.markdown("""
     cursor: pointer;
     transition: all 0.2s;
 }
-.nav-btn:hover {
+.nav-link:hover {
     background: rgba(168, 85, 247, 0.1);
     color: #a855f7;
 }
-.nav-btn.active {
+.nav-link.active {
     background: linear-gradient(135deg, #7c3aed, #db2777);
     color: white;
 }
 .user-name {
     font-size: 0.8rem;
     color: #64748b;
-    padding-left: 1rem;
-    border-left: 1px solid #2d2d5a;
+    padding: 0.4rem 1rem;
     cursor: pointer;
+    border-left: 1px solid #2d2d5a;
+    margin-left: 0.5rem;
 }
 .user-name:hover {
     color: #a855f7;
+}
+
+/* Main content padding for fixed nav */
+.main-content {
+    padding-top: 70px;
 }
 
 /* Cards */
@@ -141,43 +146,55 @@ st.markdown("""
     -webkit-text-fill-color: transparent;
 }
 
-/* Mode Selector */
-.mode-selector {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
+/* Mode Cards */
+.mode-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+.mode-card {
     background: #0f0f20;
     border: 1px solid #1e1e3a;
-    border-radius: 16px;
-    padding: 0.5rem;
-}
-.mode-btn {
-    flex: 1;
-    background: transparent;
-    border: none;
-    padding: 1rem;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
+    border-radius: 20px;
+    padding: 1.8rem;
     text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
 }
-.mode-btn.active {
-    background: linear-gradient(135deg, #7c3aed, #db2777);
-}
-.mode-btn:not(.active):hover {
-    background: rgba(168, 85, 247, 0.1);
+.mode-card:hover {
+    border-color: #7c3aed;
+    transform: translateY(-4px);
+    background: #13132a;
 }
 .mode-icon {
-    font-size: 1.5rem;
-    margin-bottom: 0.25rem;
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
 }
 .mode-title {
-    font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 0.5rem;
 }
 .mode-desc {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     color: #64748b;
+}
+
+/* JD Match Card */
+.jd-match-card {
+    background: linear-gradient(135deg, #0f0f20 0%, #1a0f35 100%);
+    border: 1px solid #2d2060;
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+.jd-match-score {
+    font-size: 4rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
 }
 
 /* Analysis Tabs */
@@ -223,19 +240,15 @@ st.markdown("""
     transform: translateX(4px);
 }
 
-/* JD Match Result */
-.jd-match-card {
-    background: linear-gradient(135deg, #0f0f20 0%, #1a0f35 100%);
-    border: 1px solid #2d2060;
-    border-radius: 20px;
+/* Welcome Card - No empty box */
+.welcome-card {
+    background: #0f0f20;
+    border: 1px solid #1e1e3a;
+    border-radius: 24px;
     padding: 2rem;
     text-align: center;
-    margin-bottom: 1.5rem;
-}
-.jd-match-score {
-    font-size: 4rem;
-    font-weight: 800;
-    margin-bottom: 0.5rem;
+    max-width: 450px;
+    margin: 0 auto;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -245,8 +258,8 @@ st.markdown("""
 # ============================================================
 if "page" not in st.session_state:
     st.session_state.page = "home"
-if "analysis_mode" not in st.session_state:
-    st.session_state.analysis_mode = "cv_only"  # cv_only or jd_match
+if "analysis_submode" not in st.session_state:
+    st.session_state.analysis_submode = None  # None, "cv_analysis", or "jd_match"
 if "analysis_tab" not in st.session_state:
     st.session_state.analysis_tab = "overview"
 if "messages" not in st.session_state:
@@ -267,6 +280,8 @@ if "name_entered" not in st.session_state:
     st.session_state.name_entered = False
 if "matched_companies" not in st.session_state:
     st.session_state.matched_companies = []
+if "jd_match_result" not in st.session_state:
+    st.session_state.jd_match_result = None
 
 
 def parse_analysis(text: str) -> dict:
@@ -296,8 +311,6 @@ def parse_analysis(text: str) -> dict:
 
 def match_companies(cv_text: str, all_matches: list) -> list:
     """Match CV to real companies from JD dataset."""
-    from rag import load_roles
-    
     cv_lower = cv_text.lower()
     companies = []
     
@@ -343,7 +356,7 @@ def calculate_jd_match_score(cv_text: str, jd_text: str) -> dict:
     keyword_patterns = [
         r'(?:experience with|knowledge of|proficiency in|familiarity with)\s+([a-z][a-z\s]+?)(?=\.|,|\n)',
         r'(?:must have|required|essential|preferred)\s+([a-z][a-z\s]+?)(?=\.|,|\n)',
-        r'\b(python|sql|tensorflow|pytorch|langchain|rag|llm|nlp|computer vision|docker|kubernetes|aws|gcp|azure|mlflow|scikit-learn|pandas|numpy|git|linux)\b'
+        r'\b(python|sql|tensorflow|pytorch|langchain|rag|llm|nlp|computer vision|docker|kubernetes|aws|gcp|azure|mlflow|scikit-learn|pandas|numpy|git|linux|keras|opencv|flask|fastapi|django)\b'
     ]
     
     for pattern in keyword_patterns:
@@ -353,30 +366,40 @@ def calculate_jd_match_score(cv_text: str, jd_text: str) -> dict:
             jd_keywords.add(' '.join(words))
     
     # Add individual skills
-    for word in jd_lower.split():
-        if len(word) > 3 and word not in ['and', 'the', 'for', 'with', 'from', 'have', 'your', 'will']:
-            jd_keywords.add(word)
+    skill_list = ['python', 'sql', 'tensorflow', 'pytorch', 'langchain', 'rag', 'llm', 'nlp', 'docker', 'kubernetes', 'aws', 'gcp', 'azure']
+    for skill in skill_list:
+        if skill in jd_lower:
+            jd_keywords.add(skill)
     
     # Calculate match
-    found_keywords = 0
+    found_keywords = []
+    missing_keywords = []
+    
     for kw in jd_keywords:
         if kw in cv_lower or kw.replace(" ", "") in cv_lower:
-            found_keywords += 1
+            found_keywords.append(kw)
+        else:
+            missing_keywords.append(kw)
     
-    match_pct = int((found_keywords / max(len(jd_keywords), 1)) * 100)
+    match_pct = int((len(found_keywords) / max(len(jd_keywords), 1)) * 100)
     
     # Find matching companies for this JD
     matching_companies = []
     try:
-        from rag import load_roles
         roles = load_roles()
         for role in roles:
             role_jd = role.get("jd_text", "").lower()
-            if any(kw in role_jd for kw in jd_keywords):
+            if any(kw in role_jd for kw in list(jd_keywords)[:10]):
+                salary = role.get("salary", {})
+                salary_str = ""
+                if salary.get("junior"):
+                    salary_str = f"৳{salary['junior']}"
+                    if salary.get("mid"):
+                        salary_str += f" - ৳{salary['mid']}"
                 matching_companies.append({
                     "name": role.get("company", "Unknown"),
                     "role": role.get("title", role.get("role")),
-                    "salary": role.get("salary", {}),
+                    "salary": salary_str,
                     "location": role.get("location", "Dhaka")
                 })
     except:
@@ -384,180 +407,226 @@ def calculate_jd_match_score(cv_text: str, jd_text: str) -> dict:
     
     return {
         "match_pct": min(95, match_pct),
-        "matched_keywords": list(jd_keywords)[:15],
-        "found_count": found_keywords,
+        "matched_keywords": found_keywords[:15],
+        "missing_keywords": missing_keywords[:15],
+        "found_count": len(found_keywords),
         "total_keywords": len(jd_keywords),
         "matching_companies": matching_companies[:4]
     }
 
 
 def render_navbar():
-    """Render navigation bar."""
+    """Render navigation bar at top."""
     name = st.session_state.candidate_name or "Guest"
     first_name = name.split()[0] if name else "Guest"
     
-    col1, col2, col3 = st.columns([2, 3, 1])
+    # Use HTML for fixed navbar
+    st.markdown(f"""
+    <div class="top-nav">
+        <div class="nav-logo" onclick="location.reload()">📄 CV Analyzer</div>
+        <div class="nav-links">
+            <button class="nav-link" onclick="parent.postMessage({{type: 'streamlit:setComponentValue', value: 'home'}}, '*')">🏠 Home</button>
+            <button class="nav-link" onclick="parent.postMessage({{type: 'streamlit:setComponentValue', value: 'analyze'}}, '*')">📊 Analysis</button>
+            <button class="nav-link" onclick="parent.postMessage({{type: 'streamlit:setComponentValue', value: 'chat'}}, '*')">💬 Chat</button>
+            <button class="nav-link" onclick="parent.postMessage({{type: 'streamlit:setComponentValue', value: 'career'}}, '*')">🎯 Career Rec</button>
+            <span class="user-name" onclick="parent.postMessage({{type: 'streamlit:setComponentValue', value: 'reset'}}, '*')">👋 {first_name}</span>
+        </div>
+    </div>
+    <div class="main-content"></div>
+    """, unsafe_allow_html=True)
+    
+    # Buttons for navigation (Streamlit way)
+    col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
     
     with col1:
-        if st.button("📄 CV Analyzer", key="logo_home", use_container_width=False):
+        if st.button("🏠 Home", key="nav_home", use_container_width=True):
             st.session_state.page = "home"
-            st.session_state.analysis_mode = "cv_only"
+            st.session_state.analysis_submode = None
             st.rerun()
     
     with col2:
-        cols = st.columns([1, 1, 1, 1, 1])
-        pages = ["🏠 Home", "📊 Analysis", "💬 Chat", "🎯 Career Rec"]
-        page_keys = ["home", "analyze", "chat", "career"]
-        
-        for idx, (label, key) in enumerate(zip(pages, page_keys)):
-            with cols[idx]:
-                if st.button(label, key=f"nav_{key}", use_container_width=True):
-                    st.session_state.page = key
-                    if key == "analyze":
-                        st.session_state.analysis_tab = "overview"
-                    st.rerun()
+        if st.button("📊 Analysis", key="nav_analyze", use_container_width=True):
+            if st.session_state.cv_text:
+                st.session_state.page = "analyze"
+                st.session_state.analysis_tab = "overview"
+            else:
+                st.warning("Please analyze your CV first on Home page")
+            st.rerun()
     
     with col3:
-        if st.button(f"👋 {first_name}", key="user_menu", use_container_width=False):
-            # Reset to name entry
+        if st.button("💬 Chat", key="nav_chat", use_container_width=True):
+            if st.session_state.agent:
+                st.session_state.page = "chat"
+            else:
+                st.warning("Please analyze your CV first")
+            st.rerun()
+    
+    with col4:
+        if st.button("🎯 Career Rec", key="nav_career", use_container_width=True):
+            if st.session_state.cv_text:
+                st.session_state.page = "career"
+            else:
+                st.warning("Please analyze your CV first")
+            st.rerun()
+    
+    with col5:
+        if st.button(f"👋 {first_name}", key="nav_reset", use_container_width=True):
             st.session_state.name_entered = False
             st.session_state.cv_text = None
             st.session_state.analysis_raw = None
             st.session_state.retrieved = None
+            st.session_state.agent = None
+            st.session_state.messages = []
             st.rerun()
     
     st.markdown("<hr style='margin: 0.5rem 0 1rem 0; border-color: #1a1a30;'>", unsafe_allow_html=True)
 
 
-def render_mode_selector():
-    """Render mode selector for CV analysis vs JD matching."""
+def render_welcome_screen():
+    """Clean welcome screen - no empty box"""
     st.markdown("""
-    <div class='mode-selector'>
-        <div style='flex: 1; text-align: center;'>
+    <div style='text-align: center; padding: 2rem 0 1rem 0;'>
+        <div style='font-family: Syne, sans-serif; font-size: 3rem; font-weight: 800;'>
+            CV <span style='background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>Analyzer</span>
+        </div>
+        <p style='color: #64748b; margin: 0.5rem 0;'>AI-powered career matching for data & AI roles</p>
+    </div>
     """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 1.5, 1])
+    with col2:
+        st.markdown('<div class="welcome-card">', unsafe_allow_html=True)
+        st.markdown('<div style="font-family: Syne, sans-serif; font-size: 1.2rem; font-weight: 600; color: #cbd5e1; margin-bottom: 1rem;">👋 Welcome! What\'s your name?</div>', unsafe_allow_html=True)
+        
+        with st.form(key="name_entry_form"):
+            name_val = st.text_input(
+                "Name",
+                placeholder="Talha Jobayer",
+                label_visibility="collapsed",
+                key="welcome_name_input"
+            )
+            st.markdown("<div style='height: 0.75rem;'></div>", unsafe_allow_html=True)
+            submitted = st.form_submit_button("✨ Start Your Career Analysis →", use_container_width=True, type="primary")
+            
+            if submitted and name_val and name_val.strip():
+                st.session_state.candidate_name = name_val.strip()
+                st.session_state.name_entered = True
+                st.rerun()
+            elif submitted:
+                st.error("Please enter your name to continue")
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+
+
+def render_home():
+    """Home page with two options - CV Analysis or JD Match"""
+    name = st.session_state.candidate_name
+    first_name = name.split()[0] if name else "there"
+    
+    st.markdown(f"""
+    <div style='text-align: center; padding: 1rem 0 1rem 0;'>
+        <div style='font-family: Syne, sans-serif; font-size: 1.8rem; font-weight: 800; color: #f1f5f9;'>
+            Hello, {first_name}! 👋
+        </div>
+        <p style='color: #64748b; margin-top: 0.25rem;'>Ready to analyze your CV?</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Two options as clickable cards
+    st.markdown('<div class="mode-grid">', unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
     with col1:
-        is_active = st.session_state.analysis_mode == "cv_only"
-        if st.button(
-            "📄 CV Analysis\n\nFind your best AI/ML role based on your CV",
-            key="mode_cv",
-            use_container_width=True,
-            type="primary" if is_active else "secondary"
-        ):
-            st.session_state.analysis_mode = "cv_only"
-            st.rerun()
-    
-    with col2:
-        is_active = st.session_state.analysis_mode == "jd_match"
-        if st.button(
-            "🎯 JD Match\n\nMatch your CV against a specific job description",
-            key="mode_jd",
-            use_container_width=True,
-            type="primary" if is_active else "secondary"
-        ):
-            st.session_state.analysis_mode = "jd_match"
-            st.rerun()
-    
-    st.markdown("</div>", unsafe_allow_html=True)
-
-
-def render_home():
-    """Home page with dual mode selection."""
-    # Mode selector
-    render_mode_selector()
-    
-    if st.session_state.analysis_mode == "cv_only":
-        render_cv_analysis_mode()
-    else:
-        render_jd_match_mode()
-
-
-def render_cv_analysis_mode():
-    """Mode 1: CV Analysis against knowledge base."""
-    st.markdown("""
-    <div style='text-align:center; padding: 0.5rem 0 1rem 0;'>
-        <div style='font-family: Syne, sans-serif; font-size: 2rem; font-weight: 800;'>
-            🎯 Find Your <span style='background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>Ideal AI Role</span>
-        </div>
-        <p style='color: #64748b; margin-top: 0.5rem;'>
-            We'll analyze your CV and match it with real job postings from Bangladesh
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2 = st.columns([1, 1], gap="large")
-    
-    with col1:
-        st.markdown('<div class="card"><div class="card-title">📄 Upload Your CV</div>', unsafe_allow_html=True)
-        uploaded_cv = st.file_uploader("PDF file", type=["pdf"], label_visibility="collapsed", key="cv_uploader_cv")
-        if uploaded_cv:
-            st.success(f"✅ {uploaded_cv.name}")
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown('<div class="card"><div class="card-title">📊 What We Analyze</div>', unsafe_allow_html=True)
         st.markdown("""
-        - ✅ Your technical skills
-        - ✅ Project experience
-        - ✅ Certifications
-        - ✅ Work experience in AI/ML
-        - ✅ Career readiness score
-        """)
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
-    with col_btn2:
-        if st.button("⚡ Analyze My CV", use_container_width=True, type="primary"):
-            if uploaded_cv:
-                process_cv_analysis(uploaded_cv, "")
-            else:
-                st.warning("⚠️ Please upload your CV first")
-
-
-def render_jd_match_mode():
-    """Mode 2: CV vs Specific JD Matching."""
-    st.markdown("""
-    <div style='text-align:center; padding: 0.5rem 0 1rem 0;'>
-        <div style='font-family: Syne, sans-serif; font-size: 2rem; font-weight: 800;'>
-            🎯 JD <span style='background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>Match Score</span>
+        <div class='mode-card'>
+            <div class='mode-icon'>📄</div>
+            <div class='mode-title'>Analyze My CV</div>
+            <div class='mode-desc'>Get matched with AI/ML roles from our knowledge base</div>
+            <div class='mode-desc' style='margin-top: 0.5rem; color: #a855f7;'>✨ Skills | Roles | Salary | Career Path</div>
         </div>
-        <p style='color: #64748b; margin-top: 0.5rem;'>
-            See how well your CV matches a specific job description
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2 = st.columns(2, gap="large")
-    
-    with col1:
-        st.markdown('<div class="card"><div class="card-title">📄 Your CV</div>', unsafe_allow_html=True)
-        uploaded_cv = st.file_uploader("Upload CV (PDF)", type=["pdf"], label_visibility="collapsed", key="cv_uploader_jd")
-        if uploaded_cv:
-            st.success(f"✅ {uploaded_cv.name}")
-        st.markdown('</div>', unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
+        if st.button("📄 Analyze My CV", key="btn_cv_analysis", use_container_width=True):
+            st.session_state.analysis_submode = "cv_analysis"
+            st.rerun()
     
     with col2:
-        st.markdown('<div class="card"><div class="card-title">📝 Job Description</div>', unsafe_allow_html=True)
-        jd_input = st.text_area(
-            "Paste JD here", 
-            height=200, 
-            placeholder="Paste the job description from LinkedIn, Indeed, etc...",
-            label_visibility="collapsed", 
-            key="jd_input_match"
-        )
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class='mode-card'>
+            <div class='mode-icon'>🎯</div>
+            <div class='mode-title'>Match with Job Description</div>
+            <div class='mode-desc'>Paste a JD and see how well your CV matches</div>
+            <div class='mode-desc' style='margin-top: 0.5rem; color: #10b981;'>✨ Match % | Missing Skills | Companies</div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("🎯 Match with JD", key="btn_jd_match", use_container_width=True):
+            st.session_state.analysis_submode = "jd_match"
+            st.rerun()
     
-    col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
-    with col_btn2:
-        if st.button("🎯 Calculate JD Match", use_container_width=True, type="primary"):
-            if uploaded_cv and jd_input.strip():
-                process_jd_match(uploaded_cv, jd_input)
-            elif not uploaded_cv:
-                st.warning("⚠️ Please upload your CV first")
-            else:
-                st.warning("⚠️ Please paste a Job Description")
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Show the selected mode UI
+    if st.session_state.analysis_submode == "cv_analysis":
+        render_cv_analysis_ui()
+    elif st.session_state.analysis_submode == "jd_match":
+        render_jd_match_ui()
+
+
+def render_cv_analysis_ui():
+    """CV Analysis UI - upload CV and analyze"""
+    st.markdown("---")
+    st.markdown("### 📄 Upload Your CV")
+    
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        uploaded_cv = st.file_uploader("Choose PDF file", type=["pdf"], label_visibility="collapsed", key="cv_analysis_upload")
+        if uploaded_cv:
+            st.success(f"✅ {uploaded_cv.name}")
+    
+    with col2:
+        st.markdown("""
+        <div style='background: #0f0f20; border: 1px solid #1e1e3a; border-radius: 12px; padding: 1rem;'>
+            <div style='font-size: 0.75rem; color: #64748b;'>📊 What we analyze:</div>
+            <div style='font-size: 0.7rem; color: #94a3b8;'>• Technical skills & tools<br>• Project experience<br>• Certifications<br>• AI/ML work experience</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    if uploaded_cv:
+        if st.button("🚀 Start Analysis", use_container_width=True, type="primary"):
+            process_cv_analysis(uploaded_cv, "")
+
+
+def render_jd_match_ui():
+    """JD Match UI - upload CV and paste JD"""
+    st.markdown("---")
+    st.markdown("### 🎯 Match Your CV with a Job Description")
+    
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        st.markdown("**📄 Your CV**")
+        uploaded_cv = st.file_uploader("Upload CV (PDF)", type=["pdf"], label_visibility="collapsed", key="jd_match_cv")
+        if uploaded_cv:
+            st.success(f"✅ {uploaded_cv.name}")
+    
+    with col2:
+        st.markdown("**📝 Job Description**")
+        jd_input = st.text_area(
+            "Paste JD here",
+            height=200,
+            placeholder="Paste the job description from LinkedIn, Indeed, etc...",
+            label_visibility="collapsed",
+            key="jd_match_text"
+        )
+    
+    if uploaded_cv and jd_input:
+        if st.button("🎯 Calculate Match Score", use_container_width=True, type="primary"):
+            process_jd_match(uploaded_cv, jd_input)
+    elif uploaded_cv and not jd_input:
+        st.info("📝 Please paste a Job Description to continue")
+    elif not uploaded_cv and jd_input:
+        st.info("📄 Please upload your CV to continue")
 
 
 def process_cv_analysis(uploaded_cv, jd_text):
@@ -594,7 +663,6 @@ def process_cv_analysis(uploaded_cv, jd_text):
     
     st.session_state.page = "analyze"
     st.session_state.analysis_tab = "overview"
-    st.session_state.analysis_mode = "cv_only"
     st.success("✅ Analysis complete!")
     st.rerun()
 
@@ -627,17 +695,17 @@ def process_jd_match(uploaded_cv, jd_text):
 
 def render_jd_result():
     """Display JD matching results."""
-    if not hasattr(st.session_state, 'jd_match_result'):
+    if not st.session_state.jd_match_result:
         st.info("No JD match result found. Please go back and try again.")
         if st.button("← Back to Home"):
             st.session_state.page = "home"
+            st.session_state.analysis_submode = None
             st.rerun()
         return
     
     result = st.session_state.jd_match_result
     match_pct = result["match_pct"]
     
-    # Determine color
     if match_pct < 30:
         color = "#ef4444"
         status = "Low Match"
@@ -664,16 +732,13 @@ def render_jd_result():
     </div>
     """, unsafe_allow_html=True)
     
-    # Match details
     col1, col2 = st.columns(2)
     with col1:
         st.markdown(f"""
         <div class='card'>
             <div class='card-title'>📊 Match Details</div>
-            <div style='font-size: 0.9rem;'>
-                <div>✅ Keywords matched: <strong style='color: #10b981;'>{result['found_count']}</strong> / {result['total_keywords']}</div>
-                <div style='margin-top: 0.5rem;'>🎯 Match rate: <strong style='color: {color};'>{match_pct}%</strong></div>
-            </div>
+            <div>✅ Keywords matched: <strong style='color: #10b981;'>{result['found_count']}</strong> / {result['total_keywords']}</div>
+            <div style='margin-top: 0.5rem;'>🎯 Match rate: <strong style='color: {color};'>{match_pct}%</strong></div>
         </div>
         """, unsafe_allow_html=True)
     
@@ -681,37 +746,29 @@ def render_jd_result():
         if result.get("matching_companies"):
             st.markdown("### 🏢 Similar Companies Hiring")
             for comp in result["matching_companies"][:3]:
-                salary_info = ""
-                if comp.get("salary") and comp["salary"].get("junior"):
-                    salary_info = f"💰 ৳{comp['salary']['junior']}/month"
                 st.markdown(f"""
                 <div class='company-card'>
                     <div style='font-weight: 700;'>{comp['name']}</div>
                     <div style='font-size: 0.75rem; color: #a855f7;'>{comp['role']}</div>
-                    <div style='font-size: 0.7rem; color: #64748b;'>{salary_info} 📍 {comp['location']}</div>
+                    <div style='font-size: 0.7rem; color: #64748b;'>{comp['salary']} 📍 {comp['location']}</div>
                 </div>
                 """, unsafe_allow_html=True)
     
-    # Keyword match breakdown
-    st.markdown("### 🔑 Keywords Matched")
-    matched_kw = [kw for kw in result['matched_keywords'] if kw in st.session_state.cv_text.lower()]
-    missing_kw = [kw for kw in result['matched_keywords'] if kw not in st.session_state.cv_text.lower()]
+    if result.get("matched_keywords"):
+        st.markdown("### ✅ Keywords Found in Your CV")
+        matched_html = "".join(f"<span class='skill-chip add-chip'>{kw}</span>" for kw in result["matched_keywords"][:10])
+        st.markdown(matched_html, unsafe_allow_html=True)
     
-    if matched_kw:
-        matched_html = "".join(f"<span class='skill-chip add-chip'>✅ {kw}</span>" for kw in matched_kw[:10])
-        st.markdown(f"**Found in your CV:**<br>{matched_html}", unsafe_allow_html=True)
-    
-    if missing_kw:
-        missing_html = "".join(f"<span class='skill-chip gap-chip'>❌ {kw}</span>" for kw in missing_kw[:10])
-        st.markdown(f"**Missing from your CV:**<br>{missing_html}", unsafe_allow_html=True)
+    if result.get("missing_keywords"):
+        st.markdown("### ❌ Missing Keywords")
+        missing_html = "".join(f"<span class='skill-chip gap-chip'>{kw}</span>" for kw in result["missing_keywords"][:10])
+        st.markdown(missing_html, unsafe_allow_html=True)
     
     st.markdown("---")
-    col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
-    with col_btn2:
-        if st.button("← New JD Match", use_container_width=True):
-            st.session_state.page = "home"
-            st.session_state.analysis_mode = "jd_match"
-            st.rerun()
+    if st.button("← New JD Match", use_container_width=True):
+        st.session_state.page = "home"
+        st.session_state.analysis_submode = "jd_match"
+        st.rerun()
 
 
 def render_score_card(score: float, level: str, recommendation: str):
@@ -1034,9 +1091,10 @@ def render_path_tab(parsed):
 def render_analysis():
     """Display analysis results with smart tabs."""
     if not st.session_state.cv_text:
-        st.info("Please analyze your CV first on the Home page")
+        st.info("👈 Please analyze your CV first on the Home page")
         if st.button("Go to Home"):
             st.session_state.page = "home"
+            st.session_state.analysis_submode = None
             st.rerun()
         return
     
@@ -1070,9 +1128,10 @@ def render_career_rec():
     """, unsafe_allow_html=True)
     
     if not st.session_state.cv_text:
-        st.info("Please analyze your CV first on the Home page")
+        st.info("👈 Please analyze your CV first on the Home page")
         if st.button("Go to Home →"):
             st.session_state.page = "home"
+            st.session_state.analysis_submode = None
             st.rerun()
         return
     
@@ -1131,19 +1190,18 @@ def render_career_rec():
             st.markdown("</div>", unsafe_allow_html=True)
     
     st.markdown("---")
-    col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
-    with col_btn2:
-        if st.button("📊 View Full Analysis →", use_container_width=True, type="primary"):
-            st.session_state.page = "analyze"
-            st.rerun()
+    if st.button("📊 View Full Analysis →", use_container_width=True, type="primary"):
+        st.session_state.page = "analyze"
+        st.rerun()
 
 
 def render_chat():
     """Chat interface."""
     if not st.session_state.agent:
-        st.info(" Please analyze your CV first on the Home page")
+        st.info("👈 Please analyze your CV first on the Home page")
         if st.button("Go to Home"):
             st.session_state.page = "home"
+            st.session_state.analysis_submode = None
             st.rerun()
         return
     
@@ -1199,42 +1257,10 @@ def render_chat():
 # MAIN APP
 # ============================================================
 def main():
-    # Name entry screen
+    # Show welcome screen if name not entered
     if not st.session_state.name_entered:
-        st.markdown("""
-        <div style='text-align: center; padding: 3rem 0;'>
-            <div style='font-family: Syne, sans-serif; font-size: 3rem; font-weight: 800;'>
-                CV <span style='background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>Analyzer</span>
-            </div>
-            <p style='color: #64748b; margin: 1rem 0;'>AI-powered career matching for data & AI roles</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        col1, col2, col3 = st.columns([1, 1.5, 1])
-        with col2:
-            st.markdown('<div class="card" style="text-align: center; padding: 1.5rem;">', unsafe_allow_html=True)
-            st.markdown('<div style="font-family: Syne, sans-serif; font-size: 1.1rem; font-weight: 600; color: #cbd5e1; margin-bottom: 1rem;">👋 Welcome! What\'s your name?</div>', unsafe_allow_html=True)
-            
-            with st.form(key="name_entry_form"):
-                name_val = st.text_input(
-                    "Name",
-                    placeholder="e.g., Talha Jobayer, Pritom, etc.",
-                    label_visibility="collapsed",
-                    key="welcome_name_input"
-                )
-                st.markdown("<div style='height: 0.75rem;'></div>", unsafe_allow_html=True)
-                submitted = st.form_submit_button("✨ Start Your Career Analysis →", use_container_width=True, type="primary")
-                
-                if submitted and name_val and name_val.strip():
-                    st.session_state.candidate_name = name_val.strip()
-                    st.session_state.name_entered = True
-                    st.rerun()
-                elif submitted:
-                    st.error("Please enter your name to continue")
-            
-            st.markdown('<p style="color: #475569; font-size: 0.7rem; text-align: center; margin-top: 1rem;">🔒 Your data stays private</p>', unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-        st.stop()
+        render_welcome_screen()
+        return
     
     # Render navbar and page content
     render_navbar()
