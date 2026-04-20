@@ -140,7 +140,6 @@ def extract_section(cv_text: str, section_name: str) -> str:
     return ""
 
 
-
 def match_cv_with_jd(cv_text: str, jd_text: str) -> dict:
     """
     Match CV with specific JD using FAISS semantic search.
@@ -175,6 +174,7 @@ def match_cv_with_jd(cv_text: str, jd_text: str) -> dict:
         "recommended_companies": [{"name": r.get("company"), "role": r.get("title"), "salary": r.get("salary")} 
                                    for r in all_matches[:3] if r.get("company")]
     }
+
 def extract_experience(cv_text: str) -> str:
     result = extract_section(cv_text, "experience|work experience|employment|work history")
     return result if result else ""
