@@ -1,309 +1,152 @@
 """
-quiz.py — AI/ML Interest & Aptitude Quiz Module
-Standalone module, imported and rendered by app.py.
+quiz.py — Career Interest & Aptitude Quiz (No technical questions)
+Focus on thinking style, problem-solving, and career preferences.
 """
 
 QUESTIONS = [
     {
         "id": 1,
-        "category": "Python Basics",
-        "question": "What is the output of: `print(type([]))`?",
-        "options": [
-            "<class 'list'>",
-            "<class 'array'>",
-            "<type 'list'>",
-            "list"
-        ],
-        "correct": 0,
-        "points": 1,
+        "question": "How do you feel about solving complex puzzles or logic problems?",
+        "options": ["Love it", "Enjoy it sometimes", "Neutral", "Prefer to avoid"],
+        "scores": [2, 1, 0, -1],
+        "category": "Problem Solving"
     },
     {
         "id": 2,
-        "category": "Python Basics",
-        "question": "Which of these is used for vectorized operations on arrays in Python?",
-        "options": ["pandas", "NumPy", "matplotlib", "requests"],
-        "correct": 1,
-        "points": 1,
+        "question": "When faced with a new technology, your first reaction is:",
+        "options": ["Excited to learn it", "Curious but cautious", "Wait until I need it", "Prefer what I know"],
+        "scores": [2, 1, 0, -1],
+        "category": "Learning Style"
     },
     {
         "id": 3,
-        "category": "Python Basics",
-        "question": "What does a Python dictionary store?",
-        "options": [
-            "Ordered sequences of numbers",
-            "Key-value pairs",
-            "Only string values",
-            "Immutable sequences"
-        ],
-        "correct": 1,
-        "points": 1,
+        "question": "Would you rather build something new or analyze existing data?",
+        "options": ["Build new things", "Analyze data", "Both equally", "Neither"],
+        "scores": [2, 1, 0, -1],
+        "category": "Work Preference"
     },
     {
         "id": 4,
-        "category": "Math & Statistics",
-        "question": "What does the mean of a dataset represent?",
-        "options": [
-            "The most frequently occurring value",
-            "The middle value when sorted",
-            "The sum of all values divided by count",
-            "The range of the dataset"
-        ],
-        "correct": 2,
-        "points": 1,
+        "question": "How comfortable are you with mathematics and numbers?",
+        "options": ["Very comfortable", "Somewhat comfortable", "Neutral", "Not comfortable"],
+        "scores": [2, 1, 0, -1],
+        "category": "Quantitative"
     },
     {
         "id": 5,
-        "category": "Math & Statistics",
-        "question": "In a normal distribution, what percentage of data falls within ±1 standard deviation?",
-        "options": ["50%", "68%", "95%", "99.7%"],
-        "correct": 1,
-        "points": 1,
+        "question": "Do you enjoy finding patterns in data or information?",
+        "options": ["Always", "Often", "Sometimes", "Rarely"],
+        "scores": [2, 1, 0, -1],
+        "category": "Pattern Recognition"
     },
     {
         "id": 6,
-        "category": "Math & Statistics",
-        "question": "Which matrix operation is NOT valid if A is (3×2) and B is (3×2)?",
-        "options": [
-            "A + B",
-            "A - B",
-            "A × B (standard matrix multiply)",
-            "Element-wise multiplication"
-        ],
-        "correct": 2,
-        "points": 2,
+        "question": "How would you describe your attention to detail?",
+        "options": ["Very detailed", "Detailed enough", "Average", "Prefer big picture"],
+        "scores": [2, 1, 0, -1],
+        "category": "Work Style"
     },
     {
         "id": 7,
-        "category": "Logical Reasoning",
-        "question": "If all models are algorithms, and all algorithms are code, then:",
-        "options": [
-            "All code is a model",
-            "All models are code",
-            "Some code is not an algorithm",
-            "None of the above"
-        ],
-        "correct": 1,
-        "points": 1,
+        "question": "When working on a project, you prefer:",
+        "options": ["Clear structure and guidelines", "Flexibility to explore", "Working with a team", "Working independently"],
+        "scores": [1, 2, 1, 1],
+        "category": "Work Environment"
     },
     {
         "id": 8,
-        "category": "Logical Reasoning",
-        "question": "A model has 90% training accuracy but 55% test accuracy. What is this called?",
-        "options": ["Underfitting", "Overfitting", "Regularization", "Data leakage"],
-        "correct": 1,
-        "points": 2,
+        "question": "How do you stay updated with technology trends?",
+        "options": ["Follow actively", "Read occasionally", "When needed", "Don't follow"],
+        "scores": [2, 1, 0, -1],
+        "category": "Tech Engagement"
     },
     {
         "id": 9,
-        "category": "AI/ML Concepts",
-        "question": "Which technique is used to find similar documents in a large corpus using vector representations?",
-        "options": [
-            "Bubble Sort",
-            "Semantic/Vector Search",
-            "Binary Search",
-            "Relational querying"
-        ],
-        "correct": 1,
-        "points": 2,
+        "question": "What excites you most about a potential career?",
+        "options": ["Solving challenging problems", "Creating innovative products", "Working with data", "Helping people"],
+        "scores": [2, 2, 1, 1],
+        "category": "Motivation"
     },
     {
         "id": 10,
-        "category": "AI/ML Concepts",
-        "question": "What is the purpose of a loss function in training a neural network?",
-        "options": [
-            "To visualize training progress",
-            "To store model weights",
-            "To measure prediction error and guide weight updates",
-            "To initialize the model parameters"
-        ],
-        "correct": 2,
-        "points": 2,
-    },
-    {
-        "id": 11,
-        "category": "AI/ML Concepts",
-        "question": "Which of the following is a supervised learning algorithm?",
-        "options": ["K-Means Clustering", "DBSCAN", "Principal Component Analysis", "Random Forest"],
-        "correct": 3,
-        "points": 1,
-    },
-    {
-        "id": 12,
-        "category": "AI/ML Concepts",
-        "question": "What does LLM stand for in the context of modern AI?",
-        "options": [
-            "Linear Learning Model",
-            "Large Language Model",
-            "Layered Logic Machine",
-            "Long Learning Module"
-        ],
-        "correct": 1,
-        "points": 1,
-    },
-    {
-        "id": 13,
-        "category": "Interest & Motivation",
-        "question": "How do you feel when you encounter a complex dataset with missing values and inconsistencies?",
-        "options": [
-            "Excited — I love cleaning and exploring data",
-            "Neutral — I'll do it if required",
-            "Uncomfortable — I prefer working with clean data only",
-            "Disinterested — data work isn't for me"
-        ],
-        "correct": 0,
-        "points": 2,
-    },
-    {
-        "id": 14,
-        "category": "Interest & Motivation",
-        "question": "How often do you engage with AI/ML content outside of formal education?",
-        "options": [
-            "Regularly — papers, courses, projects",
-            "Sometimes — when relevant to my work",
-            "Rarely — only when assigned",
-            "Never — I haven't started yet"
-        ],
-        "correct": 0,
-        "points": 2,
-    },
-    {
-        "id": 15,
-        "category": "Interest & Motivation",
-        "question": "You are given a week to build any project. What would you choose?",
-        "options": [
-            "A machine learning model or AI-powered app",
-            "A data dashboard or analytics tool",
-            "A standard web or mobile application",
-            "I haven't thought about building personal projects"
-        ],
-        "correct": 0,
-        "points": 2,
+        "question": "How do you handle ambiguity or unclear requirements?",
+        "options": ["Thrive on it", "Manage well", "Need clarity", "Avoid it"],
+        "scores": [2, 1, 0, -1],
+        "category": "Adaptability"
     },
 ]
 
-MAX_SCORE = sum(q["points"] for q in QUESTIONS)
+MAX_SCORE = sum(max(q["scores"]) for q in QUESTIONS)
 
-# Role recommendations keyed by score tier
-ROLE_RECS = {
-    "high": [
-        "🤖 AI / LLM Engineer",
-        "📊 Data Scientist",
-        "🔬 ML Research Engineer",
-        "🧠 NLP Engineer",
-    ],
-    "medium": [
-        "📈 Data Analyst",
-        "🛠️ ML Engineer (Junior)",
-        "☁️ Cloud / MLOps Engineer",
-        "📉 Business Intelligence Developer",
-    ],
+# Role recommendations based on score ranges
+ROLE_RECOMMENDATIONS = {
+    "high": {
+        "roles": ["🤖 AI/ML Engineer", "🔬 Research Scientist", "🧠 NLP Engineer", "👁️ Computer Vision Engineer"],
+        "message": "You have strong analytical thinking and curiosity — perfect for cutting-edge AI roles!",
+        "explanation": "Your profile shows high interest in problem-solving, learning new technologies, and working with complex systems. You'd thrive in research or development roles."
+    },
+    "medium": {
+        "roles": ["📊 Data Scientist", "📈 Data Analyst", "🛠️ ML Engineer", "📉 Business Intelligence Analyst"],
+        "message": "You have good analytical skills — with some focused learning, you can excel in data roles!",
+        "explanation": "You enjoy working with data and solving problems. With some technical skill development, you'd be great in data-focused roles."
+    },
+    "low": {
+        "roles": ["💻 Software Developer", "📱 App Developer", "🌐 Web Developer", "🔧 IT Support"],
+        "message": "You might enjoy roles that focus more on building than research — explore development paths!",
+        "explanation": "Your interests lean more toward building and creating rather than pure analysis. Consider software development or engineering roles."
+    }
 }
 
 
-def calculate_quiz_score(answers: dict) -> dict:
+def calculate_interest_score(responses: dict) -> dict:
     """
-    answers: {question_id (int): selected_option_index (int)}
-    Returns score dict with percentage, tier, and feedback.
+    responses: {question_id: selected_option_index}
+    Returns score, level, and recommendations.
     """
-    earned = 0
-    results = []
-
+    total_score = 0
+    category_scores = {}
+    
     for q in QUESTIONS:
         qid = q["id"]
-        selected = answers.get(qid, -1)
-        correct = q["correct"]
-        is_correct = selected == correct
-        pts = q["points"] if is_correct else 0
-        earned += pts
-        results.append({
-            "id": qid,
-            "category": q["category"],
-            "question": q["question"],
-            "selected": selected,
-            "correct": correct,
-            "is_correct": is_correct,
-            "points_earned": pts,
-            "points_possible": q["points"],
-            "correct_answer": q["options"][correct],
-            "selected_answer": q["options"][selected] if selected >= 0 else "Not answered",
-        })
-
-    pct = round((earned / MAX_SCORE) * 100)
-
+        selected = responses.get(qid, 0)
+        score = q["scores"][selected] if selected < len(q["scores"]) else 0
+        total_score += score
+        
+        # Track category scores
+        cat = q["category"]
+        if cat not in category_scores:
+            category_scores[cat] = {"score": 0, "max": max(q["scores"])}
+        category_scores[cat]["score"] += score
+    
+    # Calculate percentage (normalize to 0-100)
+    max_possible = MAX_SCORE
+    pct = int((total_score / max_possible) * 100)
+    pct = max(0, min(100, pct))
+    
+    # Determine level
     if pct >= 70:
+        level = "HIGH"
         tier = "high"
-        verdict = "suitable"
-        verdict_msg = "✅ You are well-suited for the AI/ML field!"
-        verdict_detail = (
-            "Your aptitude scores, logical reasoning, and interest signals all point strongly "
-            "toward a successful AI/ML career. You demonstrate the curiosity and analytical "
-            "thinking that defines great AI practitioners."
-        )
         color = "#10b981"
-        roles = ROLE_RECS["high"]
-    elif pct >= 50:
+    elif pct >= 45:
+        level = "MEDIUM"
         tier = "medium"
-        verdict = "suitable"
-        verdict_msg = "✅ You have solid potential for the AI/ML field!"
-        verdict_detail = (
-            "You have a good foundation. With focused effort on the identified gaps, you can "
-            "build a strong AI/ML career. Consider strengthening your mathematics and hands-on "
-            "project experience."
-        )
         color = "#f59e0b"
-        roles = ROLE_RECS["medium"]
     else:
+        level = "LOW"
         tier = "low"
-        verdict = "not_suitable"
-        verdict_msg = "⚠️ AI/ML may not align with your current profile"
-        verdict_detail = (
-            "This doesn't mean AI/ML is off-limits — but it suggests you may benefit from "
-            "strengthening your fundamentals first. Consider exploring adjacent fields while "
-            "building your technical foundation."
-        )
         color = "#ef4444"
-        roles = []
-
-    # Per-category breakdown
-    categories = {}
-    for r in results:
-        cat = r["category"]
-        if cat not in categories:
-            categories[cat] = {"earned": 0, "possible": 0, "correct": 0, "total": 0}
-        categories[cat]["earned"] += r["points_earned"]
-        categories[cat]["possible"] += r["points_possible"]
-        categories[cat]["correct"] += int(r["is_correct"])
-        categories[cat]["total"] += 1
-
-    suggestions = []
-    if tier == "low":
-        suggestions = [
-            "📚 Complete a Python fundamentals course (Codecademy, CS50P)",
-            "📐 Brush up on statistics: Khan Academy Statistics is free and excellent",
-            "🔍 Explore adjacent fields: Web Development, Mobile Apps, Cybersecurity",
-            "🧩 Solve logic puzzles daily to sharpen reasoning skills",
-            "🌱 Revisit AI/ML after 3–6 months of fundamentals work",
-        ]
-    elif tier == "medium":
-        suggestions = [
-            "🐍 Deepen Python skills: decorators, OOP, list comprehensions",
-            "📊 Practice with real datasets on Kaggle",
-            "🎓 Take Andrew Ng's Machine Learning Specialization (Coursera)",
-            "🔧 Build 2–3 end-to-end ML projects for your portfolio",
-            "☁️ Get a cloud certification (AWS ML Specialty or GCP Professional ML)",
-        ]
-
+    
+    rec = ROLE_RECOMMENDATIONS[tier]
+    
     return {
-        "earned": earned,
-        "max_score": MAX_SCORE,
+        "score": total_score,
+        "max_score": max_possible,
         "pct": pct,
-        "tier": tier,
-        "verdict": verdict,
-        "verdict_msg": verdict_msg,
-        "verdict_detail": verdict_detail,
+        "level": level,
         "color": color,
-        "recommended_roles": roles,
-        "suggestions": suggestions,
-        "results": results,
-        "categories": categories,
+        "recommended_roles": rec["roles"],
+        "message": rec["message"],
+        "explanation": rec["explanation"],
+        "category_scores": category_scores,
     }
