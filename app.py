@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Fixed navbar with WORKING buttons at the very top
+Professional navbar in single row
 """
 
 import streamlit as st
@@ -20,30 +20,26 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS — Hide Streamlit default header, position navbar at very top
+# CSS — Professional navbar in one row
 # ============================================================
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-/* CRITICAL: Remove ALL default Streamlit spacing at the top */
+/* CRITICAL: Remove ALL default Streamlit spacing */
 #MainMenu {visibility: hidden;}
 header {visibility: hidden;}
 .stDeployButton {display: none;}
 footer {visibility: hidden;}
+header[data-testid="stHeader"] {display: none;}
 
-/* Remove the default Streamlit header completely */
-header[data-testid="stHeader"] {
-    display: none;
-}
-
-/* Remove all top padding from the main container */
+/* Main app background */
 .stApp {
     background: linear-gradient(135deg, #0a0a14 0%, #0f0f20 100%);
     min-height: 100vh;
 }
 
-/* Remove padding from the block container */
+/* Remove padding from block container */
 .block-container {
     padding-top: 0rem !important;
     padding-bottom: 2rem !important;
@@ -51,20 +47,14 @@ header[data-testid="stHeader"] {
     padding-right: 2rem !important;
 }
 
-/* Remove the top margin from the first element */
 .stAppViewBlockContainer {
     margin-top: 0px !important;
 }
 
-/* Hide the blank space at the top */
-.stAppViewContainer > section {
-    padding-top: 0px !important;
-}
-
 * { font-family: 'DM Sans', sans-serif; }
 
-/* Navbar styles */
-.navbar-wrapper {
+/* ========== PROFESSIONAL NAVBAR STYLES ========== */
+.navbar-container {
     position: fixed;
     top: 0;
     left: 0;
@@ -72,14 +62,100 @@ header[data-testid="stHeader"] {
     z-index: 999999;
     background: rgba(15, 15, 32, 0.98);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid #2d2d5a;
-    padding: 0.6rem 2rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+    padding: 0.5rem 2rem;
 }
 
-/* Main content - add back padding after navbar */
+.navbar-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Logo/Brand */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.navbar-brand-icon {
+    font-size: 1.5rem;
+}
+
+.navbar-brand-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #a855f7, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Navigation Items Container */
+.navbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.2rem;
+    border-radius: 40px;
+}
+
+/* Individual Nav Items */
+.nav-item {
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    background: transparent;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.nav-item:hover {
+    background: rgba(168, 85, 247, 0.15);
+    color: #a855f7;
+}
+
+.nav-item-active {
+    background: rgba(168, 85, 247, 0.2);
+    color: #a855f7;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+/* Separator between nav items */
+.nav-separator {
+    width: 1px;
+    height: 20px;
+    background: rgba(168, 85, 247, 0.2);
+    margin: 0 0.25rem;
+}
+
+/* User Profile */
+.navbar-user {
+    background: rgba(168, 85, 247, 0.1);
+    padding: 0.3rem 1rem;
+    border-radius: 30px;
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    color: #cbd5e1;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Main content padding */
 .main-content {
-    padding-top: 70px;
+    padding-top: 80px;
 }
 
 /* Cards */
@@ -104,21 +180,9 @@ header[data-testid="stHeader"] {
     border-color: #a855f7;
     box-shadow: 0 12px 40px rgba(168, 85, 247, 0.2);
 }
-.feature-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
-.feature-title {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: #f1f5f9;
-    margin-bottom: 0.5rem;
-}
-.feature-desc {
-    font-size: 0.85rem;
-    color: #94a3b8;
-    line-height: 1.5;
-}
+.feature-icon { font-size: 3rem; margin-bottom: 1rem; }
+.feature-title { font-size: 1.3rem; font-weight: 700; color: #f1f5f9; margin-bottom: 0.5rem; }
+.feature-desc { font-size: 0.85rem; color: #94a3b8; line-height: 1.5; }
 .hero-match {
     font-size: 2.5rem;
     font-weight: 800;
@@ -150,19 +214,10 @@ header[data-testid="stHeader"] {
     margin-top: 1rem;
 }
 
-/* Contact page specific */
-.contact-container {
-    max-width: 700px;
-    margin: 0 auto;
-}
-.contact-hero {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-.contact-hero-icon {
-    font-size: 3.5rem;
-    margin-bottom: 0.5rem;
-}
+/* Contact page */
+.contact-container { max-width: 700px; margin: 0 auto; }
+.contact-hero { text-align: center; margin-bottom: 2rem; }
+.contact-hero-icon { font-size: 3.5rem; margin-bottom: 0.5rem; }
 .contact-title {
     font-family: 'Syne', sans-serif;
     font-size: 2rem;
@@ -170,12 +225,8 @@ header[data-testid="stHeader"] {
     background: linear-gradient(135deg, #a855f7, #ec4899);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    margin-bottom: 0.5rem;
 }
-.contact-subtitle {
-    color: #64748b;
-    font-size: 0.9rem;
-}
+.contact-subtitle { color: #64748b; font-size: 0.9rem; }
 .contact-card {
     background: #0f0f20;
     border: 1px solid #1e1e3a;
@@ -190,29 +241,11 @@ header[data-testid="stHeader"] {
     padding: 1rem 0;
     border-bottom: 1px solid #1e1e3a;
 }
-.contact-icon {
-    font-size: 1.5rem;
-    min-width: 50px;
-    text-align: center;
-}
-.contact-info {
-    flex: 1;
-}
-.contact-label {
-    font-weight: 600;
-    color: #cbd5e1;
-    margin-bottom: 0.25rem;
-}
-.contact-value {
-    color: #94a3b8;
-}
-.contact-link {
-    color: #a855f7;
-    text-decoration: none;
-}
-.contact-link:hover {
-    text-decoration: underline;
-}
+.contact-icon { font-size: 1.5rem; min-width: 50px; text-align: center; }
+.contact-info { flex: 1; }
+.contact-label { font-weight: 600; color: #cbd5e1; margin-bottom: 0.25rem; }
+.contact-value { color: #94a3b8; }
+.contact-link { color: #a855f7; text-decoration: none; }
 .social-links {
     display: flex;
     gap: 1rem;
@@ -232,29 +265,13 @@ header[data-testid="stHeader"] {
     background: rgba(168, 85, 247, 0.2);
     transform: translateY(-2px);
 }
-.social-icon {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-}
-.social-name {
-    color: #cbd5e1;
-    font-size: 0.85rem;
-    font-weight: 500;
-}
+.social-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.social-name { color: #cbd5e1; font-size: 0.85rem; font-weight: 500; }
 
 /* About page */
-.about-container {
-    max-width: 700px;
-    margin: 0 auto;
-}
-.about-hero {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-.about-hero-icon {
-    font-size: 3.5rem;
-    margin-bottom: 0.5rem;
-}
+.about-container { max-width: 700px; margin: 0 auto; }
+.about-hero { text-align: center; margin-bottom: 2rem; }
+.about-hero-icon { font-size: 3.5rem; margin-bottom: 0.5rem; }
 .about-title {
     font-family: 'Syne', sans-serif;
     font-size: 2rem;
@@ -262,11 +279,6 @@ header[data-testid="stHeader"] {
     background: linear-gradient(135deg, #a855f7, #ec4899);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    margin-bottom: 0.5rem;
-}
-.about-subtitle {
-    color: #64748b;
-    font-size: 0.9rem;
 }
 .tech-pill {
     background: rgba(99, 102, 241, 0.12);
@@ -305,96 +317,70 @@ for k, v in _defaults.items():
 # NAVIGATION
 # ============================================================
 def nav_goto(page):
-    """Smooth navigation using session state"""
     if st.session_state.page != page:
         st.session_state.page = page
         st.rerun()
 
 
 def render_navbar():
-    """Navbar with WORKING buttons using Streamlit components"""
+    """Professional navbar in single row"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
     
-    # Create an empty div for the fixed navbar background
-    st.markdown('<div class="navbar-wrapper"></div>', unsafe_allow_html=True)
+    # Navbar items
+    nav_items = [
+        ("🏠 Home", "home"),
+        ("📄 Analyze CV", "analyze"),
+        ("🎯 JD Match", "jd_match"),
+        ("🧠 Quiz", "quiz"),
+        ("ℹ️ About", "about"),
+        ("📞 Contact", "contact")
+    ]
     
-    # Create the actual navbar content using columns (this will be positioned over the background)
-    # Use a container with custom styling to position it correctly
-    st.markdown(
-        '<div style="position: fixed; top: 0; left: 0; right: 0; z-index: 999999; padding: 0.6rem 2rem;">',
-        unsafe_allow_html=True
-    )
+    # Build navbar HTML with active state
+    nav_buttons_html = ""
+    for idx, (label, page_key) in enumerate(nav_items):
+        active_class = "nav-item-active" if current_page == page_key else ""
+        nav_buttons_html += f'<button class="nav-item {active_class}" onclick="navigateTo(\'{page_key}\')">{label}</button>'
+        if idx < len(nav_items) - 1:
+            nav_buttons_html += '<span class="nav-separator"></span>'
     
-    # Create columns for layout
-    col_logo, col_buttons, col_user = st.columns([1.2, 4, 0.8])
+    st.markdown(f"""
+    <div class="navbar-container">
+        <div class="navbar-inner">
+            <div class="navbar-brand" onclick="window.location.reload()">
+                <span class="navbar-brand-icon">🚀</span>
+                <span class="navbar-brand-text">AI Career Platform</span>
+            </div>
+            <div class="navbar-nav">
+                {nav_buttons_html}
+            </div>
+            <div class="navbar-user">
+                <span>👤</span>
+                <span>{first}</span>
+            </div>
+        </div>
+    </div>
     
-    with col_logo:
-        st.markdown(
-            '<div style="font-family: Syne, sans-serif; font-size: 1.2rem; font-weight: 700; background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap;">🚀 AI Career Platform</div>',
-            unsafe_allow_html=True
-        )
-    
-    with col_buttons:
-        # Create sub-columns for each button
-        btn_cols = st.columns(6)
-        pages = [
-            ("🏠 Home", "home"),
-            ("📄 Analyze CV", "analyze"),
-            ("🎯 JD Match", "jd_match"),
-            ("🧠 Quiz", "quiz"),
-            ("ℹ️ About", "about"),
-            ("📞 Contact", "contact")
-        ]
-        
-        for idx, (label, page_key) in enumerate(pages):
-            with btn_cols[idx]:
-                is_active = (current_page == page_key)
-                button_type = "primary" if is_active else "secondary"
-                
-                if st.button(label, key=f"nav_{page_key}", use_container_width=True, type=button_type):
-                    nav_goto(page_key)
-    
-    with col_user:
-        st.markdown(
-            f'<div style="background: rgba(168, 85, 247, 0.1); padding: 0.3rem 0.8rem; border-radius: 20px; border: 1px solid rgba(168, 85, 247, 0.2); color: #cbd5e1; font-size: 0.85rem; text-align: center;">👤 {first}</div>',
-            unsafe_allow_html=True
-        )
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Style the buttons to match navbar design
-    st.markdown("""
-    <style>
-    /* Style navbar buttons */
-    button[key^="nav_"] {
-        background: transparent !important;
-        border: none !important;
-        color: #94a3b8 !important;
-        font-size: 0.85rem !important;
-        font-weight: 500 !important;
-        padding: 0.5rem 0.5rem !important;
-        border-radius: 8px !important;
-        transition: all 0.2s !important;
-        box-shadow: none !important;
-        min-width: auto !important;
-    }
-    button[key^="nav_"]:hover {
-        background: rgba(168, 85, 247, 0.1) !important;
-        color: #a855f7 !important;
-    }
-    button[key^="nav_"][data-testid="baseButton-primary"] {
-        background: rgba(168, 85, 247, 0.15) !important;
-        color: #a855f7 !important;
-        border: 1px solid rgba(168, 85, 247, 0.3) !important;
-    }
-    /* Remove button text transform */
-    button[key^="nav_"] p {
-        font-size: 0.85rem !important;
-    }
-    </style>
+    <script>
+    function navigateTo(page) {{
+        const url = new URL(window.location.href);
+        url.searchParams.set('nav', page);
+        window.location.href = url.toString();
+    }}
+    </script>
     """, unsafe_allow_html=True)
+    
+    # Handle navigation from URL params
+    query_params = st.query_params
+    if 'nav' in query_params:
+        target = query_params['nav']
+        if target in ['home', 'analyze', 'jd_match', 'quiz', 'about', 'contact']:
+            if st.session_state.page != target:
+                st.session_state.page = target
+                st.query_params.clear()
+                st.rerun()
 
 
 # ============================================================
@@ -790,7 +776,6 @@ def render_contact():
     
     st.markdown("<div class='contact-card'>", unsafe_allow_html=True)
     
-    # Phone
     st.markdown("""
     <div class="contact-item">
         <div class="contact-icon">📱</div>
@@ -799,10 +784,6 @@ def render_contact():
             <div class="contact-value"><a href="tel:01721577792" class="contact-link">+880 1721 577792</a></div>
         </div>
     </div>
-    """, unsafe_allow_html=True)
-    
-    # Email
-    st.markdown("""
     <div class="contact-item">
         <div class="contact-icon">✉️</div>
         <div class="contact-info">
@@ -810,10 +791,6 @@ def render_contact():
             <div class="contact-value"><a href="mailto:jobayertalha2020@gmail.com" class="contact-link">jobayertalha2020@gmail.com</a></div>
         </div>
     </div>
-    """, unsafe_allow_html=True)
-    
-    # GitHub
-    st.markdown("""
     <div class="contact-item">
         <div class="contact-icon">💻</div>
         <div class="contact-info">
@@ -821,10 +798,6 @@ def render_contact():
             <div class="contact-value"><a href="https://github.com/talhajobayer" target="_blank" class="contact-link">github.com/talhajobayer</a></div>
         </div>
     </div>
-    """, unsafe_allow_html=True)
-    
-    # LinkedIn
-    st.markdown("""
     <div class="contact-item">
         <div class="contact-icon">🔗</div>
         <div class="contact-info">
@@ -836,7 +809,6 @@ def render_contact():
     
     st.markdown("</div>", unsafe_allow_html=True)
     
-    # Social Links Quick Access
     st.markdown("""
     <div style="margin-top: 1rem;">
         <h3 style="text-align:center; margin-bottom: 1rem;">Connect With Me</h3>
@@ -867,15 +839,12 @@ def render_contact():
 # MAIN ROUTER
 # ============================================================
 def main():
-    # Name entry required first
     if not st.session_state.name_entered:
         render_welcome()
         return
     
-    # Show navbar at the VERY TOP with working buttons
     render_navbar()
     
-    # Route to correct page
     page = st.session_state.page
     
     if page == "home":
