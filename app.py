@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-With dropdown menu for Sign Out
+With working dropdown menu - NO EXTRA BUTTONS
 """
 
 import streamlit as st
@@ -41,10 +41,6 @@ st.markdown("""
     border-right: 1px solid #2d2d5a;
 }
 
-[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {
-    color: #f1f5f9;
-}
-
 /* Custom sidebar brand */
 .sidebar-brand {
     text-align: center;
@@ -66,62 +62,36 @@ st.markdown("""
     -webkit-text-fill-color: transparent;
 }
 
-/* User profile in sidebar - clickable */
-.sidebar-user {
-    background: rgba(168, 85, 247, 0.1);
-    padding: 0.75rem;
-    border-radius: 12px;
-    border: 1px solid rgba(168, 85, 247, 0.2);
-    margin-bottom: 1rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
+/* Style user menu button */
+button[key="user_menu_btn"] {
+    background: rgba(168, 85, 247, 0.1) !important;
+    border: 1px solid rgba(168, 85, 247, 0.2) !important;
+    border-radius: 12px !important;
+    padding: 0.6rem 0.75rem !important;
+    color: #cbd5e1 !important;
+    font-weight: 600 !important;
+    text-align: left !important;
+    transition: all 0.2s !important;
 }
 
-.sidebar-user:hover {
-    background: rgba(168, 85, 247, 0.2);
-    border-color: rgba(168, 85, 247, 0.4);
+button[key="user_menu_btn"]:hover {
+    background: rgba(168, 85, 247, 0.2) !important;
+    border-color: rgba(168, 85, 247, 0.4) !important;
+    color: #a855f7 !important;
 }
 
-.sidebar-user-name {
-    font-weight: 600;
-    color: #cbd5e1;
-    font-size: 1rem;
+/* Style sign out button */
+button[key="signout_option"] {
+    background: rgba(239, 68, 68, 0.1) !important;
+    border: 1px solid rgba(239, 68, 68, 0.2) !important;
+    border-radius: 10px !important;
+    color: #fca5a5 !important;
 }
 
-.sidebar-user-arrow {
-    font-size: 0.7rem;
-    color: #a855f7;
-    margin-left: 0.25rem;
-}
-
-/* Dropdown menu */
-.user-dropdown {
-    background: rgba(20, 20, 40, 0.98);
-    backdrop-filter: blur(10px);
-    border: 1px solid #2d2d5a;
-    border-radius: 12px;
-    padding: 0.5rem;
-    margin-top: 0.5rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}
-
-.dropdown-item {
-    padding: 0.6rem 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-    color: #cbd5e1;
-    font-size: 0.85rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.dropdown-item:hover {
-    background: rgba(168, 85, 247, 0.15);
-    color: #a855f7;
+button[key="signout_option"]:hover {
+    background: rgba(239, 68, 68, 0.2) !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
+    color: #ef4444 !important;
 }
 
 /* Navigation buttons */
@@ -132,12 +102,6 @@ st.markdown("""
     margin-bottom: 0.5rem;
     border-radius: 10px !important;
     padding: 0.6rem 1rem !important;
-}
-
-.nav-button-active {
-    background: rgba(168, 85, 247, 0.15) !important;
-    border: 1px solid rgba(168, 85, 247, 0.3) !important;
-    color: #a855f7 !important;
 }
 
 /* Cards */
@@ -322,6 +286,7 @@ def sign_out():
     st.session_state.candidate_name = ""
     st.session_state.name_entered = False
     st.session_state.page = "home"
+    st.session_state.show_user_menu = False
     st.session_state.cv_text = None
     st.session_state.agent = None
     st.session_state.analysis_raw = None
@@ -329,17 +294,11 @@ def sign_out():
     st.session_state.jd_match_result = None
     st.session_state.quiz_responses = {}
     st.session_state.quiz_result = None
-    st.session_state.show_user_menu = False
-    st.rerun()
-
-
-def toggle_user_menu():
-    st.session_state.show_user_menu = not st.session_state.show_user_menu
     st.rerun()
 
 
 def render_sidebar():
-    """Render sidebar navigation with dropdown menu"""
+    """Render sidebar navigation - NO EXTRA BUTTONS"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
@@ -352,32 +311,23 @@ def render_sidebar():
     </div>
     """, unsafe_allow_html=True)
     
-    # User Profile - Clickable to toggle dropdown
-    st.sidebar.markdown(f"""
-    <div class="sidebar-user" onclick="document.getElementById('user_menu_btn').click()">
-        <div style="font-size: 1.2rem; margin-bottom: 0.25rem;">👤</div>
-        <div class="sidebar-user-name">{first} <span class="sidebar-user-arrow">▼</span></div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Hidden button to toggle menu
-    if st.sidebar.button("", key="user_menu_btn", help="User Menu"):
-        toggle_user_menu()
+    # User Profile Button - Direct clickable button (no hidden button)
+    col1, col2 = st.sidebar.columns([1, 4])
+    with col1:
+        st.markdown("👤")
+    with col2:
+        if st.button(f"{first} ▼", key="user_menu_btn", use_container_width=True):
+            st.session_state.show_user_menu = not st.session_state.show_user_menu
+            st.rerun()
     
     # Show dropdown menu if expanded
     if st.session_state.show_user_menu:
-        with st.sidebar.container():
-            st.markdown('<div class="user-dropdown">', unsafe_allow_html=True)
-            
-            # Sign Out option
-            col1, col2 = st.columns([1, 5])
-            with col1:
-                st.markdown("🚪")
-            with col2:
-                if st.button("Sign Out", key="signout_option", use_container_width=True):
-                    sign_out()
-            
-            st.markdown('</div>', unsafe_allow_html=True)
+        col1, col2 = st.sidebar.columns([1, 4])
+        with col1:
+            st.markdown("🚪")
+        with col2:
+            if st.button("Sign Out", key="signout_option", use_container_width=True):
+                sign_out()
     
     st.sidebar.markdown("---")
     
