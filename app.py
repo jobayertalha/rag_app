@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Clean modular architecture with fixed navbar - WORKING NAVIGATION
+Clean modular architecture with fixed navbar at VERY TOP
 """
 
 import streamlit as st
@@ -20,91 +20,52 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS — Fixed navbar, no duplicates, working buttons
+# CSS — Hide Streamlit default header, position navbar at very top
 # ============================================================
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-/* Core resets */
+/* CRITICAL: Remove ALL default Streamlit spacing at the top */
 #MainMenu {visibility: hidden;}
 header {visibility: hidden;}
 .stDeployButton {display: none;}
 footer {visibility: hidden;}
-.stApp { background: linear-gradient(135deg, #0a0a14 0%, #0f0f20 100%); min-height: 100vh; }
-* { font-family: 'DM Sans', sans-serif; }
 
-/* FIXED NAVBAR */
-.navbar-fixed {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 99999;
-    background: rgba(15, 15, 32, 0.98);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid #2d2d5a;
-    padding: 0.75rem 2rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-}
-.nav-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-.nav-logo {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.2rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #a855f7, #ec4899);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    cursor: pointer;
-}
-.nav-links {
-    display: flex;
-    gap: 0.5rem;
-}
-.nav-btn {
-    background: transparent;
-    border: none;
-    color: #94a3b8;
-    font-size: 0.85rem;
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.nav-btn:hover {
-    background: rgba(168, 85, 247, 0.1);
-    color: #a855f7;
-}
-.nav-btn-active {
-    background: rgba(168, 85, 247, 0.15);
-    color: #a855f7;
-    border: 1px solid rgba(168, 85, 247, 0.3);
-}
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #cbd5e1;
-    font-size: 0.85rem;
-}
-.user-name {
-    background: rgba(168, 85, 247, 0.1);
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
-    border: 1px solid rgba(168, 85, 247, 0.2);
+/* Remove the default Streamlit header completely */
+header[data-testid="stHeader"] {
+    display: none;
 }
 
-/* Main content padding to account for fixed navbar */
+/* Remove the top padding from the main container */
+.stApp {
+    background: linear-gradient(135deg, #0a0a14 0%, #0f0f20 100%);
+    min-height: 100vh;
+    margin-top: -60px;
+}
+
+/* Main content - add back padding after navbar */
 .main-content {
-    padding-top: 80px;
+    padding-top: 70px;
 }
+
+/* Fix block container spacing */
+.block-container {
+    padding-top: 0rem !important;
+    padding-bottom: 2rem !important;
+}
+
+/* Remove the top margin from the first element */
+.stApp > .stAppViewContainer > .stAppViewBlockContainer {
+    padding-top: 0px !important;
+}
+
+/* Hide the blank space at the top */
+.stAppViewBlockContainer {
+    margin-top: 0px !important;
+}
+
+* { font-family: 'DM Sans', sans-serif; }
 
 /* Cards */
 .card {
@@ -250,6 +211,7 @@ footer {visibility: hidden;}
     text-align: center;
     flex: 1;
     transition: all 0.2s;
+    text-decoration: none;
 }
 .social-link:hover {
     background: rgba(168, 85, 247, 0.2);
@@ -289,7 +251,7 @@ for k, v in _defaults.items():
 
 
 # ============================================================
-# NAVIGATION - Working buttons with session state
+# NAVIGATION
 # ============================================================
 def nav_goto(page):
     """Smooth navigation using session state"""
@@ -298,138 +260,116 @@ def nav_goto(page):
         st.rerun()
 
 
-
 def render_navbar():
-    """SINGLE navbar - using Streamlit columns for perfect alignment"""
+    """Navbar at the VERY TOP - one row with logo, buttons, and username"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
     
-    # Create empty space at the top for fixed positioning
-    st.markdown('<div style="height: 60px;"></div>', unsafe_allow_html=True)
-    
-    # Use columns to create the navbar layout
-    # This creates a fixed navbar using Streamlit's native layout
-    with st.container():
-        # Create 3 columns for left, center, right alignment
-        col_left, col_center, col_right = st.columns([1.5, 4, 1.5])
-        
-        with col_left:
-            st.markdown("""
-            <div style="
-                font-family: 'Syne', sans-serif; 
-                font-size: 1.2rem; 
-                font-weight: 700;
-                background: linear-gradient(135deg, #a855f7, #ec4899);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                white-space: nowrap;
-            ">
-            🚀 AI Career Platform
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col_center:
-            # Create sub-columns for each button
-            btn_cols = st.columns(6)
-            pages = [
-                ("🏠 Home", "home"),
-                ("📄 Analyze", "analyze"),
-                ("🎯 JD Match", "jd_match"),
-                ("🧠 Quiz", "quiz"),
-                ("ℹ️ About", "about"),
-                ("📞 Contact", "contact")
-            ]
-            
-            for idx, (label, page_key) in enumerate(pages):
-                with btn_cols[idx]:
-                    # Determine button type based on current page
-                    is_active = (current_page == page_key)
-                    button_type = "primary" if is_active else "secondary"
-                    
-                    if st.button(label, key=f"nav_{page_key}", use_container_width=True, type=button_type):
-                        nav_goto(page_key)
-        
-        with col_right:
-            st.markdown(f"""
-            <div style="
-                background: rgba(168, 85, 247, 0.1);
-                padding: 0.3rem 0.8rem;
-                border-radius: 20px;
-                border: 1px solid rgba(168, 85, 247, 0.2);
-                color: #cbd5e1;
-                font-size: 0.85rem;
-                text-align: center;
-                display: inline-block;
-                float: right;
-            ">
-            👤 {first}
-            </div>
-            """, unsafe_allow_html=True)
-    
-    # Add CSS to make the navbar fixed at the top
-    st.markdown("""
+    # Create the navbar using HTML/CSS only (no Streamlit buttons that cause layout issues)
+    st.markdown(f"""
     <style>
-    /* Make the navbar container fixed */
-    .stApp > header {
-        background: transparent;
-    }
-    
-    /* Target the navbar container and make it fixed */
-    div:has(> div:contains("AI Career Platform")) {
+    .top-navbar {{
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
-        z-index: 99999;
+        z-index: 999999;
         background: rgba(15, 15, 32, 0.98);
         backdrop-filter: blur(10px);
         border-bottom: 1px solid #2d2d5a;
-        padding: 0.75rem 2rem;
+        padding: 0.6rem 2rem;
         box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    }
-    
-    /* Style the buttons */
-    button[key^="nav_"] {
-        background: transparent !important;
-        border: none !important;
-        color: #94a3b8 !important;
-        font-size: 0.85rem !important;
-        font-weight: 500 !important;
-        padding: 0.5rem 0.5rem !important;
-        border-radius: 8px !important;
-        transition: all 0.2s !important;
-        box-shadow: none !important;
-    }
-    
-    button[key^="nav_"]:hover {
-        background: rgba(168, 85, 247, 0.1) !important;
-        color: #a855f7 !important;
-    }
-    
-    button[key^="nav_"][data-testid="baseButton-primary"] {
-        background: rgba(168, 85, 247, 0.15) !important;
-        color: #a855f7 !important;
-        border: 1px solid rgba(168, 85, 247, 0.3) !important;
-    }
-    
-    /* Hide the default Streamlit header */
-    header[data-testid="stHeader"] {
-        display: none;
-    }
-    
-    /* Add padding to main content to account for fixed navbar */
-    .main-content {
-        padding-top: 20px;
-    }
+    }}
+    .nav-row {{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1400px;
+        margin: 0 auto;
+    }}
+    .nav-logo {{
+        font-family: 'Syne', sans-serif;
+        font-size: 1.2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #a855f7, #ec4899);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        white-space: nowrap;
+        cursor: pointer;
+    }}
+    .nav-buttons {{
+        display: flex;
+        gap: 0.25rem;
+        background: rgba(0,0,0,0.2);
+        padding: 0.2rem;
+        border-radius: 10px;
+    }}
+    .nav-btn {{
+        background: transparent;
+        border: none;
+        color: #94a3b8;
+        font-size: 0.85rem;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: 'DM Sans', sans-serif;
+    }}
+    .nav-btn:hover {{
+        background: rgba(168, 85, 247, 0.15);
+        color: #a855f7;
+    }}
+    .nav-btn-active {{
+        background: rgba(168, 85, 247, 0.2);
+        color: #a855f7;
+        border: 1px solid rgba(168, 85, 247, 0.3);
+    }}
+    .nav-user {{
+        background: rgba(168, 85, 247, 0.1);
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        border: 1px solid rgba(168, 85, 247, 0.2);
+        color: #cbd5e1;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }}
     </style>
+    
+    <div class="top-navbar">
+        <div class="nav-row">
+            <div class="nav-logo" onclick="window.location.reload()">🚀 AI Career Platform</div>
+            <div class="nav-buttons">
+                <button class="nav-btn {'nav-btn-active' if current_page == 'home' else ''}" onclick="window.location.href='?nav=home'">🏠 Home</button>
+                <button class="nav-btn {'nav-btn-active' if current_page == 'analyze' else ''}" onclick="window.location.href='?nav=analyze'">📄 Analyze CV</button>
+                <button class="nav-btn {'nav-btn-active' if current_page == 'jd_match' else ''}" onclick="window.location.href='?nav=jd_match'">🎯 JD Match</button>
+                <button class="nav-btn {'nav-btn-active' if current_page == 'quiz' else ''}" onclick="window.location.href='?nav=quiz'">🧠 Quiz</button>
+                <button class="nav-btn {'nav-btn-active' if current_page == 'about' else ''}" onclick="window.location.href='?nav=about'">ℹ️ About</button>
+                <button class="nav-btn {'nav-btn-active' if current_page == 'contact' else ''}" onclick="window.location.href='?nav=contact'">📞 Contact</button>
+            </div>
+            <div class="nav-user">👤 {first}</div>
+        </div>
+    </div>
     """, unsafe_allow_html=True)
+    
+    # Handle navigation from URL parameters
+    query_params = st.query_params
+    if 'nav' in query_params:
+        target = query_params['nav']
+        if target in ['home', 'analyze', 'jd_match', 'quiz', 'about', 'contact']:
+            if st.session_state.page != target:
+                st.session_state.page = target
+                st.query_params.clear()
+                st.rerun()
+
+
 # ============================================================
 # WELCOME SCREEN
 # ============================================================
 def render_welcome():
     st.markdown("""
-    <div style="max-width: 500px; margin: 80px auto; text-align: center;">
+    <div style="max-width: 500px; margin: 100px auto 0 auto; text-align: center;">
         <div style="font-family: 'Syne', sans-serif; font-size: 3rem; font-weight: 800; margin-bottom: 1rem;">
             AI <span style="background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Career</span> Platform
         </div>
@@ -801,7 +741,7 @@ def render_about():
 
 
 # ============================================================
-# CONTACT PAGE - New Feature
+# CONTACT PAGE
 # ============================================================
 def render_contact():
     st.markdown("<div class='main-content'>", unsafe_allow_html=True)
@@ -815,7 +755,6 @@ def render_contact():
     </div>
     """, unsafe_allow_html=True)
     
-    # Contact Card
     st.markdown("<div class='contact-card'>", unsafe_allow_html=True)
     
     # Phone
@@ -862,17 +801,6 @@ def render_contact():
     </div>
     """, unsafe_allow_html=True)
     
-    # Twitter/X
-    st.markdown("""
-    <div class="contact-item">
-        <div class="contact-icon">🐦</div>
-        <div class="contact-info">
-            <div class="contact-label">Twitter/X</div>
-            <div class="contact-value"><a href="https://twitter.com/talhajobayer" target="_blank" class="contact-link">@talhajobayer</a></div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
     st.markdown("</div>", unsafe_allow_html=True)
     
     # Social Links Quick Access
@@ -880,15 +808,15 @@ def render_contact():
     <div style="margin-top: 1rem;">
         <h3 style="text-align:center; margin-bottom: 1rem;">Connect With Me</h3>
         <div class="social-links">
-            <a href="https://github.com/talhajobayer" target="_blank" class="social-link" style="text-decoration:none;">
+            <a href="https://github.com/talhajobayer" target="_blank" class="social-link">
                 <div class="social-icon">💻</div>
                 <div class="social-name">GitHub</div>
             </a>
-            <a href="https://linkedin.com/in/talhajobayer" target="_blank" class="social-link" style="text-decoration:none;">
+            <a href="https://linkedin.com/in/talhajobayer" target="_blank" class="social-link">
                 <div class="social-icon">🔗</div>
                 <div class="social-name">LinkedIn</div>
             </a>
-            <a href="https://twitter.com/talhajobayer" target="_blank" class="social-link" style="text-decoration:none;">
+            <a href="https://twitter.com/talhajobayer" target="_blank" class="social-link">
                 <div class="social-icon">🐦</div>
                 <div class="social-name">Twitter</div>
             </a>
@@ -911,7 +839,7 @@ def main():
         render_welcome()
         return
     
-    # Show SINGLE navbar (working buttons)
+    # Show navbar at the VERY TOP
     render_navbar()
     
     # Route to correct page
