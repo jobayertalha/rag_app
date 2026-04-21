@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Professional navbar in single row
+WORKING SIDEBAR NAVIGATION (Always works, no positioning issues)
 """
 
 import streamlit as st
@@ -16,22 +16,15 @@ st.set_page_config(
     page_title="AI Career Platform",
     page_icon="🚀",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
 # ============================================================
-# CSS — Professional navbar in one row
+# CSS — Clean styling for sidebar and content
 # ============================================================
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
-
-/* CRITICAL: Remove ALL default Streamlit spacing */
-#MainMenu {visibility: hidden;}
-header {visibility: hidden;}
-.stDeployButton {display: none;}
-footer {visibility: hidden;}
-header[data-testid="stHeader"] {display: none;}
 
 /* Main app background */
 .stApp {
@@ -39,123 +32,69 @@ header[data-testid="stHeader"] {display: none;}
     min-height: 100vh;
 }
 
-/* Remove padding from block container */
-.block-container {
-    padding-top: 0rem !important;
-    padding-bottom: 2rem !important;
-    padding-left: 2rem !important;
-    padding-right: 2rem !important;
-}
-
-.stAppViewBlockContainer {
-    margin-top: 0px !important;
-}
-
 * { font-family: 'DM Sans', sans-serif; }
 
-/* ========== PROFESSIONAL NAVBAR STYLES ========== */
-.navbar-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 999999;
-    background: rgba(15, 15, 32, 0.98);
+/* Sidebar styling */
+[data-testid="stSidebar"] {
+    background: rgba(15, 15, 32, 0.95);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(168, 85, 247, 0.2);
-    padding: 0.5rem 2rem;
+    border-right: 1px solid #2d2d5a;
 }
 
-.navbar-inner {
-    max-width: 1400px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {
+    color: #f1f5f9;
 }
 
-/* Logo/Brand */
-.navbar-brand {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
+/* Custom sidebar brand */
+.sidebar-brand {
+    text-align: center;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid #2d2d5a;
+    margin-bottom: 1rem;
 }
 
-.navbar-brand-icon {
-    font-size: 1.5rem;
+.sidebar-brand-icon {
+    font-size: 2.5rem;
 }
 
-.navbar-brand-text {
+.sidebar-brand-text {
     font-family: 'Syne', sans-serif;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: 700;
     background: linear-gradient(135deg, #a855f7, #ec4899);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
-/* Navigation Items Container */
-.navbar-nav {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    background: rgba(255, 255, 255, 0.03);
-    padding: 0.2rem;
-    border-radius: 40px;
-}
-
-/* Individual Nav Items */
-.nav-item {
-    padding: 0.5rem 1rem;
-    border-radius: 30px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: #94a3b8;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-    background: transparent;
-    border: none;
-    font-family: 'DM Sans', sans-serif;
-}
-
-.nav-item:hover {
-    background: rgba(168, 85, 247, 0.15);
-    color: #a855f7;
-}
-
-.nav-item-active {
-    background: rgba(168, 85, 247, 0.2);
-    color: #a855f7;
-    border: 1px solid rgba(168, 85, 247, 0.3);
-}
-
-/* Separator between nav items */
-.nav-separator {
-    width: 1px;
-    height: 20px;
-    background: rgba(168, 85, 247, 0.2);
-    margin: 0 0.25rem;
-}
-
-/* User Profile */
-.navbar-user {
+/* User profile in sidebar */
+.sidebar-user {
     background: rgba(168, 85, 247, 0.1);
-    padding: 0.3rem 1rem;
-    border-radius: 30px;
+    padding: 0.75rem;
+    border-radius: 12px;
     border: 1px solid rgba(168, 85, 247, 0.2);
-    color: #cbd5e1;
-    font-size: 0.85rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
 }
 
-/* Main content padding */
-.main-content {
-    padding-top: 80px;
+.sidebar-user-name {
+    font-weight: 600;
+    color: #cbd5e1;
+}
+
+/* Navigation buttons */
+.nav-button {
+    width: 100%;
+    text-align: left !important;
+    justify-content: flex-start !important;
+    margin-bottom: 0.5rem;
+    border-radius: 10px !important;
+    padding: 0.6rem 1rem !important;
+}
+
+.nav-button-active {
+    background: rgba(168, 85, 247, 0.15) !important;
+    border: 1px solid rgba(168, 85, 247, 0.3) !important;
+    color: #a855f7 !important;
 }
 
 /* Cards */
@@ -322,13 +261,31 @@ def nav_goto(page):
         st.rerun()
 
 
-def render_navbar():
-    """Professional navbar in single row"""
+def render_sidebar():
+    """Render sidebar navigation - ALWAYS WORKS"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
     
-    # Navbar items
+    # Sidebar Brand
+    st.sidebar.markdown("""
+    <div class="sidebar-brand">
+        <div class="sidebar-brand-icon">🚀</div>
+        <div class="sidebar-brand-text">AI Career Platform</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # User Profile
+    st.sidebar.markdown(f"""
+    <div class="sidebar-user">
+        <div style="font-size: 1.2rem; margin-bottom: 0.25rem;">👤</div>
+        <div class="sidebar-user-name">{first}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.sidebar.markdown("---")
+    
+    # Navigation Buttons
     nav_items = [
         ("🏠 Home", "home"),
         ("📄 Analyze CV", "analyze"),
@@ -338,75 +295,43 @@ def render_navbar():
         ("📞 Contact", "contact")
     ]
     
-    # Build navbar HTML with active state
-    nav_buttons_html = ""
-    for idx, (label, page_key) in enumerate(nav_items):
-        active_class = "nav-item-active" if current_page == page_key else ""
-        nav_buttons_html += f'<button class="nav-item {active_class}" onclick="navigateTo(\'{page_key}\')">{label}</button>'
-        if idx < len(nav_items) - 1:
-            nav_buttons_html += '<span class="nav-separator"></span>'
+    for label, page_key in nav_items:
+        is_active = (current_page == page_key)
+        button_type = "primary" if is_active else "secondary"
+        
+        if st.sidebar.button(label, key=f"sidebar_{page_key}", use_container_width=True, type=button_type):
+            nav_goto(page_key)
     
-    st.markdown(f"""
-    <div class="navbar-container">
-        <div class="navbar-inner">
-            <div class="navbar-brand" onclick="window.location.reload()">
-                <span class="navbar-brand-icon">🚀</span>
-                <span class="navbar-brand-text">AI Career Platform</span>
-            </div>
-            <div class="navbar-nav">
-                {nav_buttons_html}
-            </div>
-            <div class="navbar-user">
-                <span>👤</span>
-                <span>{first}</span>
-            </div>
-        </div>
-    </div>
-    
-    <script>
-    function navigateTo(page) {{
-        const url = new URL(window.location.href);
-        url.searchParams.set('nav', page);
-        window.location.href = url.toString();
-    }}
-    </script>
-    """, unsafe_allow_html=True)
-    
-    # Handle navigation from URL params
-    query_params = st.query_params
-    if 'nav' in query_params:
-        target = query_params['nav']
-        if target in ['home', 'analyze', 'jd_match', 'quiz', 'about', 'contact']:
-            if st.session_state.page != target:
-                st.session_state.page = target
-                st.query_params.clear()
-                st.rerun()
+    st.sidebar.markdown("---")
+    st.sidebar.caption("© 2024 AI Career Platform")
 
 
 # ============================================================
 # WELCOME SCREEN
 # ============================================================
 def render_welcome():
-    st.markdown("""
-    <div style="max-width: 500px; margin: 100px auto 0 auto; text-align: center;">
-        <div style="font-family: 'Syne', sans-serif; font-size: 3rem; font-weight: 800; margin-bottom: 1rem;">
-            AI <span style="background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Career</span> Platform
-        </div>
-        <p style="color: #64748b; margin-bottom: 2rem;">Your AI-powered career companion for data science & AI/ML roles</p>
-        <div class="card">
-            <div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">👋 Welcome! What's your name?</div>
-    """, unsafe_allow_html=True)
-    
-    name = st.text_input("Name", placeholder="e.g. Talha Jobayer", label_visibility="collapsed")
-    if st.button("✨ Get Started →", type="primary", use_container_width=True):
-        if name and name.strip():
-            st.session_state.candidate_name = name.strip()
-            st.session_state.name_entered = True
-            st.rerun()
-        else:
-            st.error("Please enter your name")
-    
-    st.markdown("</div></div>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.markdown("""
+        <div style="text-align: center; margin-top: 50px;">
+            <div style="font-family: 'Syne', sans-serif; font-size: 3rem; font-weight: 800; margin-bottom: 1rem;">
+                AI <span style="background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Career</span> Platform
+            </div>
+            <p style="color: #64748b; margin-bottom: 2rem;">Your AI-powered career companion for data science & AI/ML roles</p>
+            <div class="card">
+                <div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">👋 Welcome! What's your name?</div>
+        """, unsafe_allow_html=True)
+        
+        name = st.text_input("Name", placeholder="e.g. Talha Jobayer", label_visibility="collapsed")
+        if st.button("✨ Get Started →", type="primary", use_container_width=True):
+            if name and name.strip():
+                st.session_state.candidate_name = name.strip()
+                st.session_state.name_entered = True
+                st.rerun()
+            else:
+                st.error("Please enter your name")
+        
+        st.markdown("</div></div>", unsafe_allow_html=True)
 
 
 # ============================================================
@@ -417,10 +342,8 @@ def render_home():
     first = name.split()[0] if name else "Guest"
     
     st.markdown(f"""
-    <div class="main-content">
-        <h2 style="text-align:center; margin-bottom: 0.5rem;">Hello, {first}! 👋</h2>
-        <p style="text-align:center; color:#64748b; margin-bottom: 3rem;">What would you like to do today?</p>
-    </div>
+    <h2 style="text-align:center; margin-bottom: 0.5rem;">Hello, {first}! 👋</h2>
+    <p style="text-align:center; color:#64748b; margin-bottom: 3rem;">What would you like to do today?</p>
     """, unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns(3)
@@ -466,7 +389,6 @@ def render_home():
 # ANALYZE PAGE
 # ============================================================
 def render_analyze():
-    st.markdown("<div class='main-content'>", unsafe_allow_html=True)
     st.markdown("<h2 style='text-align:center; margin-bottom: 1rem;'>📄 CV Analysis</h2>", unsafe_allow_html=True)
     st.markdown("<p style='text-align:center; color:#64748b; margin-bottom: 2rem;'>Upload your CV to get personalized career recommendations</p>", unsafe_allow_html=True)
     
@@ -491,8 +413,6 @@ def render_analyze():
     
     if st.session_state.retrieved:
         render_analysis_results()
-    
-    st.markdown("</div>", unsafe_allow_html=True)
 
 
 def render_analysis_results():
@@ -545,7 +465,6 @@ def render_analysis_results():
 # JD MATCH PAGE
 # ============================================================
 def render_jd_match():
-    st.markdown("<div class='main-content'>", unsafe_allow_html=True)
     st.markdown("<h2 style='text-align:center; margin-bottom: 1rem;'>🎯 Job Description Matching</h2>", unsafe_allow_html=True)
     st.markdown("<p style='text-align:center; color:#64748b; margin-bottom: 2rem;'>See how well your CV matches a specific job description</p>", unsafe_allow_html=True)
     
@@ -570,8 +489,6 @@ def render_jd_match():
     
     if st.session_state.jd_match_result:
         render_jd_match_results()
-    
-    st.markdown("</div>", unsafe_allow_html=True)
 
 
 def render_jd_match_results():
@@ -609,13 +526,11 @@ def render_jd_match_results():
 # QUIZ PAGE
 # ============================================================
 def render_quiz():
-    st.markdown("<div class='main-content'>", unsafe_allow_html=True)
     st.markdown("<h2 style='text-align:center; margin-bottom: 0.5rem;'>🧠 Career Interest Quiz</h2>", unsafe_allow_html=True)
     st.markdown("<p style='text-align:center; color:#64748b; margin-bottom: 2rem;'>Discover which AI/ML roles match your thinking style and interests</p>", unsafe_allow_html=True)
     
     if st.session_state.quiz_result:
         render_quiz_results()
-        st.markdown("</div>", unsafe_allow_html=True)
         return
     
     if not st.session_state.quiz_responses:
@@ -630,7 +545,6 @@ def render_quiz():
         if st.button("🚀 Start Quiz", type="primary", use_container_width=True):
             st.session_state.quiz_responses = {q["id"]: None for q in QUESTIONS}
             st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
         return
     
     with st.form("quiz_form"):
@@ -655,8 +569,6 @@ def render_quiz():
             result = calculate_interest_score(st.session_state.quiz_responses)
             st.session_state.quiz_result = result
             st.rerun()
-    
-    st.markdown("</div>", unsafe_allow_html=True)
 
 
 def render_quiz_results():
@@ -699,7 +611,6 @@ def render_quiz_results():
 # ABOUT PAGE
 # ============================================================
 def render_about():
-    st.markdown("<div class='main-content'>", unsafe_allow_html=True)
     st.markdown("<div class='about-container'>", unsafe_allow_html=True)
     
     st.markdown("""
@@ -756,14 +667,13 @@ def render_about():
     if st.button("← Back to Home", use_container_width=True):
         nav_goto("home")
     
-    st.markdown("</div></div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 # ============================================================
 # CONTACT PAGE
 # ============================================================
 def render_contact():
-    st.markdown("<div class='main-content'>", unsafe_allow_html=True)
     st.markdown("<div class='contact-container'>", unsafe_allow_html=True)
     
     st.markdown("""
@@ -832,7 +742,7 @@ def render_contact():
     if st.button("← Back to Home", use_container_width=True):
         nav_goto("home")
     
-    st.markdown("</div></div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 # ============================================================
@@ -843,8 +753,10 @@ def main():
         render_welcome()
         return
     
-    render_navbar()
+    # Render sidebar navigation (ALWAYS WORKS)
+    render_sidebar()
     
+    # Route to correct page
     page = st.session_state.page
     
     if page == "home":
