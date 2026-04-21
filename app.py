@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-WORKING SIDEBAR NAVIGATION (Always works, no positioning issues)
+Updated About and Contact pages
 """
 
 import streamlit as st
@@ -185,6 +185,7 @@ st.markdown("""
 .contact-label { font-weight: 600; color: #cbd5e1; margin-bottom: 0.25rem; }
 .contact-value { color: #94a3b8; }
 .contact-link { color: #a855f7; text-decoration: none; }
+.contact-link:hover { text-decoration: underline; }
 .social-links {
     display: flex;
     gap: 1rem;
@@ -208,7 +209,7 @@ st.markdown("""
 .social-name { color: #cbd5e1; font-size: 0.85rem; font-weight: 500; }
 
 /* About page */
-.about-container { max-width: 700px; margin: 0 auto; }
+.about-container { max-width: 800px; margin: 0 auto; }
 .about-hero { text-align: center; margin-bottom: 2rem; }
 .about-hero-icon { font-size: 3.5rem; margin-bottom: 0.5rem; }
 .about-title {
@@ -219,6 +220,7 @@ st.markdown("""
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
+.about-subtitle { color: #64748b; font-size: 0.9rem; }
 .tech-pill {
     background: rgba(99, 102, 241, 0.12);
     border: 1px solid rgba(99, 102, 241, 0.25);
@@ -227,6 +229,16 @@ st.markdown("""
     padding: 0.25rem 0.7rem;
     border-radius: 20px;
     display: inline-block;
+}
+.interest-tag {
+    display: inline-block;
+    background: rgba(168, 85, 247, 0.12);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    color: #a855f7;
+    font-size: 0.75rem;
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    margin: 0.2rem;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -262,7 +274,7 @@ def nav_goto(page):
 
 
 def render_sidebar():
-    """Render sidebar navigation - ALWAYS WORKS"""
+    """Render sidebar navigation"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
@@ -303,7 +315,7 @@ def render_sidebar():
             nav_goto(page_key)
     
     st.sidebar.markdown("---")
-    st.sidebar.caption("© 2024 AI Career Platform")
+    st.sidebar.caption("© 2025 AI Career Platform")
 
 
 # ============================================================
@@ -608,53 +620,52 @@ def render_quiz_results():
 
 
 # ============================================================
-# ABOUT PAGE
+# ABOUT PAGE - Updated Version
 # ============================================================
 def render_about():
     st.markdown("<div class='about-container'>", unsafe_allow_html=True)
     
     st.markdown("""
     <div class="about-hero">
-        <div class="about-hero-icon">🚀</div>
-        <div class="about-title">AI Career Platform</div>
-        <div class="about-subtitle">AI-powered career matching for data science & AI/ML roles</div>
+        <div class="about-hero-icon">👨‍💻</div>
+        <div class="about-title">Talha Jobayer Zihan</div>
+        <div class="about-subtitle">Researcher & AI/ML Engineer</div>
     </div>
     """, unsafe_allow_html=True)
     
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     
-    st.markdown("### 👨‍💻 Developer")
-    st.markdown("**Talha Jobayer Zihan**  \n*Researcher & AI/ML Engineer*")
-    st.markdown("---")
-    
-    st.markdown("### 📞 Contact Information")
-    
-    col1, col2 = st.columns([1, 5])
-    with col1:
-        st.markdown("🏛️")
-    with col2:
-        st.markdown("**Department of Computer Science & Engineering, RUET**")
-    
-    col1, col2 = st.columns([1, 5])
-    with col1:
-        st.markdown("📞")
-    with col2:
-        st.markdown('<a href="tel:01721577792" style="color:#a855f7; text-decoration:none;">01721577792</a>', unsafe_allow_html=True)
-    
-    col1, col2 = st.columns([1, 5])
-    with col1:
-        st.markdown("✉️")
-    with col2:
-        st.markdown('<a href="mailto:jobayertalha2020@gmail.com" style="color:#a855f7; text-decoration:none;">jobayertalha2020@gmail.com</a>', unsafe_allow_html=True)
-    
-    col1, col2 = st.columns([1, 5])
-    with col1:
-        st.markdown("🔗")
-    with col2:
-        st.markdown('<a href="https://linkedin.com" target="_blank" style="color:#a855f7; text-decoration:none;">LinkedIn Profile</a>', unsafe_allow_html=True)
+    # Research Interests
+    st.markdown("### 🔬 Research Interests")
+    interests = ["Natural Language Processing (NLP)", "Computer Vision", "Cyber Security"]
+    interest_html = " ".join(f"<span class='interest-tag'>{interest}</span>" for interest in interests)
+    st.markdown(interest_html, unsafe_allow_html=True)
     
     st.markdown("---")
     
+    # Department
+    st.markdown("### 🎓 Academic Affiliation")
+    st.markdown("**Department of Computer Science & Engineering**  \n*Rajshahi University of Engineering & Technology (RUET)*")
+    
+    st.markdown("---")
+    
+    # About the Platform
+    st.markdown("### 🚀 About This Platform")
+    st.markdown("""
+    AI Career Platform is an intelligent career matching system designed to help job seekers in Bangladesh 
+    find the best AI/ML roles based on their CV content, skills, and career preferences.
+    
+    **Features:**
+    - 📄 AI-powered CV analysis and role matching
+    - 🎯 Job Description matching with real-time skill gap analysis
+    - 🧠 Career interest quiz to discover your ideal role
+    - 💰 Salary insights and market demand data
+    - 📈 Personalized career path recommendations
+    """)
+    
+    st.markdown("---")
+    
+    # Technology Stack
     st.markdown("### 🛠️ Technology Stack")
     tech_stack = ["Streamlit", "LangChain", "Groq LLaMA-3.3-70b", "FAISS", "HuggingFace", "Python"]
     cols = st.columns(len(tech_stack))
@@ -671,7 +682,7 @@ def render_about():
 
 
 # ============================================================
-# CONTACT PAGE
+# CONTACT PAGE - Updated Version
 # ============================================================
 def render_contact():
     st.markdown("<div class='contact-container'>", unsafe_allow_html=True)
@@ -686,54 +697,57 @@ def render_contact():
     
     st.markdown("<div class='contact-card'>", unsafe_allow_html=True)
     
+    # GitHub
     st.markdown("""
-    <div class="contact-item">
-        <div class="contact-icon">📱</div>
-        <div class="contact-info">
-            <div class="contact-label">Phone</div>
-            <div class="contact-value"><a href="tel:01721577792" class="contact-link">+880 1721 577792</a></div>
-        </div>
-    </div>
-    <div class="contact-item">
-        <div class="contact-icon">✉️</div>
-        <div class="contact-info">
-            <div class="contact-label">Email</div>
-            <div class="contact-value"><a href="mailto:jobayertalha2020@gmail.com" class="contact-link">jobayertalha2020@gmail.com</a></div>
-        </div>
-    </div>
     <div class="contact-item">
         <div class="contact-icon">💻</div>
         <div class="contact-info">
             <div class="contact-label">GitHub</div>
-            <div class="contact-value"><a href="https://github.com/talhajobayer" target="_blank" class="contact-link">github.com/talhajobayer</a></div>
+            <div class="contact-value"><a href="https://github.com/jobayertalha" target="_blank" class="contact-link">github.com/jobayertalha</a></div>
         </div>
     </div>
+    """, unsafe_allow_html=True)
+    
+    # LinkedIn
+    st.markdown("""
     <div class="contact-item">
         <div class="contact-icon">🔗</div>
         <div class="contact-info">
             <div class="contact-label">LinkedIn</div>
-            <div class="contact-value"><a href="https://linkedin.com/in/talhajobayer" target="_blank" class="contact-link">linkedin.com/in/talhajobayer</a></div>
+            <div class="contact-value"><a href="https://www.linkedin.com/in/talha-jobayer-696a74237/" target="_blank" class="contact-link">linkedin.com/in/talha-jobayer</a></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Personal Portfolio
+    st.markdown("""
+    <div class="contact-item">
+        <div class="contact-icon">🌐</div>
+        <div class="contact-info">
+            <div class="contact-label">Portfolio</div>
+            <div class="contact-value"><a href="https://v0-personal-portfolio-site-tau.vercel.app/" target="_blank" class="contact-link">Personal Portfolio</a></div>
         </div>
     </div>
     """, unsafe_allow_html=True)
     
     st.markdown("</div>", unsafe_allow_html=True)
     
+    # Social Links Quick Access
     st.markdown("""
     <div style="margin-top: 1rem;">
         <h3 style="text-align:center; margin-bottom: 1rem;">Connect With Me</h3>
         <div class="social-links">
-            <a href="https://github.com/talhajobayer" target="_blank" class="social-link">
+            <a href="https://github.com/jobayertalha" target="_blank" class="social-link">
                 <div class="social-icon">💻</div>
                 <div class="social-name">GitHub</div>
             </a>
-            <a href="https://linkedin.com/in/talhajobayer" target="_blank" class="social-link">
+            <a href="https://www.linkedin.com/in/talha-jobayer-696a74237/" target="_blank" class="social-link">
                 <div class="social-icon">🔗</div>
                 <div class="social-name">LinkedIn</div>
             </a>
-            <a href="https://twitter.com/talhajobayer" target="_blank" class="social-link">
-                <div class="social-icon">🐦</div>
-                <div class="social-name">Twitter</div>
+            <a href="https://v0-personal-portfolio-site-tau.vercel.app/" target="_blank" class="social-link">
+                <div class="social-icon">🌐</div>
+                <div class="social-name">Portfolio</div>
             </a>
         </div>
     </div>
@@ -753,10 +767,8 @@ def main():
         render_welcome()
         return
     
-    # Render sidebar navigation (ALWAYS WORKS)
     render_sidebar()
     
-    # Route to correct page
     page = st.session_state.page
     
     if page == "home":
