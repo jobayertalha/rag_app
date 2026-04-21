@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Updated with Sign Out feature and restored Contact info
+With dropdown menu for Sign Out
 """
 
 import streamlit as st
@@ -66,7 +66,7 @@ st.markdown("""
     -webkit-text-fill-color: transparent;
 }
 
-/* User profile in sidebar */
+/* User profile in sidebar - clickable */
 .sidebar-user {
     background: rgba(168, 85, 247, 0.1);
     padding: 0.75rem;
@@ -76,6 +76,7 @@ st.markdown("""
     text-align: center;
     cursor: pointer;
     transition: all 0.2s;
+    position: relative;
 }
 
 .sidebar-user:hover {
@@ -89,15 +90,38 @@ st.markdown("""
     font-size: 1rem;
 }
 
-.sidebar-user-edit {
+.sidebar-user-arrow {
     font-size: 0.7rem;
     color: #a855f7;
-    margin-top: 0.25rem;
+    margin-left: 0.25rem;
 }
 
-/* Sign out button */
-.signout-btn {
+/* Dropdown menu */
+.user-dropdown {
+    background: rgba(20, 20, 40, 0.98);
+    backdrop-filter: blur(10px);
+    border: 1px solid #2d2d5a;
+    border-radius: 12px;
+    padding: 0.5rem;
     margin-top: 0.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.dropdown-item {
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #cbd5e1;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dropdown-item:hover {
+    background: rgba(168, 85, 247, 0.15);
+    color: #a855f7;
 }
 
 /* Navigation buttons */
@@ -270,7 +294,7 @@ _defaults = {
     "page": "home",
     "candidate_name": "",
     "name_entered": False,
-    "show_name_dialog": False,
+    "show_user_menu": False,
     "cv_text": None,
     "agent": None,
     "analysis_raw": None,
@@ -294,7 +318,7 @@ def nav_goto(page):
 
 
 def sign_out():
-    """Sign out and clear user session"""
+    """Sign out and clear all user data, return to welcome screen"""
     st.session_state.candidate_name = ""
     st.session_state.name_entered = False
     st.session_state.page = "home"
@@ -305,17 +329,17 @@ def sign_out():
     st.session_state.jd_match_result = None
     st.session_state.quiz_responses = {}
     st.session_state.quiz_result = None
+    st.session_state.show_user_menu = False
     st.rerun()
 
 
-def change_name():
-    """Show dialog to change name"""
-    st.session_state.show_name_dialog = True
+def toggle_user_menu():
+    st.session_state.show_user_menu = not st.session_state.show_user_menu
     st.rerun()
 
 
 def render_sidebar():
-    """Render sidebar navigation with Sign Out feature"""
+    """Render sidebar navigation with dropdown menu"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
@@ -328,18 +352,32 @@ def render_sidebar():
     </div>
     """, unsafe_allow_html=True)
     
-    # User Profile with Click to Change Name
+    # User Profile - Clickable to toggle dropdown
     st.sidebar.markdown(f"""
-    <div class="sidebar-user" onclick="document.getElementById('change_name_btn').click()">
+    <div class="sidebar-user" onclick="document.getElementById('user_menu_btn').click()">
         <div style="font-size: 1.2rem; margin-bottom: 0.25rem;">👤</div>
-        <div class="sidebar-user-name">{first}</div>
-        <div class="sidebar-user-edit">✏️ Click to change name</div>
+        <div class="sidebar-user-name">{first} <span class="sidebar-user-arrow">▼</span></div>
     </div>
     """, unsafe_allow_html=True)
     
-    # Hidden button for name change
-    if st.sidebar.button("✏️ Change Name", key="change_name_btn", use_container_width=True):
-        change_name()
+    # Hidden button to toggle menu
+    if st.sidebar.button("", key="user_menu_btn", help="User Menu"):
+        toggle_user_menu()
+    
+    # Show dropdown menu if expanded
+    if st.session_state.show_user_menu:
+        with st.sidebar.container():
+            st.markdown('<div class="user-dropdown">', unsafe_allow_html=True)
+            
+            # Sign Out option
+            col1, col2 = st.columns([1, 5])
+            with col1:
+                st.markdown("🚪")
+            with col2:
+                if st.button("Sign Out", key="signout_option", use_container_width=True):
+                    sign_out()
+            
+            st.markdown('</div>', unsafe_allow_html=True)
     
     st.sidebar.markdown("---")
     
@@ -358,37 +396,11 @@ def render_sidebar():
         button_type = "primary" if is_active else "secondary"
         
         if st.sidebar.button(label, key=f"sidebar_{page_key}", use_container_width=True, type=button_type):
+            st.session_state.show_user_menu = False
             nav_goto(page_key)
     
     st.sidebar.markdown("---")
-    
-    # Sign Out Button
-    if st.sidebar.button("🚪 Sign Out", key="signout_btn", use_container_width=True):
-        sign_out()
-    
     st.sidebar.caption("© 2025 AI Career Platform")
-
-
-def render_change_name_dialog():
-    """Dialog for changing user name"""
-    if st.session_state.show_name_dialog:
-        with st.expander("✏️ Change Your Name", expanded=True):
-            col1, col2, col3 = st.columns([1, 2, 1])
-            with col2:
-                new_name = st.text_input("Enter your name", value=st.session_state.candidate_name, placeholder="e.g. Talha Jobayer")
-                col_a, col_b = st.columns(2)
-                with col_a:
-                    if st.button("✅ Save", use_container_width=True):
-                        if new_name and new_name.strip():
-                            st.session_state.candidate_name = new_name.strip()
-                            st.session_state.show_name_dialog = False
-                            st.rerun()
-                        else:
-                            st.error("Please enter a valid name")
-                with col_b:
-                    if st.button("❌ Cancel", use_container_width=True):
-                        st.session_state.show_name_dialog = False
-                        st.rerun()
 
 
 # ============================================================
@@ -412,6 +424,7 @@ def render_welcome():
             if name and name.strip():
                 st.session_state.candidate_name = name.strip()
                 st.session_state.name_entered = True
+                st.session_state.show_user_menu = False
                 st.rerun()
             else:
                 st.error("Please enter your name")
@@ -755,7 +768,7 @@ def render_about():
 
 
 # ============================================================
-# CONTACT PAGE - Restored with Name, Phone, Email
+# CONTACT PAGE
 # ============================================================
 def render_contact():
     st.markdown("<div class='contact-container'>", unsafe_allow_html=True)
@@ -872,10 +885,6 @@ def main():
     if not st.session_state.name_entered:
         render_welcome()
         return
-    
-    # Show change name dialog if needed
-    if st.session_state.show_name_dialog:
-        render_change_name_dialog()
     
     render_sidebar()
     
