@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Clean modular architecture with fixed navbar - FIXED VERSION
+Clean modular architecture with fixed navbar - WORKING NAVIGATION
 """
 
 import streamlit as st
@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS — Fixed navbar, clean, no duplicates
+# CSS — Fixed navbar, no duplicates, working buttons
 # ============================================================
 st.markdown("""
 <style>
@@ -34,7 +34,7 @@ footer {visibility: hidden;}
 .stApp { background: linear-gradient(135deg, #0a0a14 0%, #0f0f20 100%); min-height: 100vh; }
 * { font-family: 'DM Sans', sans-serif; }
 
-/* FIXED NAVBAR - Clean version */
+/* FIXED NAVBAR */
 .navbar-fixed {
     position: fixed;
     top: 0;
@@ -103,7 +103,7 @@ footer {visibility: hidden;}
 
 /* Main content padding to account for fixed navbar */
 .main-content {
-    padding-top: 70px;
+    padding-top: 80px;
 }
 
 /* Cards */
@@ -120,7 +120,6 @@ footer {visibility: hidden;}
     border-radius: 24px;
     padding: 2rem;
     text-align: center;
-    cursor: pointer;
     transition: all 0.3s;
     height: 100%;
 }
@@ -175,20 +174,20 @@ footer {visibility: hidden;}
     margin-top: 1rem;
 }
 
-/* About page specific */
-.about-container {
+/* Contact page specific */
+.contact-container {
     max-width: 700px;
     margin: 0 auto;
 }
-.about-hero {
+.contact-hero {
     text-align: center;
     margin-bottom: 2rem;
 }
-.about-hero-icon {
+.contact-hero-icon {
     font-size: 3.5rem;
     margin-bottom: 0.5rem;
 }
-.about-title {
+.contact-title {
     font-family: 'Syne', sans-serif;
     font-size: 2rem;
     font-weight: 800;
@@ -197,30 +196,39 @@ footer {visibility: hidden;}
     -webkit-text-fill-color: transparent;
     margin-bottom: 0.5rem;
 }
-.about-subtitle {
+.contact-subtitle {
     color: #64748b;
     font-size: 0.9rem;
 }
-.contact-row {
+.contact-card {
+    background: #0f0f20;
+    border: 1px solid #1e1e3a;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+.contact-item {
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 0.8rem 0;
+    padding: 1rem 0;
     border-bottom: 1px solid #1e1e3a;
 }
 .contact-icon {
-    font-size: 1.2rem;
-    min-width: 40px;
+    font-size: 1.5rem;
+    min-width: 50px;
     text-align: center;
+}
+.contact-info {
+    flex: 1;
 }
 .contact-label {
     font-weight: 600;
     color: #cbd5e1;
-    min-width: 100px;
+    margin-bottom: 0.25rem;
 }
 .contact-value {
     color: #94a3b8;
-    flex: 1;
 }
 .contact-link {
     color: #a855f7;
@@ -229,19 +237,32 @@ footer {visibility: hidden;}
 .contact-link:hover {
     text-decoration: underline;
 }
-.tech-stack {
+.social-links {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 1rem;
     margin-top: 1rem;
 }
-.tech-pill {
-    background: rgba(99, 102, 241, 0.12);
-    border: 1px solid rgba(99, 102, 241, 0.25);
-    color: #a5b4fc;
-    font-size: 0.72rem;
-    padding: 0.25rem 0.7rem;
-    border-radius: 20px;
+.social-link {
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    text-align: center;
+    flex: 1;
+    transition: all 0.2s;
+}
+.social-link:hover {
+    background: rgba(168, 85, 247, 0.2);
+    transform: translateY(-2px);
+}
+.social-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+.social-name {
+    color: #cbd5e1;
+    font-size: 0.85rem;
+    font-weight: 500;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -268,58 +289,112 @@ for k, v in _defaults.items():
 
 
 # ============================================================
-# NAVIGATION - Clean version with proper rerouting
+# NAVIGATION - Working buttons with session state
 # ============================================================
 def nav_goto(page):
-    """Smooth navigation without duplicate elements"""
+    """Smooth navigation using session state"""
     if st.session_state.page != page:
         st.session_state.page = page
         st.rerun()
 
 
 def render_navbar():
-    """SINGLE navbar - clean, fixed, no duplicates"""
+    """SINGLE navbar with working Streamlit buttons"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
     
-    # Create the HTML navbar - buttons will be clickable via JavaScript
+    # Create the HTML structure for visual navbar
     st.markdown(f"""
     <div class="navbar-fixed">
         <div class="nav-container">
-            <div class="nav-logo" onclick="location.reload()">🚀 AI Career Platform</div>
-            <div class="nav-links">
-                <button class="nav-btn {'nav-btn-active' if current_page == 'home' else ''}" onclick="navigateTo('home')">🏠 Home</button>
-                <button class="nav-btn {'nav-btn-active' if current_page == 'analyze' else ''}" onclick="navigateTo('analyze')">📄 Analyze CV</button>
-                <button class="nav-btn {'nav-btn-active' if current_page == 'jd_match' else ''}" onclick="navigateTo('jd_match')">🎯 JD Match</button>
-                <button class="nav-btn {'nav-btn-active' if current_page == 'quiz' else ''}" onclick="navigateTo('quiz')">🧠 Quiz</button>
-                <button class="nav-btn {'nav-btn-active' if current_page == 'about' else ''}" onclick="navigateTo('about')">ℹ️ About</button>
-            </div>
+            <div class="nav-logo">🚀 AI Career Platform</div>
             <div class="user-info">
                 <span class="user-name">👤 {first}</span>
             </div>
         </div>
     </div>
-    
-    <script>
-    function navigateTo(page) {{
-        const url = new URL(window.location.href);
-        url.searchParams.set('nav_page', page);
-        window.location.href = url.toString();
-    }}
-    </script>
     """, unsafe_allow_html=True)
     
-    # Check URL params for navigation (fallback for JavaScript)
-    import urllib.parse
-    query_params = st.query_params
-    if 'nav_page' in query_params:
-        target = query_params['nav_page']
-        if target in ['home', 'analyze', 'jd_match', 'quiz', 'about']:
-            if st.session_state.page != target:
-                st.session_state.page = target
-                st.query_params.clear()
-                st.rerun()
+    # Create invisible space for buttons - using columns for proper layout
+    # This creates clickable buttons that actually work with Streamlit
+    st.markdown('<div style="position: fixed; top: 12px; left: 200px; z-index: 99999;">', unsafe_allow_html=True)
+    
+    # Create 6 buttons in a row for navigation
+    cols = st.columns([0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 3])
+    
+    with cols[0]:
+        if st.button("🏠 Home", key="nav_home", use_container_width=True,
+                    type="primary" if current_page == "home" else "secondary"):
+            nav_goto("home")
+    
+    with cols[1]:
+        if st.button("📄 Analyze CV", key="nav_analyze", use_container_width=True,
+                    type="primary" if current_page == "analyze" else "secondary"):
+            nav_goto("analyze")
+    
+    with cols[2]:
+        if st.button("🎯 JD Match", key="nav_jd", use_container_width=True,
+                    type="primary" if current_page == "jd_match" else "secondary"):
+            nav_goto("jd_match")
+    
+    with cols[3]:
+        if st.button("🧠 Quiz", key="nav_quiz", use_container_width=True,
+                    type="primary" if current_page == "quiz" else "secondary"):
+            nav_goto("quiz")
+    
+    with cols[4]:
+        if st.button("ℹ️ About", key="nav_about", use_container_width=True,
+                    type="primary" if current_page == "about" else "secondary"):
+            nav_goto("about")
+    
+    with cols[5]:
+        if st.button("📞 Contact", key="nav_contact", use_container_width=True,
+                    type="primary" if current_page == "contact" else "secondary"):
+            nav_goto("contact")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Add CSS to style the buttons to match navbar design
+    st.markdown("""
+    <style>
+    /* Style the navbar buttons */
+    div[data-testid="column"]:has(button[key*="nav_"]) {
+        position: relative;
+    }
+    button[key*="nav_"] {
+        background: transparent !important;
+        border: none !important;
+        color: #94a3b8 !important;
+        font-size: 0.85rem !important;
+        font-weight: 500 !important;
+        padding: 0.5rem 1rem !important;
+        border-radius: 8px !important;
+        transition: all 0.2s !important;
+        box-shadow: none !important;
+    }
+    button[key*="nav_"]:hover {
+        background: rgba(168, 85, 247, 0.1) !important;
+        color: #a855f7 !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    button[key*="nav_"][data-testid="baseButton-secondary"] {
+        background: transparent !important;
+    }
+    /* Style for active button */
+    button[key="nav_home"][data-testid="baseButton-primary"],
+    button[key="nav_analyze"][data-testid="baseButton-primary"],
+    button[key="nav_jd"][data-testid="baseButton-primary"],
+    button[key="nav_quiz"][data-testid="baseButton-primary"],
+    button[key="nav_about"][data-testid="baseButton-primary"],
+    button[key="nav_contact"][data-testid="baseButton-primary"] {
+        background: rgba(168, 85, 247, 0.15) !important;
+        color: #a855f7 !important;
+        border: 1px solid rgba(168, 85, 247, 0.3) !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 
 # ============================================================
@@ -349,7 +424,7 @@ def render_welcome():
 
 
 # ============================================================
-# HOME PAGE - 3 cards
+# HOME PAGE
 # ============================================================
 def render_home():
     name = st.session_state.candidate_name
@@ -699,6 +774,108 @@ def render_about():
 
 
 # ============================================================
+# CONTACT PAGE - New Feature
+# ============================================================
+def render_contact():
+    st.markdown("<div class='main-content'>", unsafe_allow_html=True)
+    st.markdown("<div class='contact-container'>", unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="contact-hero">
+        <div class="contact-hero-icon">📞</div>
+        <div class="contact-title">Contact Us</div>
+        <div class="contact-subtitle">Get in touch with the developer</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Contact Card
+    st.markdown("<div class='contact-card'>", unsafe_allow_html=True)
+    
+    # Phone
+    st.markdown("""
+    <div class="contact-item">
+        <div class="contact-icon">📱</div>
+        <div class="contact-info">
+            <div class="contact-label">Phone</div>
+            <div class="contact-value"><a href="tel:01721577792" class="contact-link">+880 1721 577792</a></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Email
+    st.markdown("""
+    <div class="contact-item">
+        <div class="contact-icon">✉️</div>
+        <div class="contact-info">
+            <div class="contact-label">Email</div>
+            <div class="contact-value"><a href="mailto:jobayertalha2020@gmail.com" class="contact-link">jobayertalha2020@gmail.com</a></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # GitHub
+    st.markdown("""
+    <div class="contact-item">
+        <div class="contact-icon">💻</div>
+        <div class="contact-info">
+            <div class="contact-label">GitHub</div>
+            <div class="contact-value"><a href="https://github.com/talhajobayer" target="_blank" class="contact-link">github.com/talhajobayer</a></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # LinkedIn
+    st.markdown("""
+    <div class="contact-item">
+        <div class="contact-icon">🔗</div>
+        <div class="contact-info">
+            <div class="contact-label">LinkedIn</div>
+            <div class="contact-value"><a href="https://linkedin.com/in/talhajobayer" target="_blank" class="contact-link">linkedin.com/in/talhajobayer</a></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Twitter/X
+    st.markdown("""
+    <div class="contact-item">
+        <div class="contact-icon">🐦</div>
+        <div class="contact-info">
+            <div class="contact-label">Twitter/X</div>
+            <div class="contact-value"><a href="https://twitter.com/talhajobayer" target="_blank" class="contact-link">@talhajobayer</a></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("</div>", unsafe_allow_html=True)
+    
+    # Social Links Quick Access
+    st.markdown("""
+    <div style="margin-top: 1rem;">
+        <h3 style="text-align:center; margin-bottom: 1rem;">Connect With Me</h3>
+        <div class="social-links">
+            <a href="https://github.com/talhajobayer" target="_blank" class="social-link" style="text-decoration:none;">
+                <div class="social-icon">💻</div>
+                <div class="social-name">GitHub</div>
+            </a>
+            <a href="https://linkedin.com/in/talhajobayer" target="_blank" class="social-link" style="text-decoration:none;">
+                <div class="social-icon">🔗</div>
+                <div class="social-name">LinkedIn</div>
+            </a>
+            <a href="https://twitter.com/talhajobayer" target="_blank" class="social-link" style="text-decoration:none;">
+                <div class="social-icon">🐦</div>
+                <div class="social-name">Twitter</div>
+            </a>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    if st.button("← Back to Home", use_container_width=True):
+        nav_goto("home")
+    
+    st.markdown("</div></div>", unsafe_allow_html=True)
+
+
+# ============================================================
 # MAIN ROUTER
 # ============================================================
 def main():
@@ -707,7 +884,7 @@ def main():
         render_welcome()
         return
     
-    # Show SINGLE navbar (clean version)
+    # Show SINGLE navbar (working buttons)
     render_navbar()
     
     # Route to correct page
@@ -723,6 +900,8 @@ def main():
         render_quiz()
     elif page == "about":
         render_about()
+    elif page == "contact":
+        render_contact()
     else:
         render_home()
 
