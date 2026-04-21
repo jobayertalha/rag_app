@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Clean modular architecture with fixed navbar at VERY TOP
+Fixed navbar with WORKING buttons at the very top
 """
 
 import streamlit as st
@@ -37,35 +37,50 @@ header[data-testid="stHeader"] {
     display: none;
 }
 
-/* Remove the top padding from the main container */
+/* Remove all top padding from the main container */
 .stApp {
     background: linear-gradient(135deg, #0a0a14 0%, #0f0f20 100%);
     min-height: 100vh;
-    margin-top: -60px;
+}
+
+/* Remove padding from the block container */
+.block-container {
+    padding-top: 0rem !important;
+    padding-bottom: 2rem !important;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+}
+
+/* Remove the top margin from the first element */
+.stAppViewBlockContainer {
+    margin-top: 0px !important;
+}
+
+/* Hide the blank space at the top */
+.stAppViewContainer > section {
+    padding-top: 0px !important;
+}
+
+* { font-family: 'DM Sans', sans-serif; }
+
+/* Navbar styles */
+.navbar-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 999999;
+    background: rgba(15, 15, 32, 0.98);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #2d2d5a;
+    padding: 0.6rem 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
 /* Main content - add back padding after navbar */
 .main-content {
     padding-top: 70px;
 }
-
-/* Fix block container spacing */
-.block-container {
-    padding-top: 0rem !important;
-    padding-bottom: 2rem !important;
-}
-
-/* Remove the top margin from the first element */
-.stApp > .stAppViewContainer > .stAppViewBlockContainer {
-    padding-top: 0px !important;
-}
-
-/* Hide the blank space at the top */
-.stAppViewBlockContainer {
-    margin-top: 0px !important;
-}
-
-* { font-family: 'DM Sans', sans-serif; }
 
 /* Cards */
 .card {
@@ -226,6 +241,42 @@ header[data-testid="stHeader"] {
     font-size: 0.85rem;
     font-weight: 500;
 }
+
+/* About page */
+.about-container {
+    max-width: 700px;
+    margin: 0 auto;
+}
+.about-hero {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.about-hero-icon {
+    font-size: 3.5rem;
+    margin-bottom: 0.5rem;
+}
+.about-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #a855f7, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+.about-subtitle {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+.tech-pill {
+    background: rgba(99, 102, 241, 0.12);
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    color: #a5b4fc;
+    font-size: 0.72rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 20px;
+    display: inline-block;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -261,107 +312,89 @@ def nav_goto(page):
 
 
 def render_navbar():
-    """Navbar at the VERY TOP - one row with logo, buttons, and username"""
+    """Navbar with WORKING buttons using Streamlit components"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
     
-    # Create the navbar using HTML/CSS only (no Streamlit buttons that cause layout issues)
-    st.markdown(f"""
+    # Create an empty div for the fixed navbar background
+    st.markdown('<div class="navbar-wrapper"></div>', unsafe_allow_html=True)
+    
+    # Create the actual navbar content using columns (this will be positioned over the background)
+    # Use a container with custom styling to position it correctly
+    st.markdown(
+        '<div style="position: fixed; top: 0; left: 0; right: 0; z-index: 999999; padding: 0.6rem 2rem;">',
+        unsafe_allow_html=True
+    )
+    
+    # Create columns for layout
+    col_logo, col_buttons, col_user = st.columns([1.2, 4, 0.8])
+    
+    with col_logo:
+        st.markdown(
+            '<div style="font-family: Syne, sans-serif; font-size: 1.2rem; font-weight: 700; background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap;">🚀 AI Career Platform</div>',
+            unsafe_allow_html=True
+        )
+    
+    with col_buttons:
+        # Create sub-columns for each button
+        btn_cols = st.columns(6)
+        pages = [
+            ("🏠 Home", "home"),
+            ("📄 Analyze CV", "analyze"),
+            ("🎯 JD Match", "jd_match"),
+            ("🧠 Quiz", "quiz"),
+            ("ℹ️ About", "about"),
+            ("📞 Contact", "contact")
+        ]
+        
+        for idx, (label, page_key) in enumerate(pages):
+            with btn_cols[idx]:
+                is_active = (current_page == page_key)
+                button_type = "primary" if is_active else "secondary"
+                
+                if st.button(label, key=f"nav_{page_key}", use_container_width=True, type=button_type):
+                    nav_goto(page_key)
+    
+    with col_user:
+        st.markdown(
+            f'<div style="background: rgba(168, 85, 247, 0.1); padding: 0.3rem 0.8rem; border-radius: 20px; border: 1px solid rgba(168, 85, 247, 0.2); color: #cbd5e1; font-size: 0.85rem; text-align: center;">👤 {first}</div>',
+            unsafe_allow_html=True
+        )
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Style the buttons to match navbar design
+    st.markdown("""
     <style>
-    .top-navbar {{
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 999999;
-        background: rgba(15, 15, 32, 0.98);
-        backdrop-filter: blur(10px);
-        border-bottom: 1px solid #2d2d5a;
-        padding: 0.6rem 2rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    }}
-    .nav-row {{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        max-width: 1400px;
-        margin: 0 auto;
-    }}
-    .nav-logo {{
-        font-family: 'Syne', sans-serif;
-        font-size: 1.2rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, #a855f7, #ec4899);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        white-space: nowrap;
-        cursor: pointer;
-    }}
-    .nav-buttons {{
-        display: flex;
-        gap: 0.25rem;
-        background: rgba(0,0,0,0.2);
-        padding: 0.2rem;
-        border-radius: 10px;
-    }}
-    .nav-btn {{
-        background: transparent;
-        border: none;
-        color: #94a3b8;
-        font-size: 0.85rem;
-        font-weight: 500;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.2s;
-        font-family: 'DM Sans', sans-serif;
-    }}
-    .nav-btn:hover {{
-        background: rgba(168, 85, 247, 0.15);
-        color: #a855f7;
-    }}
-    .nav-btn-active {{
-        background: rgba(168, 85, 247, 0.2);
-        color: #a855f7;
-        border: 1px solid rgba(168, 85, 247, 0.3);
-    }}
-    .nav-user {{
-        background: rgba(168, 85, 247, 0.1);
-        padding: 0.3rem 0.8rem;
-        border-radius: 20px;
-        border: 1px solid rgba(168, 85, 247, 0.2);
-        color: #cbd5e1;
-        font-size: 0.85rem;
-        white-space: nowrap;
-    }}
+    /* Style navbar buttons */
+    button[key^="nav_"] {
+        background: transparent !important;
+        border: none !important;
+        color: #94a3b8 !important;
+        font-size: 0.85rem !important;
+        font-weight: 500 !important;
+        padding: 0.5rem 0.5rem !important;
+        border-radius: 8px !important;
+        transition: all 0.2s !important;
+        box-shadow: none !important;
+        min-width: auto !important;
+    }
+    button[key^="nav_"]:hover {
+        background: rgba(168, 85, 247, 0.1) !important;
+        color: #a855f7 !important;
+    }
+    button[key^="nav_"][data-testid="baseButton-primary"] {
+        background: rgba(168, 85, 247, 0.15) !important;
+        color: #a855f7 !important;
+        border: 1px solid rgba(168, 85, 247, 0.3) !important;
+    }
+    /* Remove button text transform */
+    button[key^="nav_"] p {
+        font-size: 0.85rem !important;
+    }
     </style>
-    
-    <div class="top-navbar">
-        <div class="nav-row">
-            <div class="nav-logo" onclick="window.location.reload()">🚀 AI Career Platform</div>
-            <div class="nav-buttons">
-                <button class="nav-btn {'nav-btn-active' if current_page == 'home' else ''}" onclick="window.location.href='?nav=home'">🏠 Home</button>
-                <button class="nav-btn {'nav-btn-active' if current_page == 'analyze' else ''}" onclick="window.location.href='?nav=analyze'">📄 Analyze CV</button>
-                <button class="nav-btn {'nav-btn-active' if current_page == 'jd_match' else ''}" onclick="window.location.href='?nav=jd_match'">🎯 JD Match</button>
-                <button class="nav-btn {'nav-btn-active' if current_page == 'quiz' else ''}" onclick="window.location.href='?nav=quiz'">🧠 Quiz</button>
-                <button class="nav-btn {'nav-btn-active' if current_page == 'about' else ''}" onclick="window.location.href='?nav=about'">ℹ️ About</button>
-                <button class="nav-btn {'nav-btn-active' if current_page == 'contact' else ''}" onclick="window.location.href='?nav=contact'">📞 Contact</button>
-            </div>
-            <div class="nav-user">👤 {first}</div>
-        </div>
-    </div>
     """, unsafe_allow_html=True)
-    
-    # Handle navigation from URL parameters
-    query_params = st.query_params
-    if 'nav' in query_params:
-        target = query_params['nav']
-        if target in ['home', 'analyze', 'jd_match', 'quiz', 'about', 'contact']:
-            if st.session_state.page != target:
-                st.session_state.page = target
-                st.query_params.clear()
-                st.rerun()
 
 
 # ============================================================
@@ -839,7 +872,7 @@ def main():
         render_welcome()
         return
     
-    # Show navbar at the VERY TOP
+    # Show navbar at the VERY TOP with working buttons
     render_navbar()
     
     # Route to correct page
