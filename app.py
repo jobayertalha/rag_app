@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Clean modular architecture with proper page routing and fixed navbar
+Clean modular architecture with fixed navbar - FIXED VERSION
 """
 
 import streamlit as st
@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS — Fixed navbar, no duplicate, no lag
+# CSS — Fixed navbar, clean, no duplicates
 # ============================================================
 st.markdown("""
 <style>
@@ -34,7 +34,7 @@ footer {visibility: hidden;}
 .stApp { background: linear-gradient(135deg, #0a0a14 0%, #0f0f20 100%); min-height: 100vh; }
 * { font-family: 'DM Sans', sans-serif; }
 
-/* FIXED NAVBAR - Critical fix - NO DUPLICATE */
+/* FIXED NAVBAR - Clean version */
 .navbar-fixed {
     position: fixed;
     top: 0;
@@ -268,66 +268,58 @@ for k, v in _defaults.items():
 
 
 # ============================================================
-# NAVIGATION - Smooth, no lag
+# NAVIGATION - Clean version with proper rerouting
 # ============================================================
 def nav_goto(page):
-    """Smooth navigation without page rebuild flicker"""
+    """Smooth navigation without duplicate elements"""
     if st.session_state.page != page:
         st.session_state.page = page
         st.rerun()
 
 
 def render_navbar():
-    """SINGLE navbar - fixed, no duplicate"""
+    """SINGLE navbar - clean, fixed, no duplicates"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
     
-    # Use columns for click handling without JavaScript
+    # Create the HTML navbar - buttons will be clickable via JavaScript
     st.markdown(f"""
     <div class="navbar-fixed">
         <div class="nav-container">
-            <div class="nav-logo" style="cursor:pointer;" onclick="window.location.reload()">🚀 AI Career Platform</div>
+            <div class="nav-logo" onclick="location.reload()">🚀 AI Career Platform</div>
             <div class="nav-links">
-                <span class="nav-btn {'nav-btn-active' if current_page == 'home' else ''}" id="nav-home">🏠 Home</span>
-                <span class="nav-btn {'nav-btn-active' if current_page == 'analyze' else ''}" id="nav-analyze">📄 Analyze CV</span>
-                <span class="nav-btn {'nav-btn-active' if current_page == 'jd_match' else ''}" id="nav-jd">🎯 JD Match</span>
-                <span class="nav-btn {'nav-btn-active' if current_page == 'quiz' else ''}" id="nav-quiz">🧠 Quiz</span>
-                <span class="nav-btn {'nav-btn-active' if current_page == 'about' else ''}" id="nav-about">ℹ️ About</span>
+                <button class="nav-btn {'nav-btn-active' if current_page == 'home' else ''}" onclick="navigateTo('home')">🏠 Home</button>
+                <button class="nav-btn {'nav-btn-active' if current_page == 'analyze' else ''}" onclick="navigateTo('analyze')">📄 Analyze CV</button>
+                <button class="nav-btn {'nav-btn-active' if current_page == 'jd_match' else ''}" onclick="navigateTo('jd_match')">🎯 JD Match</button>
+                <button class="nav-btn {'nav-btn-active' if current_page == 'quiz' else ''}" onclick="navigateTo('quiz')">🧠 Quiz</button>
+                <button class="nav-btn {'nav-btn-active' if current_page == 'about' else ''}" onclick="navigateTo('about')">ℹ️ About</button>
             </div>
             <div class="user-info">
                 <span class="user-name">👤 {first}</span>
             </div>
         </div>
     </div>
+    
+    <script>
+    function navigateTo(page) {{
+        const url = new URL(window.location.href);
+        url.searchParams.set('nav_page', page);
+        window.location.href = url.toString();
+    }}
+    </script>
     """, unsafe_allow_html=True)
     
-    # Hidden buttons for navigation (invisible, only for functionality)
-    col1, col2, col3, col4, col5 = st.columns(5)
-    with col1:
-        if st.button("", key="nav_home_hidden", help="Home"):
-            nav_goto("home")
-    with col2:
-        if st.button("", key="nav_analyze_hidden", help="Analyze CV"):
-            nav_goto("analyze")
-    with col3:
-        if st.button("", key="nav_jd_hidden", help="JD Match"):
-            nav_goto("jd_match")
-    with col4:
-        if st.button("", key="nav_quiz_hidden", help="Quiz"):
-            nav_goto("quiz")
-    with col5:
-        if st.button("", key="nav_about_hidden", help="About"):
-            nav_goto("about")
-    
-    # Hide the column buttons completely
-    st.markdown("""
-    <style>
-    div[data-testid="column"]:has(button[key*="hidden"]) {
-        display: none;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+    # Check URL params for navigation (fallback for JavaScript)
+    import urllib.parse
+    query_params = st.query_params
+    if 'nav_page' in query_params:
+        target = query_params['nav_page']
+        if target in ['home', 'analyze', 'jd_match', 'quiz', 'about']:
+            if st.session_state.page != target:
+                st.session_state.page = target
+                st.query_params.clear()
+                st.rerun()
 
 
 # ============================================================
@@ -357,7 +349,7 @@ def render_welcome():
 
 
 # ============================================================
-# HOME PAGE - 3 cards only, no expansion
+# HOME PAGE - 3 cards
 # ============================================================
 def render_home():
     name = st.session_state.candidate_name
@@ -643,13 +635,12 @@ def render_quiz_results():
 
 
 # ============================================================
-# ABOUT PAGE - Clean, no raw HTML, clickable contact
+# ABOUT PAGE
 # ============================================================
 def render_about():
     st.markdown("<div class='main-content'>", unsafe_allow_html=True)
     st.markdown("<div class='about-container'>", unsafe_allow_html=True)
     
-    # Hero Section
     st.markdown("""
     <div class="about-hero">
         <div class="about-hero-icon">🚀</div>
@@ -658,39 +649,32 @@ def render_about():
     </div>
     """, unsafe_allow_html=True)
     
-    # Main Card
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     
-    # Developer Info
     st.markdown("### 👨‍💻 Developer")
     st.markdown("**Talha Jobayer Zihan**  \n*Researcher & AI/ML Engineer*")
     st.markdown("---")
     
-    # Contact Section - Structured rows with clickable links
     st.markdown("### 📞 Contact Information")
     
-    # Department
     col1, col2 = st.columns([1, 5])
     with col1:
         st.markdown("🏛️")
     with col2:
         st.markdown("**Department of Computer Science & Engineering, RUET**")
     
-    # Phone - Clickable
     col1, col2 = st.columns([1, 5])
     with col1:
         st.markdown("📞")
     with col2:
         st.markdown('<a href="tel:01721577792" style="color:#a855f7; text-decoration:none;">01721577792</a>', unsafe_allow_html=True)
     
-    # Email - Clickable
     col1, col2 = st.columns([1, 5])
     with col1:
         st.markdown("✉️")
     with col2:
         st.markdown('<a href="mailto:jobayertalha2020@gmail.com" style="color:#a855f7; text-decoration:none;">jobayertalha2020@gmail.com</a>', unsafe_allow_html=True)
     
-    # LinkedIn
     col1, col2 = st.columns([1, 5])
     with col1:
         st.markdown("🔗")
@@ -699,7 +683,6 @@ def render_about():
     
     st.markdown("---")
     
-    # Tech Stack
     st.markdown("### 🛠️ Technology Stack")
     tech_stack = ["Streamlit", "LangChain", "Groq LLaMA-3.3-70b", "FAISS", "HuggingFace", "Python"]
     cols = st.columns(len(tech_stack))
@@ -707,9 +690,8 @@ def render_about():
         with cols[i]:
             st.markdown(f"<div class='tech-pill' style='text-align:center;'>{tech}</div>", unsafe_allow_html=True)
     
-    st.markdown("</div>", unsafe_allow_html=True)  # Close card
+    st.markdown("</div>", unsafe_allow_html=True)
     
-    # Back button
     if st.button("← Back to Home", use_container_width=True):
         nav_goto("home")
     
@@ -725,7 +707,7 @@ def main():
         render_welcome()
         return
     
-    # Show SINGLE navbar (fixed)
+    # Show SINGLE navbar (clean version)
     render_navbar()
     
     # Route to correct page
