@@ -298,105 +298,132 @@ def nav_goto(page):
         st.rerun()
 
 
+
 def render_navbar():
-    """SINGLE navbar with working Streamlit buttons"""
+    """SINGLE navbar - using Streamlit columns for perfect alignment"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
     
-    # Create the HTML structure for visual navbar
-    st.markdown(f"""
-    <div class="navbar-fixed">
-        <div class="nav-container">
-            <div class="nav-logo">🚀 AI Career Platform</div>
-            <div class="user-info">
-                <span class="user-name">👤 {first}</span>
+    # Create empty space at the top for fixed positioning
+    st.markdown('<div style="height: 60px;"></div>', unsafe_allow_html=True)
+    
+    # Use columns to create the navbar layout
+    # This creates a fixed navbar using Streamlit's native layout
+    with st.container():
+        # Create 3 columns for left, center, right alignment
+        col_left, col_center, col_right = st.columns([1.5, 4, 1.5])
+        
+        with col_left:
+            st.markdown("""
+            <div style="
+                font-family: 'Syne', sans-serif; 
+                font-size: 1.2rem; 
+                font-weight: 700;
+                background: linear-gradient(135deg, #a855f7, #ec4899);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                white-space: nowrap;
+            ">
+            🚀 AI Career Platform
             </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
+        
+        with col_center:
+            # Create sub-columns for each button
+            btn_cols = st.columns(6)
+            pages = [
+                ("🏠 Home", "home"),
+                ("📄 Analyze", "analyze"),
+                ("🎯 JD Match", "jd_match"),
+                ("🧠 Quiz", "quiz"),
+                ("ℹ️ About", "about"),
+                ("📞 Contact", "contact")
+            ]
+            
+            for idx, (label, page_key) in enumerate(pages):
+                with btn_cols[idx]:
+                    # Determine button type based on current page
+                    is_active = (current_page == page_key)
+                    button_type = "primary" if is_active else "secondary"
+                    
+                    if st.button(label, key=f"nav_{page_key}", use_container_width=True, type=button_type):
+                        nav_goto(page_key)
+        
+        with col_right:
+            st.markdown(f"""
+            <div style="
+                background: rgba(168, 85, 247, 0.1);
+                padding: 0.3rem 0.8rem;
+                border-radius: 20px;
+                border: 1px solid rgba(168, 85, 247, 0.2);
+                color: #cbd5e1;
+                font-size: 0.85rem;
+                text-align: center;
+                display: inline-block;
+                float: right;
+            ">
+            👤 {first}
+            </div>
+            """, unsafe_allow_html=True)
     
-    # Create invisible space for buttons - using columns for proper layout
-    # This creates clickable buttons that actually work with Streamlit
-    st.markdown('<div style="position: fixed; top: 12px; left: 200px; z-index: 99999;">', unsafe_allow_html=True)
-    
-    # Create 6 buttons in a row for navigation
-    cols = st.columns([0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 3])
-    
-    with cols[0]:
-        if st.button("🏠 Home", key="nav_home", use_container_width=True,
-                    type="primary" if current_page == "home" else "secondary"):
-            nav_goto("home")
-    
-    with cols[1]:
-        if st.button("📄 Analyze CV", key="nav_analyze", use_container_width=True,
-                    type="primary" if current_page == "analyze" else "secondary"):
-            nav_goto("analyze")
-    
-    with cols[2]:
-        if st.button("🎯 JD Match", key="nav_jd", use_container_width=True,
-                    type="primary" if current_page == "jd_match" else "secondary"):
-            nav_goto("jd_match")
-    
-    with cols[3]:
-        if st.button("🧠 Quiz", key="nav_quiz", use_container_width=True,
-                    type="primary" if current_page == "quiz" else "secondary"):
-            nav_goto("quiz")
-    
-    with cols[4]:
-        if st.button("ℹ️ About", key="nav_about", use_container_width=True,
-                    type="primary" if current_page == "about" else "secondary"):
-            nav_goto("about")
-    
-    with cols[5]:
-        if st.button("📞 Contact", key="nav_contact", use_container_width=True,
-                    type="primary" if current_page == "contact" else "secondary"):
-            nav_goto("contact")
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Add CSS to style the buttons to match navbar design
+    # Add CSS to make the navbar fixed at the top
     st.markdown("""
     <style>
-    /* Style the navbar buttons */
-    div[data-testid="column"]:has(button[key*="nav_"]) {
-        position: relative;
+    /* Make the navbar container fixed */
+    .stApp > header {
+        background: transparent;
     }
-    button[key*="nav_"] {
+    
+    /* Target the navbar container and make it fixed */
+    div:has(> div:contains("AI Career Platform")) {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 99999;
+        background: rgba(15, 15, 32, 0.98);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid #2d2d5a;
+        padding: 0.75rem 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    
+    /* Style the buttons */
+    button[key^="nav_"] {
         background: transparent !important;
         border: none !important;
         color: #94a3b8 !important;
         font-size: 0.85rem !important;
         font-weight: 500 !important;
-        padding: 0.5rem 1rem !important;
+        padding: 0.5rem 0.5rem !important;
         border-radius: 8px !important;
         transition: all 0.2s !important;
         box-shadow: none !important;
     }
-    button[key*="nav_"]:hover {
+    
+    button[key^="nav_"]:hover {
         background: rgba(168, 85, 247, 0.1) !important;
         color: #a855f7 !important;
-        border: none !important;
-        box-shadow: none !important;
     }
-    button[key*="nav_"][data-testid="baseButton-secondary"] {
-        background: transparent !important;
-    }
-    /* Style for active button */
-    button[key="nav_home"][data-testid="baseButton-primary"],
-    button[key="nav_analyze"][data-testid="baseButton-primary"],
-    button[key="nav_jd"][data-testid="baseButton-primary"],
-    button[key="nav_quiz"][data-testid="baseButton-primary"],
-    button[key="nav_about"][data-testid="baseButton-primary"],
-    button[key="nav_contact"][data-testid="baseButton-primary"] {
+    
+    button[key^="nav_"][data-testid="baseButton-primary"] {
         background: rgba(168, 85, 247, 0.15) !important;
         color: #a855f7 !important;
         border: 1px solid rgba(168, 85, 247, 0.3) !important;
     }
+    
+    /* Hide the default Streamlit header */
+    header[data-testid="stHeader"] {
+        display: none;
+    }
+    
+    /* Add padding to main content to account for fixed navbar */
+    .main-content {
+        padding-top: 20px;
+    }
     </style>
     """, unsafe_allow_html=True)
-
-
 # ============================================================
 # WELCOME SCREEN
 # ============================================================
