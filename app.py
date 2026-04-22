@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-WORKING SIDEBAR - Final Version
+WORKING SIDEBAR - With Shutdown Icon
 """
 
 import streamlit as st
@@ -46,26 +46,6 @@ footer {visibility: hidden;}
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0d1117 0%, #0a0e1a 100%);
     border-right: 1px solid #1f2937;
-}
-
-/* Sidebar brand */
-.sidebar-brand {
-    text-align: center;
-    padding: 1.5rem 1rem;
-    border-bottom: 1px solid #1f2937;
-    margin-bottom: 1rem;
-}
-
-.sidebar-brand-icon {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-}
-
-.sidebar-brand-text {
-    font-family: 'Inter', sans-serif;
-    font-size: 1rem;
-    font-weight: 700;
-    color: #ffffff;
 }
 
 /* Main content */
@@ -462,7 +442,7 @@ def sign_out():
 
 
 def render_sidebar():
-    """Simple working sidebar"""
+    """Simple working sidebar with shutdown icon"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
@@ -476,9 +456,12 @@ def render_sidebar():
         </div>
         """, unsafe_allow_html=True)
         
-        # User name button
-        if st.button(f"👤 {first}", key="user_btn", use_container_width=True):
-            pass  # Just show the name, no dropdown needed
+        # User name display
+        st.markdown(f"""
+        <div style="background: #1f2937; border-radius: 10px; padding: 0.6rem 1rem; margin-bottom: 1rem;">
+            <span style="color: #e5e7eb;">👤 {first}</span>
+        </div>
+        """, unsafe_allow_html=True)
         
         st.markdown("---")
         
@@ -501,8 +484,8 @@ def render_sidebar():
         
         st.markdown("---")
         
-        # Sign out button
-        if st.button("🚪 Sign Out", key="signout_btn", use_container_width=True):
+        # Sign out button with shutdown/power icon (⏻)
+        if st.button("⏻ Sign Out", key="signout_btn", use_container_width=True):
             sign_out()
         
         st.caption("© 2025 AI Career Platform")
