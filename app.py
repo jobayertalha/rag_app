@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-FIXED: Working top navbar with Streamlit buttons
+Fixed: Left sidebar navigation that always works
 """
 
 import streamlit as st
@@ -16,7 +16,7 @@ st.set_page_config(
     page_title="AI Career Platform",
     page_icon="🎯",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
 # ============================================================
@@ -45,62 +45,101 @@ header {visibility: hidden;}
 footer {visibility: hidden;}
 [data-testid="stHeader"] {display: none;}
 [data-testid="stToolbar"] {display: none;}
-[data-testid="stSidebar"] {display: none;}
 
-/* Top Navbar Container */
-.top-navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 999999;
-    background: #0d1117;
+/* Sidebar Styling */
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0d1117 0%, #0a0e1a 100%);
+    border-right: 1px solid #1f2937;
+    width: 280px !important;
+}
+
+/* Hide sidebar collapse button */
+[data-testid="stSidebarCollapseButton"] {
+    display: none !important;
+}
+
+/* Sidebar Brand */
+.sidebar-brand {
+    text-align: center;
+    padding: 1.5rem 1rem;
     border-bottom: 1px solid #1f2937;
-    padding: 0.6rem 2rem;
+    margin-bottom: 1.5rem;
 }
 
-.nav-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1400px;
-    margin: 0 auto;
+.sidebar-brand-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
 }
 
-.nav-logo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1.2rem;
+.sidebar-brand-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
     font-weight: 700;
     color: #ffffff;
+    letter-spacing: -0.5px;
 }
 
-.nav-buttons {
-    display: flex;
-    gap: 0.25rem;
-    background: rgba(255,255,255,0.03);
-    padding: 0.25rem;
-    border-radius: 40px;
-}
-
-.nav-user {
+/* User Profile in Sidebar */
+.sidebar-user {
     background: #1f2937;
-    padding: 0.4rem 1rem;
-    border-radius: 30px;
+    border-radius: 12px;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
     cursor: pointer;
 }
 
-.user-name {
-    color: #e5e7eb;
-    font-size: 0.85rem;
+.sidebar-user-icon {
+    font-size: 1.2rem;
 }
 
-/* Main Content */
+.sidebar-user-name {
+    flex: 1;
+    color: #e5e7eb;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.sidebar-user-arrow {
+    color: #9ca3af;
+    font-size: 0.7rem;
+}
+
+/* Navigation Buttons in Sidebar */
+.nav-sidebar-btn {
+    width: 100%;
+    text-align: left !important;
+    justify-content: flex-start !important;
+    margin-bottom: 0.5rem !important;
+    border-radius: 10px !important;
+    padding: 0.6rem 1rem !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+}
+
+.nav-sidebar-btn:hover {
+    transform: translateX(5px);
+}
+
+/* Sign Out Button */
+.signout-btn {
+    margin-top: 2rem;
+    width: 100%;
+    background: rgba(239, 68, 68, 0.1) !important;
+    border: 1px solid rgba(239, 68, 68, 0.25) !important;
+    color: #fca5a5 !important;
+}
+
+.signout-btn:hover {
+    background: rgba(239, 68, 68, 0.2) !important;
+    color: #ef4444 !important;
+}
+
+/* Main Content Area */
 .main-content {
-    padding-top: 70px;
-    padding-left: 2rem;
-    padding-right: 2rem;
+    padding: 2rem;
 }
 
 /* Main Header */
@@ -219,6 +258,12 @@ footer {visibility: hidden;}
     color: #ffffff !important;
 }
 
+.stTextInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+}
+
 .stButton > button {
     background: #3b82f6 !important;
     border: none !important;
@@ -232,29 +277,6 @@ footer {visibility: hidden;}
 .stButton > button:hover {
     background: #2563eb !important;
     transform: translateY(-2px);
-}
-
-/* Navbar buttons */
-.nav-btn {
-    background: transparent !important;
-    border: none !important;
-    color: #9ca3af !important;
-    font-size: 0.85rem !important;
-    font-weight: 500 !important;
-    padding: 0.5rem 1rem !important;
-    border-radius: 30px !important;
-    margin: 0 !important;
-}
-
-.nav-btn:hover {
-    background: rgba(59, 130, 246, 0.15) !important;
-    color: #60a5fa !important;
-}
-
-.nav-btn-active {
-    background: rgba(59, 130, 246, 0.2) !important;
-    color: #60a5fa !important;
-    border: 1px solid rgba(59, 130, 246, 0.3) !important;
 }
 
 /* Contact & About Pages */
@@ -467,6 +489,19 @@ footer {visibility: hidden;}
     color: #ffffff;
     margin-bottom: 1rem;
 }
+
+/* Dropdown menu for user */
+.user-dropdown {
+    position: fixed;
+    top: 70px;
+    left: 230px;
+    background: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 12px;
+    padding: 0.5rem;
+    z-index: 1000;
+    min-width: 140px;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -521,98 +556,85 @@ def toggle_user_menu():
     st.rerun()
 
 
-def render_navbar():
-    """Working top navbar with Streamlit buttons"""
+def render_sidebar():
+    """Render left sidebar navigation"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
     
-    # Create empty div for fixed navbar background
-    st.markdown('<div class="top-navbar"></div>', unsafe_allow_html=True)
+    # Sidebar Brand
+    st.sidebar.markdown("""
+    <div class="sidebar-brand">
+        <div class="sidebar-brand-icon">🎯</div>
+        <div class="sidebar-brand-text">AI Career Platform</div>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # Create the navbar content using columns (positioned over the background)
-    st.markdown(
-        '<div style="position: fixed; top: 0; left: 0; right: 0; z-index: 999999; padding: 0.6rem 2rem; background: #0d1117;">',
-        unsafe_allow_html=True
-    )
-    
-    # Create columns for layout
-    col_logo, col_buttons, col_user = st.columns([1, 4, 1])
-    
-    with col_logo:
-        st.markdown(
-            '<div style="font-size: 1.2rem; font-weight: 700; color: #ffffff;">🎯 AI Career Platform</div>',
-            unsafe_allow_html=True
-        )
-    
-    with col_buttons:
-        # Create 6 columns for navigation buttons
-        btn_cols = st.columns(6)
-        
-        nav_items = [
-            ("🏠 Home", "home"),
-            ("📄 Analyze CV", "analyze"),
-            ("🎯 JD Match", "jd_match"),
-            ("🧠 Quiz", "quiz"),
-            ("ℹ️ About", "about"),
-            ("📞 Contact", "contact")
-        ]
-        
-        for idx, (label, page_key) in enumerate(nav_items):
-            with btn_cols[idx]:
-                is_active = (current_page == page_key)
-                button_type = "primary" if is_active else "secondary"
-                
-                if st.button(label, key=f"nav_{page_key}", use_container_width=True, type=button_type):
-                    nav_goto(page_key)
-    
-    with col_user:
-        # User profile button
-        if st.button(f"👤 {first} ▼", key="user_menu_btn", use_container_width=True):
+    # User Profile Section
+    col1, col2, col3 = st.sidebar.columns([1, 4, 1])
+    with col1:
+        st.markdown("👤")
+    with col2:
+        if st.button(f"{first} ▼", key="user_menu_btn", use_container_width=True):
             toggle_user_menu()
-    
-    st.markdown('</div>', unsafe_allow_html=True)
     
     # Show dropdown menu if expanded
     if st.session_state.show_user_menu:
-        st.markdown(
-            '<div style="position: fixed; top: 55px; right: 30px; z-index: 1000000;">',
-            unsafe_allow_html=True
-        )
-        col1, col2, col3 = st.columns([3, 1, 2])
-        with col2:
-            if st.button("⏻ Sign Out", key="signout_dropdown", use_container_width=True):
-                sign_out()
-        st.markdown('</div>', unsafe_allow_html=True)
+        if st.sidebar.button("⏻ Sign Out", key="signout_sidebar", use_container_width=True):
+            sign_out()
     
-    # Style the navbar buttons
-    st.markdown("""
+    st.sidebar.markdown("---")
+    
+    # Navigation Buttons
+    nav_items = [
+        ("🏠 Home", "home"),
+        ("📄 Analyze CV", "analyze"),
+        ("🎯 JD Match", "jd_match"),
+        ("🧠 Quiz", "quiz"),
+        ("ℹ️ About", "about"),
+        ("📞 Contact", "contact")
+    ]
+    
+    for label, page_key in nav_items:
+        is_active = (current_page == page_key)
+        button_type = "primary" if is_active else "secondary"
+        
+        if st.sidebar.button(label, key=f"sidebar_{page_key}", use_container_width=True, type=button_type):
+            nav_goto(page_key)
+    
+    st.sidebar.markdown("---")
+    st.sidebar.caption("© 2025 AI Career Platform")
+    
+    # Style sidebar buttons
+    st.sidebar.markdown("""
     <style>
-    button[key^="nav_"] {
-        background: transparent !important;
-        border: none !important;
-        color: #9ca3af !important;
-        font-size: 0.85rem !important;
+    button[key^="sidebar_"] {
+        transition: all 0.3s ease !important;
+        border-radius: 10px !important;
+        margin-bottom: 0.5rem !important;
         font-weight: 500 !important;
-        padding: 0.5rem 0.5rem !important;
-        border-radius: 30px !important;
-        box-shadow: none !important;
+        text-align: left !important;
+        justify-content: flex-start !important;
     }
-    button[key^="nav_"]:hover {
-        background: rgba(59, 130, 246, 0.15) !important;
-        color: #60a5fa !important;
-    }
-    button[key^="nav_"][data-testid="baseButton-primary"] {
-        background: rgba(59, 130, 246, 0.2) !important;
-        color: #60a5fa !important;
-        border: 1px solid rgba(59, 130, 246, 0.3) !important;
+    button[key^="sidebar_"]:hover {
+        transform: translateX(5px);
     }
     button[key="user_menu_btn"] {
         background: #1f2937 !important;
         border: 1px solid #374151 !important;
-        border-radius: 30px !important;
+        border-radius: 10px !important;
         color: #e5e7eb !important;
-        font-size: 0.85rem !important;
+        text-align: left !important;
+    }
+    button[key="signout_sidebar"] {
+        background: rgba(239, 68, 68, 0.1) !important;
+        border: 1px solid rgba(239, 68, 68, 0.25) !important;
+        color: #fca5a5 !important;
+        margin-top: 0.5rem !important;
+    }
+    button[key="signout_sidebar"]:hover {
+        background: rgba(239, 68, 68, 0.2) !important;
+        color: #ef4444 !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -1140,7 +1162,7 @@ def main():
         render_welcome()
         return
     
-    render_navbar()
+    render_sidebar()
     
     page = st.session_state.page
     
@@ -1162,3 +1184,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
