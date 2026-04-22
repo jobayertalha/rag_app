@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Fixed: Left sidebar navigation that always works
+Fixed: Sidebar with hamburger menu toggle
 """
 
 import streamlit as st
@@ -46,16 +46,18 @@ footer {visibility: hidden;}
 [data-testid="stHeader"] {display: none;}
 [data-testid="stToolbar"] {display: none;}
 
-/* Sidebar Styling */
+/* Sidebar Styling - Make it visible */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0d1117 0%, #0a0e1a 100%);
     border-right: 1px solid #1f2937;
-    width: 280px !important;
+    min-width: 280px;
 }
 
-/* Hide sidebar collapse button */
+/* Make sidebar collapse button visible */
 [data-testid="stSidebarCollapseButton"] {
-    display: none !important;
+    display: flex !important;
+    background: #1f2937 !important;
+    border-radius: 8px !important;
 }
 
 /* Sidebar Brand */
@@ -490,17 +492,14 @@ footer {visibility: hidden;}
     margin-bottom: 1rem;
 }
 
-/* Dropdown menu for user */
-.user-dropdown {
-    position: fixed;
-    top: 70px;
-    left: 230px;
-    background: #1f2937;
-    border: 1px solid #374151;
-    border-radius: 12px;
-    padding: 0.5rem;
-    z-index: 1000;
-    min-width: 140px;
+/* Custom sidebar button styles */
+button[kind="sidebar"] {
+    background: #1f2937 !important;
+}
+
+/* Make sure sidebar content is visible */
+section[data-testid="stSidebar"] > div {
+    padding-top: 1rem;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -557,7 +556,7 @@ def toggle_user_menu():
 
 
 def render_sidebar():
-    """Render left sidebar navigation"""
+    """Render left sidebar navigation with hamburger menu"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
@@ -1184,4 +1183,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
