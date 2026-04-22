@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-PREMIUM FIXED: Glass blur navbar, clean pill buttons, no conflicts
+FIXED: Working top navbar with Streamlit buttons
 """
 
 import streamlit as st
@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# PREMIUM CSS - Glass blur navbar, clean design
+# PROFESSIONAL CSS
 # ============================================================
 st.markdown("""
 <style>
@@ -47,93 +47,58 @@ footer {visibility: hidden;}
 [data-testid="stToolbar"] {display: none;}
 [data-testid="stSidebar"] {display: none;}
 
-/* ========== PREMIUM NAVBAR - Glass Blur Effect ========== */
+/* Top Navbar Container */
 .top-navbar {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 999999;
-    background: rgba(13, 17, 23, 0.85);
-    backdrop-filter: blur(14px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: #0d1117;
+    border-bottom: 1px solid #1f2937;
     padding: 0.6rem 2rem;
 }
 
-.nav-container {
+.nav-row {
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
     max-width: 1400px;
     margin: 0 auto;
 }
 
 .nav-logo {
-    font-weight: 700;
-    font-size: 1.2rem;
-    color: #ffffff;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #ffffff;
 }
 
-/* ========== NAVBAR BUTTONS - Clean Pills ========== */
-.top-navbar .stButton > button {
-    background: transparent !important;
-    border: none !important;
-    border-radius: 999px !important;
-    padding: 0.45rem 1rem !important;
-    font-size: 0.85rem !important;
-    color: #9ca3af !important;
-    transition: all 0.25s ease !important;
-    font-weight: 500 !important;
+.nav-buttons {
+    display: flex;
+    gap: 0.25rem;
+    background: rgba(255,255,255,0.03);
+    padding: 0.25rem;
+    border-radius: 40px;
 }
 
-.top-navbar .stButton > button:hover {
-    background: rgba(59, 130, 246, 0.15) !important;
-    color: #60a5fa !important;
-    transform: translateY(-1px);
+.nav-user {
+    background: #1f2937;
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    cursor: pointer;
 }
 
-.top-navbar .stButton > button[kind="primary"] {
-    background: rgba(59, 130, 246, 0.25) !important;
-    color: #60a5fa !important;
-    border: 1px solid rgba(59, 130, 246, 0.4) !important;
-    box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+.user-name {
+    color: #e5e7eb;
+    font-size: 0.85rem;
 }
 
-/* ========== USER BUTTON ========== */
-.user-btn .stButton > button {
-    background: #1f2937 !important;
-    border-radius: 999px !important;
-    padding: 0.4rem 1rem !important;
-    color: #e5e7eb !important;
-}
-
-.user-btn .stButton > button:hover {
-    background: #374151 !important;
-    transform: translateY(-1px);
-}
-
-/* ========== DEFAULT APP BUTTONS (Not Navbar) ========== */
-.stButton > button:not(.top-navbar .stButton > button) {
-    background: #3b82f6 !important;
-    border: none !important;
-    border-radius: 12px !important;
-    color: white !important;
-    font-weight: 600 !important;
-    padding: 0.6rem 1.5rem !important;
-    transition: all 0.3s ease !important;
-}
-
-.stButton > button:not(.top-navbar .stButton > button):hover {
-    background: #2563eb !important;
-    transform: translateY(-2px);
-}
-
-/* ========== MAIN CONTENT - Fixed spacing ========== */
+/* Main Content */
 .main-content {
-    padding-top: 85px;
+    padding-top: 70px;
     padding-left: 2rem;
     padding-right: 2rem;
 }
@@ -254,10 +219,42 @@ footer {visibility: hidden;}
     color: #ffffff !important;
 }
 
-.stTextInput > div > div > input:focus,
-.stTextArea > div > div > textarea:focus {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+.stButton > button {
+    background: #3b82f6 !important;
+    border: none !important;
+    border-radius: 12px !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.6rem 1.5rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.stButton > button:hover {
+    background: #2563eb !important;
+    transform: translateY(-2px);
+}
+
+/* Navbar buttons */
+.nav-btn {
+    background: transparent !important;
+    border: none !important;
+    color: #9ca3af !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 30px !important;
+    margin: 0 !important;
+}
+
+.nav-btn:hover {
+    background: rgba(59, 130, 246, 0.15) !important;
+    color: #60a5fa !important;
+}
+
+.nav-btn-active {
+    background: rgba(59, 130, 246, 0.2) !important;
+    color: #60a5fa !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
 }
 
 /* Contact & About Pages */
@@ -501,7 +498,6 @@ for k, v in _defaults.items():
 def nav_goto(page):
     if st.session_state.page != page:
         st.session_state.page = page
-        st.session_state.show_user_menu = False
         st.rerun()
 
 
@@ -520,54 +516,106 @@ def sign_out():
     st.rerun()
 
 
+def toggle_user_menu():
+    st.session_state.show_user_menu = not st.session_state.show_user_menu
+    st.rerun()
+
+
 def render_navbar():
+    """Working top navbar with Streamlit buttons"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
-
-    nav_items = [
-        ("🏠 Home", "home"),
-        ("📄 Analyze CV", "analyze"),
-        ("🎯 JD Match", "jd_match"),
-        ("🧠 Quiz", "quiz"),
-        ("ℹ️ About", "about"),
-        ("📞 Contact", "contact")
-    ]
-
-    st.markdown('<div class="top-navbar"><div class="nav-container">', unsafe_allow_html=True)
-
-    col1, col2, col3 = st.columns([1.5, 5, 1.5])
-
-    # Logo
-    with col1:
-        st.markdown('<div class="nav-logo">🎯 AI Career Platform</div>', unsafe_allow_html=True)
-
-    # Center Nav Buttons
-    with col2:
-        nav_cols = st.columns(len(nav_items))
-        for i, (label, page_key) in enumerate(nav_items):
-            is_active = current_page == page_key
-            if nav_cols[i].button(
-                label,
-                key=f"nav_{page_key}",
-                type="primary" if is_active else "secondary"
-            ):
-                nav_goto(page_key)
-
-    # User Menu
-    with col3:
-        st.markdown('<div class="user-btn">', unsafe_allow_html=True)
-        if st.button(f"👤 {first}", key="user_menu"):
-            st.session_state.show_user_menu = not st.session_state.show_user_menu
-            st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        # Sign Out Dropdown
-        if st.session_state.show_user_menu:
+    
+    # Create empty div for fixed navbar background
+    st.markdown('<div class="top-navbar"></div>', unsafe_allow_html=True)
+    
+    # Create the navbar content using columns (positioned over the background)
+    st.markdown(
+        '<div style="position: fixed; top: 0; left: 0; right: 0; z-index: 999999; padding: 0.6rem 2rem; background: #0d1117;">',
+        unsafe_allow_html=True
+    )
+    
+    # Create columns for layout
+    col_logo, col_buttons, col_user = st.columns([1, 4, 1])
+    
+    with col_logo:
+        st.markdown(
+            '<div style="font-size: 1.2rem; font-weight: 700; color: #ffffff;">🎯 AI Career Platform</div>',
+            unsafe_allow_html=True
+        )
+    
+    with col_buttons:
+        # Create 6 columns for navigation buttons
+        btn_cols = st.columns(6)
+        
+        nav_items = [
+            ("🏠 Home", "home"),
+            ("📄 Analyze CV", "analyze"),
+            ("🎯 JD Match", "jd_match"),
+            ("🧠 Quiz", "quiz"),
+            ("ℹ️ About", "about"),
+            ("📞 Contact", "contact")
+        ]
+        
+        for idx, (label, page_key) in enumerate(nav_items):
+            with btn_cols[idx]:
+                is_active = (current_page == page_key)
+                button_type = "primary" if is_active else "secondary"
+                
+                if st.button(label, key=f"nav_{page_key}", use_container_width=True, type=button_type):
+                    nav_goto(page_key)
+    
+    with col_user:
+        # User profile button
+        if st.button(f"👤 {first} ▼", key="user_menu_btn", use_container_width=True):
+            toggle_user_menu()
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Show dropdown menu if expanded
+    if st.session_state.show_user_menu:
+        st.markdown(
+            '<div style="position: fixed; top: 55px; right: 30px; z-index: 1000000;">',
+            unsafe_allow_html=True
+        )
+        col1, col2, col3 = st.columns([3, 1, 2])
+        with col2:
             if st.button("⏻ Sign Out", key="signout_dropdown", use_container_width=True):
                 sign_out()
-
-    st.markdown('</div></div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Style the navbar buttons
+    st.markdown("""
+    <style>
+    button[key^="nav_"] {
+        background: transparent !important;
+        border: none !important;
+        color: #9ca3af !important;
+        font-size: 0.85rem !important;
+        font-weight: 500 !important;
+        padding: 0.5rem 0.5rem !important;
+        border-radius: 30px !important;
+        box-shadow: none !important;
+    }
+    button[key^="nav_"]:hover {
+        background: rgba(59, 130, 246, 0.15) !important;
+        color: #60a5fa !important;
+    }
+    button[key^="nav_"][data-testid="baseButton-primary"] {
+        background: rgba(59, 130, 246, 0.2) !important;
+        color: #60a5fa !important;
+        border: 1px solid rgba(59, 130, 246, 0.3) !important;
+    }
+    button[key="user_menu_btn"] {
+        background: #1f2937 !important;
+        border: 1px solid #374151 !important;
+        border-radius: 30px !important;
+        color: #e5e7eb !important;
+        font-size: 0.85rem !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 
 # ============================================================
@@ -578,11 +626,11 @@ def render_welcome():
     
     with col2:
         st.markdown("""
-        <div style="text-align: center; margin-top: 60px;">
-            <div style="font-family: 'Inter', sans-serif; font-size: 1.6rem; font-weight: 800; margin-bottom: 0.5rem;">
+        <div style="text-align: center; margin-top: 100px;">
+            <div style="font-family: 'Inter', sans-serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">
                 AI <span style="color: #3b82f6;">Career</span> Platform
             </div>
-            <p style="color: #9ca3af; margin-bottom: 1.5rem; font-size: 0.75rem;">Your AI-powered career companion</p>
+            <p style="color: #9ca3af; margin-bottom: 1.5rem; font-size: 0.8rem;">Your AI-powered career companion</p>
             <div style="background: #111827; border: 1px solid #1f2937; border-radius: 16px; padding: 1.2rem;">
                 <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; color: #e5e7eb;">👋 Welcome! What's your name?</div>
         """, unsafe_allow_html=True)
