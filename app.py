@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Fixed: Sidebar with hamburger menu toggle
+FIXED: Navigation working, smaller name block, back to home buttons
 """
 
 import streamlit as st
@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# PROFESSIONAL CSS
+# PROFESSIONAL CSS - Clean Modern Design
 # ============================================================
 st.markdown("""
 <style>
@@ -46,105 +46,76 @@ footer {visibility: hidden;}
 [data-testid="stHeader"] {display: none;}
 [data-testid="stToolbar"] {display: none;}
 
-/* Sidebar Styling - Make it visible */
+/* Sidebar Styling */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0d1117 0%, #0a0e1a 100%);
     border-right: 1px solid #1f2937;
-    min-width: 280px;
-}
-
-/* Make sidebar collapse button visible */
-[data-testid="stSidebarCollapseButton"] {
-    display: flex !important;
-    background: #1f2937 !important;
-    border-radius: 8px !important;
 }
 
 /* Sidebar Brand */
 .sidebar-brand {
     text-align: center;
-    padding: 1.5rem 1rem;
+    padding: 2rem 1rem;
     border-bottom: 1px solid #1f2937;
     margin-bottom: 1.5rem;
 }
 
 .sidebar-brand-icon {
-    font-size: 2rem;
+    font-size: 2.5rem;
     margin-bottom: 0.5rem;
 }
 
 .sidebar-brand-text {
     font-family: 'Inter', sans-serif;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: #ffffff;
     letter-spacing: -0.5px;
 }
 
-/* User Profile in Sidebar */
-.sidebar-user {
-    background: #1f2937;
-    border-radius: 12px;
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    cursor: pointer;
-}
-
-.sidebar-user-icon {
-    font-size: 1.2rem;
-}
-
-.sidebar-user-name {
-    flex: 1;
-    color: #e5e7eb;
-    font-size: 0.85rem;
-    font-weight: 500;
-}
-
-.sidebar-user-arrow {
-    color: #9ca3af;
-    font-size: 0.7rem;
-}
-
-/* Navigation Buttons in Sidebar */
-.nav-sidebar-btn {
-    width: 100%;
+/* User Profile Button */
+button[key="user_menu_btn"] {
+    background: #1f2937 !important;
+    border: 1px solid #374151 !important;
+    border-radius: 12px !important;
+    padding: 0.75rem !important;
+    color: #e5e7eb !important;
+    font-weight: 600 !important;
     text-align: left !important;
-    justify-content: flex-start !important;
-    margin-bottom: 0.5rem !important;
-    border-radius: 10px !important;
-    padding: 0.6rem 1rem !important;
-    font-weight: 500 !important;
     transition: all 0.3s ease !important;
 }
 
-.nav-sidebar-btn:hover {
-    transform: translateX(5px);
+button[key="user_menu_btn"]:hover {
+    background: #374151 !important;
+    border-color: #4b5563 !important;
 }
 
 /* Sign Out Button */
-.signout-btn {
-    margin-top: 2rem;
-    width: 100%;
-    background: rgba(239, 68, 68, 0.1) !important;
-    border: 1px solid rgba(239, 68, 68, 0.25) !important;
-    color: #fca5a5 !important;
+button[key="signout_option"] {
+    background: #1f2937 !important;
+    border: 1px solid #374151 !important;
+    border-radius: 10px !important;
+    color: #f87171 !important;
 }
 
-.signout-btn:hover {
-    background: rgba(239, 68, 68, 0.2) !important;
+button[key="signout_option"]:hover {
+    background: #374151 !important;
     color: #ef4444 !important;
 }
 
-/* Main Content Area */
-.main-content {
-    padding: 2rem;
+/* Navigation Buttons */
+button[key^="sidebar_"] {
+    transition: all 0.3s ease !important;
+    border-radius: 10px !important;
+    margin-bottom: 0.5rem !important;
+    font-weight: 500 !important;
 }
 
-/* Main Header */
+button[key^="sidebar_"]:hover {
+    transform: translateX(5px);
+}
+
+/* Main Content Area */
 .main-header {
     margin-bottom: 2rem;
     padding-bottom: 1rem;
@@ -322,6 +293,11 @@ footer {visibility: hidden;}
     text-decoration: none;
 }
 
+.contact-link:hover {
+    color: #93c5fd;
+    text-decoration: underline;
+}
+
 .social-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -382,6 +358,7 @@ footer {visibility: hidden;}
     color: #9ca3af;
 }
 
+/* Profile Header */
 .profile-header {
     text-align: center;
     margin-bottom: 2rem;
@@ -406,6 +383,7 @@ footer {visibility: hidden;}
     font-size: 0.9rem;
 }
 
+/* Section Headers */
 .section-header {
     font-size: 1rem;
     font-weight: 600;
@@ -415,14 +393,15 @@ footer {visibility: hidden;}
     border-bottom: 1px solid #1f2937;
 }
 
-/* Welcome Screen */
+/* Welcome Screen - FIXED: Much smaller name entry block */
 .welcome-container {
     max-width: 380px;
-    margin: 80px auto;
+    margin: 60px auto;
     text-align: center;
 }
 
 .welcome-title {
+    font-family: 'Inter', sans-serif;
     font-size: 1.8rem;
     font-weight: 800;
     margin-bottom: 0.5rem;
@@ -446,38 +425,11 @@ footer {visibility: hidden;}
     padding: 1.2rem;
 }
 
-/* Quiz Start Block */
-.quiz-start-container {
-    max-width: 380px;
-    margin: 40px auto;
-    text-align: center;
-}
-
-.quiz-start-card {
-    background: #111827;
-    border: 1px solid #1f2937;
-    border-radius: 16px;
-    padding: 1.5rem;
-}
-
-.quiz-start-icon {
-    font-size: 2rem;
-    margin-bottom: 0.75rem;
-}
-
-.quiz-start-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #ffffff;
+.welcome-card .stTextInput {
     margin-bottom: 0.5rem;
 }
 
-.quiz-start-desc {
-    color: #9ca3af;
-    font-size: 0.75rem;
-    margin-bottom: 1rem;
-}
-
+/* Quiz Styles */
 .quiz-question {
     background: #111827;
     border: 1px solid #1f2937;
@@ -492,14 +444,9 @@ footer {visibility: hidden;}
     margin-bottom: 1rem;
 }
 
-/* Custom sidebar button styles */
-button[kind="sidebar"] {
-    background: #1f2937 !important;
-}
-
-/* Make sure sidebar content is visible */
-section[data-testid="stSidebar"] > div {
-    padding-top: 1rem;
+/* Back to Home button styling */
+.back-home-btn {
+    margin-top: 2rem;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -550,18 +497,11 @@ def sign_out():
     st.rerun()
 
 
-def toggle_user_menu():
-    st.session_state.show_user_menu = not st.session_state.show_user_menu
-    st.rerun()
-
-
 def render_sidebar():
-    """Render left sidebar navigation with hamburger menu"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
     
-    # Sidebar Brand
     st.sidebar.markdown("""
     <div class="sidebar-brand">
         <div class="sidebar-brand-icon">🎯</div>
@@ -569,22 +509,24 @@ def render_sidebar():
     </div>
     """, unsafe_allow_html=True)
     
-    # User Profile Section
-    col1, col2, col3 = st.sidebar.columns([1, 4, 1])
+    col1, col2 = st.sidebar.columns([1, 4])
     with col1:
         st.markdown("👤")
     with col2:
         if st.button(f"{first} ▼", key="user_menu_btn", use_container_width=True):
-            toggle_user_menu()
+            st.session_state.show_user_menu = not st.session_state.show_user_menu
+            st.rerun()
     
-    # Show dropdown menu if expanded
     if st.session_state.show_user_menu:
-        if st.sidebar.button("⏻ Sign Out", key="signout_sidebar", use_container_width=True):
-            sign_out()
+        col1, col2 = st.sidebar.columns([1, 4])
+        with col1:
+            st.markdown("⏻")
+        with col2:
+            if st.button("Sign Out", key="signout_option", use_container_width=True):
+                sign_out()
     
     st.sidebar.markdown("---")
     
-    # Navigation Buttons
     nav_items = [
         ("🏠 Home", "home"),
         ("📄 Analyze CV", "analyze"),
@@ -599,61 +541,29 @@ def render_sidebar():
         button_type = "primary" if is_active else "secondary"
         
         if st.sidebar.button(label, key=f"sidebar_{page_key}", use_container_width=True, type=button_type):
+            st.session_state.show_user_menu = False
             nav_goto(page_key)
     
     st.sidebar.markdown("---")
     st.sidebar.caption("© 2025 AI Career Platform")
-    
-    # Style sidebar buttons
-    st.sidebar.markdown("""
-    <style>
-    button[key^="sidebar_"] {
-        transition: all 0.3s ease !important;
-        border-radius: 10px !important;
-        margin-bottom: 0.5rem !important;
-        font-weight: 500 !important;
-        text-align: left !important;
-        justify-content: flex-start !important;
-    }
-    button[key^="sidebar_"]:hover {
-        transform: translateX(5px);
-    }
-    button[key="user_menu_btn"] {
-        background: #1f2937 !important;
-        border: 1px solid #374151 !important;
-        border-radius: 10px !important;
-        color: #e5e7eb !important;
-        text-align: left !important;
-    }
-    button[key="signout_sidebar"] {
-        background: rgba(239, 68, 68, 0.1) !important;
-        border: 1px solid rgba(239, 68, 68, 0.25) !important;
-        color: #fca5a5 !important;
-        margin-top: 0.5rem !important;
-    }
-    button[key="signout_sidebar"]:hover {
-        background: rgba(239, 68, 68, 0.2) !important;
-        color: #ef4444 !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
 
 
 # ============================================================
-# WELCOME SCREEN
+# WELCOME SCREEN - FIXED: Much smaller, centered
 # ============================================================
 def render_welcome():
-    col1, col2, col3 = st.columns([1, 1.2, 1])
+    # Use columns to center the small form
+    col1, col2, col3 = st.columns([1, 1.5, 1])
     
     with col2:
         st.markdown("""
-        <div style="text-align: center; margin-top: 100px;">
+        <div style="text-align: center;">
             <div style="font-family: 'Inter', sans-serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">
                 AI <span style="color: #3b82f6;">Career</span> Platform
             </div>
             <p style="color: #9ca3af; margin-bottom: 1.5rem; font-size: 0.8rem;">Your AI-powered career companion</p>
             <div style="background: #111827; border: 1px solid #1f2937; border-radius: 16px; padding: 1.2rem;">
-                <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; color: #e5e7eb;">👋 Welcome! What's your name?</div>
+                <div style="font-size: 0.9rem; font-weight: 600; margin-bottom: 1rem; color: #e5e7eb;">👋 Welcome! What's your name?</div>
         """, unsafe_allow_html=True)
         
         with st.form(key="welcome_form"):
@@ -679,11 +589,10 @@ def render_home():
     first = name.split()[0] if name else "Guest"
     
     st.markdown(f"""
-    <div class="main-content">
-        <div class="main-header">
-            <h1>Hello, {first}! 👋</h1>
-            <p>Welcome to your AI-powered career companion. Let's find your perfect role in AI/ML.</p>
-        </div>
+    <div class="main-header">
+        <h1>Hello, {first}! 👋</h1>
+        <p>Welcome to your AI-powered career companion. Let's find your perfect role in AI/ML.</p>
+    </div>
     """, unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns(3)
@@ -702,7 +611,8 @@ def render_home():
         </div>
         """, unsafe_allow_html=True)
         if st.button("📄 Analyze CV", key="home_cv", use_container_width=True):
-            nav_goto("analyze")
+            st.session_state.page = "analyze"
+            st.rerun()
     
     with col2:
         st.markdown("""
@@ -718,7 +628,8 @@ def render_home():
         </div>
         """, unsafe_allow_html=True)
         if st.button("🎯 JD Match", key="home_jd", use_container_width=True):
-            nav_goto("jd_match")
+            st.session_state.page = "jd_match"
+            st.rerun()
     
     with col3:
         st.markdown("""
@@ -734,21 +645,19 @@ def render_home():
         </div>
         """, unsafe_allow_html=True)
         if st.button("🧠 Take Quiz", key="home_quiz", use_container_width=True):
-            nav_goto("quiz")
-    
-    st.markdown("</div>", unsafe_allow_html=True)
+            st.session_state.page = "quiz"
+            st.rerun()
 
 
 # ============================================================
-# ANALYZE PAGE
+# ANALYZE PAGE - WITH BACK TO HOME BUTTON
 # ============================================================
 def render_analyze():
     st.markdown("""
-    <div class="main-content">
-        <div class="main-header">
-            <h1>📄 CV Analysis</h1>
-            <p>Upload your CV to get personalized career recommendations based on real job market data.</p>
-        </div>
+    <div class="main-header">
+        <h1>📄 CV Analysis</h1>
+        <p>Upload your CV to get personalized career recommendations based on real job market data.</p>
+    </div>
     """, unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -773,11 +682,11 @@ def render_analyze():
     if st.session_state.retrieved:
         render_analysis_results()
     
+    # Back to Home button
     st.markdown("---")
     if st.button("← Back to Home", key="back_home_analyze", use_container_width=False):
-        nav_goto("home")
-    
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.session_state.page = "home"
+        st.rerun()
 
 
 def render_analysis_results():
@@ -834,15 +743,14 @@ def render_analysis_results():
 
 
 # ============================================================
-# JD MATCH PAGE
+# JD MATCH PAGE - WITH BACK TO HOME BUTTON
 # ============================================================
 def render_jd_match():
     st.markdown("""
-    <div class="main-content">
-        <div class="main-header">
-            <h1>🎯 Job Description Matching</h1>
-            <p>See how well your CV matches a specific job description.</p>
-        </div>
+    <div class="main-header">
+        <h1>🎯 Job Description Matching</h1>
+        <p>See how well your CV matches a specific job description.</p>
+    </div>
     """, unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
@@ -867,11 +775,11 @@ def render_jd_match():
     if st.session_state.jd_match_result:
         render_jd_match_results()
     
+    # Back to Home button
     st.markdown("---")
     if st.button("← Back to Home", key="back_home_jd", use_container_width=False):
-        nav_goto("home")
-    
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.session_state.page = "home"
+        st.rerun()
 
 
 def render_jd_match_results():
@@ -904,46 +812,43 @@ def render_jd_match_results():
 
 
 # ============================================================
-# QUIZ PAGE
+# QUIZ PAGE - WITH BACK TO HOME BUTTON
 # ============================================================
 def render_quiz():
     st.markdown("""
-    <div class="main-content">
-        <div class="main-header">
-            <h1>🧠 Career Interest Quiz</h1>
-            <p>Discover which AI/ML roles match your thinking style and interests.</p>
-        </div>
+    <div class="main-header">
+        <h1>🧠 Career Interest Quiz</h1>
+        <p>Discover which AI/ML roles match your thinking style and interests.</p>
+    </div>
     """, unsafe_allow_html=True)
     
     if st.session_state.quiz_result:
         render_quiz_results()
+        # Back to Home button
         st.markdown("---")
         if st.button("← Back to Home", key="back_home_quiz", use_container_width=False):
-            nav_goto("home")
-        st.markdown("</div>", unsafe_allow_html=True)
+            st.session_state.page = "home"
+            st.rerun()
         return
     
     if not st.session_state.quiz_responses:
-        col1, col2, col3 = st.columns([1, 1.2, 1])
-        with col2:
-            st.markdown("""
-            <div class="quiz-start-container">
-                <div class="quiz-start-card">
-                    <div class="quiz-start-icon">📋</div>
-                    <div class="quiz-start-title">Ready to discover your career fit?</div>
-                    <div class="quiz-start-desc">Answer 10 questions about your preferences and thinking style.</div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            if st.button("🚀 Start Quiz", use_container_width=True):
-                st.session_state.quiz_responses = {q["id"]: None for q in QUESTIONS}
-                st.rerun()
+        st.markdown("""
+        <div style="text-align:center; max-width: 400px; margin: 2rem auto;">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">📋</div>
+            <div style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: #ffffff;">Ready to discover your career fit?</div>
+            <div style="color: #9ca3af; font-size: 0.8rem;">Answer 10 questions about your preferences.</div>
+        </div>
+        """, unsafe_allow_html=True)
         
+        if st.button("🚀 Start Quiz", use_container_width=True):
+            st.session_state.quiz_responses = {q["id"]: None for q in QUESTIONS}
+            st.rerun()
+        
+        # Back to Home button
         st.markdown("---")
         if st.button("← Back to Home", key="back_home_quiz_start", use_container_width=False):
-            nav_goto("home")
-        st.markdown("</div>", unsafe_allow_html=True)
+            st.session_state.page = "home"
+            st.rerun()
         return
     
     with st.form("quiz_form"):
@@ -968,8 +873,6 @@ def render_quiz():
             result = calculate_interest_score(st.session_state.quiz_responses)
             st.session_state.quiz_result = result
             st.rerun()
-    
-    st.markdown("</div>", unsafe_allow_html=True)
 
 
 def render_quiz_results():
@@ -1009,19 +912,19 @@ def render_quiz_results():
         if st.button("← Back to Home", use_container_width=True):
             st.session_state.quiz_responses = {}
             st.session_state.quiz_result = None
-            nav_goto("home")
+            st.session_state.page = "home"
+            st.rerun()
 
 
 # ============================================================
-# ABOUT PAGE
+# ABOUT PAGE - WITH BACK TO HOME BUTTON
 # ============================================================
 def render_about():
     st.markdown("""
-    <div class="main-content">
-        <div class="main-header">
-            <h1>ℹ️ About</h1>
-            <p>Learn more about the developer and this platform.</p>
-        </div>
+    <div class="main-header">
+        <h1>ℹ️ About</h1>
+        <p>Learn more about the developer and this platform.</p>
+    </div>
     """, unsafe_allow_html=True)
     
     st.markdown("""
@@ -1078,21 +981,19 @@ def render_about():
     
     st.markdown("---")
     if st.button("← Back to Home", key="back_home_about", use_container_width=False):
-        nav_goto("home")
-    
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.session_state.page = "home"
+        st.rerun()
 
 
 # ============================================================
-# CONTACT PAGE
+# CONTACT PAGE - WITH BACK TO HOME BUTTON
 # ============================================================
 def render_contact():
     st.markdown("""
-    <div class="main-content">
-        <div class="main-header">
-            <h1>📞 Contact Us</h1>
-            <p>Get in touch with the developer.</p>
-        </div>
+    <div class="main-header">
+        <h1>📞 Contact Us</h1>
+        <p>Get in touch with the developer.</p>
+    </div>
     """, unsafe_allow_html=True)
     
     st.markdown("""
@@ -1148,9 +1049,8 @@ def render_contact():
     
     st.markdown("---")
     if st.button("← Back to Home", key="back_home_contact", use_container_width=False):
-        nav_goto("home")
-    
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.session_state.page = "home"
+        st.rerun()
 
 
 # ============================================================
