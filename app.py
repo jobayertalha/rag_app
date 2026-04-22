@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-FIXED: Top navbar always visible, working navigation
+PREMIUM FIXED: Glass blur navbar, clean pill buttons, no conflicts
 """
 
 import streamlit as st
@@ -16,11 +16,11 @@ st.set_page_config(
     page_title="AI Career Platform",
     page_icon="🎯",
     layout="wide",
-    initial_sidebar_state="collapsed"  # Collapse sidebar to hide it
+    initial_sidebar_state="collapsed"
 )
 
 # ============================================================
-# PROFESSIONAL CSS - With Top Navbar
+# PREMIUM CSS - Glass blur navbar, clean design
 # ============================================================
 st.markdown("""
 <style>
@@ -45,135 +45,95 @@ header {visibility: hidden;}
 footer {visibility: hidden;}
 [data-testid="stHeader"] {display: none;}
 [data-testid="stToolbar"] {display: none;}
-[data-testid="stSidebar"] {display: none;} /* Hide sidebar completely */
+[data-testid="stSidebar"] {display: none;}
 
-/* Top Navbar - Always Visible */
+/* ========== PREMIUM NAVBAR - Glass Blur Effect ========== */
 .top-navbar {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 999999;
-    background: linear-gradient(135deg, #0d1117 0%, #0a0e1a 100%);
-    border-bottom: 1px solid #1f2937;
-    padding: 0.75rem 2rem;
-    backdrop-filter: blur(10px);
+    background: rgba(13, 17, 23, 0.85);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 0.6rem 2rem;
 }
 
 .nav-container {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     max-width: 1400px;
     margin: 0 auto;
 }
 
 .nav-logo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: 'Inter', sans-serif;
-    font-size: 1.2rem;
     font-weight: 700;
+    font-size: 1.2rem;
     color: #ffffff;
-    letter-spacing: -0.5px;
-}
-
-.nav-logo-icon {
-    font-size: 1.5rem;
-}
-
-.nav-menu {
-    display: flex;
-    gap: 0.25rem;
-    background: rgba(255,255,255,0.03);
-    padding: 0.25rem;
-    border-radius: 40px;
-}
-
-.nav-item {
-    padding: 0.5rem 1rem;
-    border-radius: 30px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: #9ca3af;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: transparent;
-    border: none;
-    font-family: 'Inter', sans-serif;
-}
-
-.nav-item:hover {
-    background: rgba(59, 130, 246, 0.15);
-    color: #60a5fa;
-}
-
-.nav-item-active {
-    background: rgba(59, 130, 246, 0.2);
-    color: #60a5fa;
-    border: 1px solid rgba(59, 130, 246, 0.3);
-}
-
-.nav-user {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    background: #1f2937;
-    padding: 0.4rem 1rem;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.nav-user:hover {
-    background: #374151;
-}
-
-.user-name {
-    color: #e5e7eb;
-    font-size: 0.85rem;
-    font-weight: 500;
-}
-
-.user-arrow {
-    color: #9ca3af;
-    font-size: 0.7rem;
-}
-
-/* User Dropdown Menu */
-.user-dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    margin-top: 0.5rem;
-    background: #1f2937;
-    border: 1px solid #374151;
-    border-radius: 12px;
-    padding: 0.5rem;
-    min-width: 140px;
-    z-index: 1000;
-}
-
-.dropdown-item {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    color: #fca5a5;
-    cursor: pointer;
-    transition: all 0.3s ease;
 }
 
-.dropdown-item:hover {
-    background: #374151;
+/* ========== NAVBAR BUTTONS - Clean Pills ========== */
+.top-navbar .stButton > button {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 999px !important;
+    padding: 0.45rem 1rem !important;
+    font-size: 0.85rem !important;
+    color: #9ca3af !important;
+    transition: all 0.25s ease !important;
+    font-weight: 500 !important;
 }
 
-/* Main Content - Add padding for fixed navbar */
+.top-navbar .stButton > button:hover {
+    background: rgba(59, 130, 246, 0.15) !important;
+    color: #60a5fa !important;
+    transform: translateY(-1px);
+}
+
+.top-navbar .stButton > button[kind="primary"] {
+    background: rgba(59, 130, 246, 0.25) !important;
+    color: #60a5fa !important;
+    border: 1px solid rgba(59, 130, 246, 0.4) !important;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+}
+
+/* ========== USER BUTTON ========== */
+.user-btn .stButton > button {
+    background: #1f2937 !important;
+    border-radius: 999px !important;
+    padding: 0.4rem 1rem !important;
+    color: #e5e7eb !important;
+}
+
+.user-btn .stButton > button:hover {
+    background: #374151 !important;
+    transform: translateY(-1px);
+}
+
+/* ========== DEFAULT APP BUTTONS (Not Navbar) ========== */
+.stButton > button:not(.top-navbar .stButton > button) {
+    background: #3b82f6 !important;
+    border: none !important;
+    border-radius: 12px !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.6rem 1.5rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.stButton > button:not(.top-navbar .stButton > button):hover {
+    background: #2563eb !important;
+    transform: translateY(-2px);
+}
+
+/* ========== MAIN CONTENT - Fixed spacing ========== */
 .main-content {
-    padding-top: 70px;
+    padding-top: 85px;
     padding-left: 2rem;
     padding-right: 2rem;
 }
@@ -298,21 +258,6 @@ footer {visibility: hidden;}
 .stTextArea > div > div > textarea:focus {
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
-}
-
-.stButton > button {
-    background: #3b82f6 !important;
-    border: none !important;
-    border-radius: 12px !important;
-    color: white !important;
-    font-weight: 600 !important;
-    padding: 0.6rem 1.5rem !important;
-    transition: all 0.3s ease !important;
-}
-
-.stButton > button:hover {
-    background: #2563eb !important;
-    transform: translateY(-2px);
 }
 
 /* Contact & About Pages */
@@ -525,11 +470,6 @@ footer {visibility: hidden;}
     color: #ffffff;
     margin-bottom: 1rem;
 }
-
-/* Back button */
-.back-home-btn {
-    margin-top: 2rem;
-}
 </style>
 """, unsafe_allow_html=True)
 
@@ -580,18 +520,11 @@ def sign_out():
     st.rerun()
 
 
-def toggle_user_menu():
-    st.session_state.show_user_menu = not st.session_state.show_user_menu
-    st.rerun()
-
-
 def render_navbar():
-    """Render top navbar - always visible"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
-    
-    # Navbar items
+
     nav_items = [
         ("🏠 Home", "home"),
         ("📄 Analyze CV", "analyze"),
@@ -600,83 +533,41 @@ def render_navbar():
         ("ℹ️ About", "about"),
         ("📞 Contact", "contact")
     ]
-    
-    # Build navbar HTML
-    nav_buttons_html = ""
-    for label, page_key in nav_items:
-        active_class = "nav-item-active" if current_page == page_key else ""
-        nav_buttons_html += f'<button class="nav-item {active_class}" onclick="navigateTo(\'{page_key}\')">{label}</button>'
-    
-    st.markdown(f"""
-    <div class="top-navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <span class="nav-logo-icon">🎯</span>
-                <span>AI Career Platform</span>
-            </div>
-            <div class="nav-menu">
-                {nav_buttons_html}
-            </div>
-            <div class="nav-user" onclick="document.getElementById('user_dropdown_btn').click()">
-                <span>👤</span>
-                <span class="user-name">{first}</span>
-                <span class="user-arrow">▼</span>
-            </div>
-        </div>
-    </div>
-    
-    <div id="user_dropdown_btn" style="display: none;"></div>
-    
-    <script>
-    function navigateTo(page) {{
-        const url = new URL(window.location.href);
-        url.searchParams.set('nav', page);
-        window.location.href = url.toString();
-    }}
-    </script>
-    """, unsafe_allow_html=True)
-    
-    # Handle dropdown toggle with a hidden button
-    col1, col2, col3 = st.columns([1, 1, 10])
+
+    st.markdown('<div class="top-navbar"><div class="nav-container">', unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns([1.5, 5, 1.5])
+
+    # Logo
     with col1:
-        if st.button("", key="user_dropdown_btn"):
-            toggle_user_menu()
-    
-    # Show dropdown menu if expanded
-    if st.session_state.show_user_menu:
-        st.markdown("""
-        <style>
-        .dropdown-container {
-            position: fixed;
-            top: 60px;
-            right: 30px;
-            z-index: 1000000;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-        with st.container():
-            col1, col2, col3 = st.columns([8, 2, 2])
-            with col2:
-                st.markdown("""
-                <div style="background: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 0.5rem; min-width: 140px;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 8px; color: #fca5a5; cursor: pointer;">
-                        <span>⏻</span>
-                        <span>Sign Out</span>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-                if st.button("Sign Out", key="signout_dropdown", use_container_width=True):
-                    sign_out()
-    
-    # Handle navigation from URL params
-    query_params = st.query_params
-    if 'nav' in query_params:
-        target = query_params['nav']
-        if target in ['home', 'analyze', 'jd_match', 'quiz', 'about', 'contact']:
-            if st.session_state.page != target:
-                st.session_state.page = target
-                st.query_params.clear()
-                st.rerun()
+        st.markdown('<div class="nav-logo">🎯 AI Career Platform</div>', unsafe_allow_html=True)
+
+    # Center Nav Buttons
+    with col2:
+        nav_cols = st.columns(len(nav_items))
+        for i, (label, page_key) in enumerate(nav_items):
+            is_active = current_page == page_key
+            if nav_cols[i].button(
+                label,
+                key=f"nav_{page_key}",
+                type="primary" if is_active else "secondary"
+            ):
+                nav_goto(page_key)
+
+    # User Menu
+    with col3:
+        st.markdown('<div class="user-btn">', unsafe_allow_html=True)
+        if st.button(f"👤 {first}", key="user_menu"):
+            st.session_state.show_user_menu = not st.session_state.show_user_menu
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        # Sign Out Dropdown
+        if st.session_state.show_user_menu:
+            if st.button("⏻ Sign Out", key="signout_dropdown", use_container_width=True):
+                sign_out()
+
+    st.markdown('</div></div>', unsafe_allow_html=True)
 
 
 # ============================================================
