@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Fixed: Working Sidebar Navigation
+WORKING SIDEBAR - Final Version
 """
 
 import streamlit as st
@@ -20,13 +20,12 @@ st.set_page_config(
 )
 
 # ============================================================
-# PROFESSIONAL CSS
+# SIMPLE CLEAN CSS - NO SIDEBAR HIDING
 # ============================================================
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-/* Global Styles */
 * {
     margin: 0;
     padding: 0;
@@ -38,76 +37,43 @@ st.markdown("""
     min-height: 100vh;
 }
 
-/* Hide Streamlit Default Elements */
+/* Hide only unnecessary elements */
 #MainMenu {visibility: hidden;}
-header {visibility: hidden;}
-.stDeployButton {display: none;}
 footer {visibility: hidden;}
-[data-testid="stHeader"] {display: none;}
+.stDeployButton {display: none;}
 
-/* ===== SIDEBAR BASE ===== */
+/* Keep sidebar visible and styled */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0d1117 0%, #0a0e1a 100%);
     border-right: 1px solid #1f2937;
-    padding: 1rem 0.5rem;
 }
 
-/* ===== REMOVE DEFAULT PADDING ===== */
-section[data-testid="stSidebar"] > div {
-    padding-top: 0 !important;
-}
-
-/* ===== BRAND ===== */
+/* Sidebar brand */
 .sidebar-brand {
     text-align: center;
     padding: 1.5rem 1rem;
     border-bottom: 1px solid #1f2937;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
-.sidebar-brand-title {
-    font-size: 1.1rem;
+.sidebar-brand-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-brand-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
     font-weight: 700;
-    color: white;
+    color: #ffffff;
 }
 
-/* ===== NAV BUTTONS ===== */
-[data-testid="stSidebar"] .stButton > button {
-    width: 100%;
-    text-align: left !important;
-    justify-content: flex-start !important;
-
-    background: transparent !important;
-    border: none !important;
-    border-radius: 10px !important;
-
-    padding: 0.6rem 1rem !important;
-    font-size: 0.85rem !important;
-    color: #9ca3af !important;
-
-    transition: all 0.2s ease !important;
-}
-
-/* Hover */
-[data-testid="stSidebar"] .stButton > button:hover {
-    background: rgba(59, 130, 246, 0.15) !important;
-    color: #60a5fa !important;
-}
-
-/* Active */
-[data-testid="stSidebar"] .stButton > button[kind="primary"] {
-    background: rgba(59, 130, 246, 0.25) !important;
-    color: #ffffff !important;
-    border-left: 3px solid #3b82f6 !important;
-}
-
-
-/* Main Content Area */
+/* Main content */
 .main-content {
     padding: 2rem;
 }
 
-/* Main Header */
+/* Main header */
 .main-header {
     margin-bottom: 2rem;
     padding-bottom: 1rem;
@@ -126,14 +92,13 @@ section[data-testid="stSidebar"] > div {
     font-size: 0.95rem;
 }
 
-/* Feature Cards */
+/* Feature cards */
 .feature-card {
     background: #111827;
     border: 1px solid #1f2937;
     border-radius: 16px;
     padding: 2rem;
     transition: all 0.3s ease;
-    margin-bottom: 1rem;
     height: 100%;
 }
 
@@ -176,7 +141,7 @@ section[data-testid="stSidebar"] > div {
     color: #60a5fa;
 }
 
-/* Result Cards */
+/* Result cards */
 .result-card {
     background: #111827;
     border: 1px solid #1f2937;
@@ -196,7 +161,7 @@ section[data-testid="stSidebar"] > div {
     color: #3b82f6;
 }
 
-/* Skill Chips */
+/* Skill chips */
 .skill-chip {
     display: inline-block;
     background: #1f2937;
@@ -214,7 +179,7 @@ section[data-testid="stSidebar"] > div {
     color: #fca5a5;
 }
 
-/* Form Elements */
+/* Form inputs */
 .stTextInput > div > div > input,
 .stTextArea > div > div > textarea {
     background: #111827 !important;
@@ -223,29 +188,15 @@ section[data-testid="stSidebar"] > div {
     color: #ffffff !important;
 }
 
-.stTextInput > div > div > input:focus,
-.stTextArea > div > div > textarea:focus {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
-}
-
+/* Buttons */
 .stButton > button {
     background: #3b82f6 !important;
     border: none !important;
     border-radius: 12px !important;
     color: white !important;
     font-weight: 600 !important;
-    padding: 0.5rem 0.9rem !important;
+    padding: 0.6rem 1.5rem !important;
     transition: all 0.3s ease !important;
-}
-/* SIDEBAR BUTTON FIX (clean look) */
-[data-testid="stSidebar"] .stButton > button {
-    background: transparent !important;
-    border: none !important;
-    border-radius: 10px !important;
-    padding: 0.55rem 0.9rem !important;
-    font-size: 0.85rem !important;
-    color: #9ca3af !important;
 }
 
 .stButton > button:hover {
@@ -253,7 +204,7 @@ section[data-testid="stSidebar"] > div {
     transform: translateY(-2px);
 }
 
-/* Contact & About Pages */
+/* Contact & About pages */
 .contact-card, .about-card {
     background: #111827;
     border: 1px solid #1f2937;
@@ -387,7 +338,7 @@ section[data-testid="stSidebar"] > div {
     border-bottom: 1px solid #1f2937;
 }
 
-/* Welcome Screen */
+/* Welcome screen */
 .welcome-container {
     max-width: 380px;
     margin: 80px auto;
@@ -418,7 +369,7 @@ section[data-testid="stSidebar"] > div {
     padding: 1.2rem;
 }
 
-/* Quiz Start Block */
+/* Quiz start block */
 .quiz-start-container {
     max-width: 380px;
     margin: 40px auto;
@@ -463,17 +414,6 @@ section[data-testid="stSidebar"] > div {
     color: #ffffff;
     margin-bottom: 1rem;
 }
-
-/* Sidebar button styles */
-.sidebar-nav-btn {
-    width: 100%;
-    text-align: left !important;
-    justify-content: flex-start !important;
-    margin-bottom: 0.5rem !important;
-    border-radius: 10px !important;
-    padding: 0.6rem 1rem !important;
-    font-weight: 500 !important;
-}
 </style>
 """, unsafe_allow_html=True)
 
@@ -485,7 +425,6 @@ _defaults = {
     "page": "home",
     "candidate_name": "",
     "name_entered": False,
-    "show_user_menu": False,
     "cv_text": None,
     "agent": None,
     "analysis_raw": None,
@@ -512,7 +451,6 @@ def sign_out():
     st.session_state.candidate_name = ""
     st.session_state.name_entered = False
     st.session_state.page = "home"
-    st.session_state.show_user_menu = False
     st.session_state.cv_text = None
     st.session_state.agent = None
     st.session_state.analysis_raw = None
@@ -522,32 +460,29 @@ def sign_out():
     st.session_state.quiz_result = None
     st.rerun()
 
+
 def render_sidebar():
+    """Simple working sidebar"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
-
+    
     with st.sidebar:
-
-        # 🔹 BRAND
+        # Brand
         st.markdown("""
-        <div class="sidebar-brand">
+        <div style="text-align: center; padding: 1.5rem 0; border-bottom: 1px solid #1f2937; margin-bottom: 1.5rem;">
             <div style="font-size: 2rem;">🎯</div>
-            <div class="sidebar-brand-title">AI Career Platform</div>
+            <div style="font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 700; color: #ffffff;">AI Career Platform</div>
         </div>
         """, unsafe_allow_html=True)
-
-        # 🔹 USER SECTION
+        
+        # User name button
         if st.button(f"👤 {first}", key="user_btn", use_container_width=True):
-            st.session_state.show_user_menu = not st.session_state.show_user_menu
-
-        if st.session_state.show_user_menu:
-            if st.button("⏻ Sign Out", key="logout_btn", use_container_width=True):
-                sign_out()
-
+            pass  # Just show the name, no dropdown needed
+        
         st.markdown("---")
-
-        # 🔹 NAVIGATION
+        
+        # Navigation buttons
         nav_items = [
             ("🏠 Home", "home"),
             ("📄 Analyze CV", "analyze"),
@@ -556,17 +491,20 @@ def render_sidebar():
             ("ℹ️ About", "about"),
             ("📞 Contact", "contact")
         ]
-
+        
         for label, page_key in nav_items:
-            if st.button(
-                label,
-                key=f"nav_{page_key}",
-                use_container_width=True,
-                type="primary" if current_page == page_key else "secondary"
-            ):
-                nav_goto(page_key)
-
+            if current_page == page_key:
+                st.button(label, key=f"nav_{page_key}", use_container_width=True, type="primary")
+            else:
+                if st.button(label, key=f"nav_{page_key}", use_container_width=True):
+                    nav_goto(page_key)
+        
         st.markdown("---")
+        
+        # Sign out button
+        if st.button("🚪 Sign Out", key="signout_btn", use_container_width=True):
+            sign_out()
+        
         st.caption("© 2025 AI Career Platform")
 
 
