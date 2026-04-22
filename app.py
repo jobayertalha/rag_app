@@ -46,15 +46,21 @@ footer {visibility: hidden;}
 [data-testid="stHeader"] {display: none;}
 [data-testid="stToolbar"] {display: none;}
 
-/* Typography */
-html, body, [class*="css"] {
-    font-family: 'Inter', sans-serif;
-}
-
-/* Sidebar Styling */
+/* Make Sidebar Fixed - Never Hidden */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0d1117 0%, #0a0e1a 100%);
     border-right: 1px solid #1f2937;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    z-index: 100 !important;
+    overflow-y: auto !important;
+}
+
+/* Main content margin to accommodate fixed sidebar */
+.main-content {
+    margin-left: 0;
 }
 
 /* Sidebar Brand */
@@ -95,7 +101,7 @@ button[key="user_menu_btn"]:hover {
     border-color: #4b5563 !important;
 }
 
-/* Sign Out Button with Shutdown Icon */
+/* Sign Out Button */
 button[key="signout_option"] {
     background: #1f2937 !important;
     border: 1px solid #374151 !important;
@@ -239,11 +245,6 @@ button[key^="sidebar_"]:hover {
 .stTextArea > div > div > textarea:focus {
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
-}
-
-/* Fix Enter key for text input */
-.stTextInput > div > div > input {
-    padding: 0.6rem 1rem !important;
 }
 
 .stButton > button {
@@ -402,18 +403,18 @@ button[key^="sidebar_"]:hover {
     border-bottom: 1px solid #1f2937;
 }
 
-/* Welcome Screen */
+/* Welcome Screen - FIXED: Smaller name entry block */
 .welcome-container {
-    max-width: 500px;
-    margin: 100px auto;
+    max-width: 450px;
+    margin: 80px auto;
     text-align: center;
 }
 
 .welcome-title {
     font-family: 'Inter', sans-serif;
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     font-weight: 800;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
     color: #ffffff;
 }
 
@@ -423,14 +424,15 @@ button[key^="sidebar_"]:hover {
 
 .welcome-subtitle {
     color: #9ca3af;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
 }
 
 .welcome-card {
     background: #111827;
     border: 1px solid #1f2937;
     border-radius: 20px;
-    padding: 2rem;
+    padding: 1.5rem;
 }
 
 /* Quiz Styles */
@@ -519,7 +521,6 @@ def render_sidebar():
     if st.session_state.show_user_menu:
         col1, col2 = st.sidebar.columns([1, 4])
         with col1:
-            # Shutdown/Power logo
             st.markdown("⏻")
         with col2:
             if st.button("Sign Out", key="signout_option", use_container_width=True):
@@ -549,7 +550,7 @@ def render_sidebar():
 
 
 # ============================================================
-# WELCOME SCREEN - Fixed Enter key functionality
+# WELCOME SCREEN - FIXED: Smaller and centered
 # ============================================================
 def render_welcome():
     st.markdown("""
@@ -559,10 +560,10 @@ def render_welcome():
         </div>
         <p class="welcome-subtitle">Your AI-powered career companion for data science & AI/ML roles</p>
         <div class="welcome-card">
-            <div style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #e5e7eb;">👋 Welcome! What's your name?</div>
+            <div style="font-size: 0.95rem; font-weight: 600; margin-bottom: 1rem; color: #e5e7eb;">👋 Welcome! What's your name?</div>
     """, unsafe_allow_html=True)
     
-    # Use form to handle Enter key properly
+    # Smaller name input with form
     with st.form(key="welcome_form"):
         name = st.text_input("Name", placeholder="e.g. Talha Jobayer", label_visibility="collapsed")
         submit_button = st.form_submit_button("✨ Get Started →", use_container_width=True, type="primary")
@@ -818,10 +819,10 @@ def render_quiz():
     
     if not st.session_state.quiz_responses:
         st.markdown("""
-        <div style="text-align:center; max-width: 500px; margin: 2rem auto;">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">📋</div>
-            <div style="font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem; color: #ffffff;">Ready to discover your career fit?</div>
-            <div style="color: #9ca3af;">Answer 10 questions about your preferences and thinking style.</div>
+        <div style="text-align:center; max-width: 450px; margin: 2rem auto;">
+            <div style="font-size: 2.5rem; margin-bottom: 1rem;">📋</div>
+            <div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; color: #ffffff;">Ready to discover your career fit?</div>
+            <div style="color: #9ca3af; font-size: 0.85rem;">Answer 10 questions about your preferences and thinking style.</div>
         </div>
         """, unsafe_allow_html=True)
         
