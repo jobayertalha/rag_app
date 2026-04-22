@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-FIXED: Navigation working, smaller name block, back to home buttons
+FIXED: Sidebar always visible, smaller quiz block
 """
 
 import streamlit as st
@@ -12,11 +12,12 @@ from agent import extract_cv_text, build_agent, run_agent
 from rag import retrieve_context, match_cv_with_jd, score_ai_ml_readiness
 from quiz import QUESTIONS, calculate_interest_score
 
+# Remove default sidebar collapse - make it always expanded
 st.set_page_config(
     page_title="AI Career Platform",
     page_icon="🎯",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded"  # This ensures sidebar is always expanded
 )
 
 # ============================================================
@@ -46,10 +47,29 @@ footer {visibility: hidden;}
 [data-testid="stHeader"] {display: none;}
 [data-testid="stToolbar"] {display: none;}
 
-/* Sidebar Styling */
+/* Disable sidebar collapse button - hide the collapse control */
+[data-testid="stSidebarCollapseButton"] {
+    display: none !important;
+}
+
+/* Make sidebar always visible and fixed */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0d1117 0%, #0a0e1a 100%);
     border-right: 1px solid #1f2937;
+    min-width: 260px !important;
+    width: 260px !important;
+}
+
+/* Prevent sidebar from collapsing */
+[data-testid="stSidebar"][aria-expanded="false"] {
+    margin-left: 0 !important;
+    min-width: 260px !important;
+    width: 260px !important;
+}
+
+/* Main content - adjust for fixed sidebar */
+.main-content {
+    margin-left: 0;
 }
 
 /* Sidebar Brand */
@@ -393,7 +413,7 @@ button[key^="sidebar_"]:hover {
     border-bottom: 1px solid #1f2937;
 }
 
-/* Welcome Screen - FIXED: Much smaller name entry block */
+/* Welcome Screen - Small centered block */
 .welcome-container {
     max-width: 380px;
     margin: 60px auto;
@@ -425,8 +445,36 @@ button[key^="sidebar_"]:hover {
     padding: 1.2rem;
 }
 
-.welcome-card .stTextInput {
+/* Quiz Start Block - Smaller like name entry */
+.quiz-start-container {
+    max-width: 380px;
+    margin: 40px auto;
+    text-align: center;
+}
+
+.quiz-start-card {
+    background: #111827;
+    border: 1px solid #1f2937;
+    border-radius: 16px;
+    padding: 1.5rem;
+}
+
+.quiz-start-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+}
+
+.quiz-start-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
     margin-bottom: 0.5rem;
+}
+
+.quiz-start-desc {
+    color: #9ca3af;
+    font-size: 0.75rem;
+    margin-bottom: 1rem;
 }
 
 /* Quiz Styles */
@@ -444,9 +492,13 @@ button[key^="sidebar_"]:hover {
     margin-bottom: 1rem;
 }
 
-/* Back to Home button styling */
-.back-home-btn {
-    margin-top: 2rem;
+/* Hide the sidebar collapse button completely */
+.css-1lcbmhc e1fqkh3o3 {
+    display: none !important;
+}
+
+button[kind="icon"] {
+    display: none !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -549,21 +601,20 @@ def render_sidebar():
 
 
 # ============================================================
-# WELCOME SCREEN - FIXED: Much smaller, centered
+# WELCOME SCREEN - Small centered block
 # ============================================================
 def render_welcome():
-    # Use columns to center the small form
-    col1, col2, col3 = st.columns([1, 1.5, 1])
+    col1, col2, col3 = st.columns([1, 1.2, 1])
     
     with col2:
         st.markdown("""
         <div style="text-align: center;">
-            <div style="font-family: 'Inter', sans-serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">
+            <div style="font-family: 'Inter', sans-serif; font-size: 1.6rem; font-weight: 800; margin-bottom: 0.5rem;">
                 AI <span style="color: #3b82f6;">Career</span> Platform
             </div>
-            <p style="color: #9ca3af; margin-bottom: 1.5rem; font-size: 0.8rem;">Your AI-powered career companion</p>
+            <p style="color: #9ca3af; margin-bottom: 1.5rem; font-size: 0.75rem;">Your AI-powered career companion</p>
             <div style="background: #111827; border: 1px solid #1f2937; border-radius: 16px; padding: 1.2rem;">
-                <div style="font-size: 0.9rem; font-weight: 600; margin-bottom: 1rem; color: #e5e7eb;">👋 Welcome! What's your name?</div>
+                <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; color: #e5e7eb;">👋 Welcome! What's your name?</div>
         """, unsafe_allow_html=True)
         
         with st.form(key="welcome_form"):
@@ -650,7 +701,7 @@ def render_home():
 
 
 # ============================================================
-# ANALYZE PAGE - WITH BACK TO HOME BUTTON
+# ANALYZE PAGE
 # ============================================================
 def render_analyze():
     st.markdown("""
@@ -682,7 +733,6 @@ def render_analyze():
     if st.session_state.retrieved:
         render_analysis_results()
     
-    # Back to Home button
     st.markdown("---")
     if st.button("← Back to Home", key="back_home_analyze", use_container_width=False):
         st.session_state.page = "home"
@@ -743,7 +793,7 @@ def render_analysis_results():
 
 
 # ============================================================
-# JD MATCH PAGE - WITH BACK TO HOME BUTTON
+# JD MATCH PAGE
 # ============================================================
 def render_jd_match():
     st.markdown("""
@@ -775,7 +825,6 @@ def render_jd_match():
     if st.session_state.jd_match_result:
         render_jd_match_results()
     
-    # Back to Home button
     st.markdown("---")
     if st.button("← Back to Home", key="back_home_jd", use_container_width=False):
         st.session_state.page = "home"
@@ -812,7 +861,7 @@ def render_jd_match_results():
 
 
 # ============================================================
-# QUIZ PAGE - WITH BACK TO HOME BUTTON
+# QUIZ PAGE - FIXED: Smaller start block
 # ============================================================
 def render_quiz():
     st.markdown("""
@@ -824,7 +873,6 @@ def render_quiz():
     
     if st.session_state.quiz_result:
         render_quiz_results()
-        # Back to Home button
         st.markdown("---")
         if st.button("← Back to Home", key="back_home_quiz", use_container_width=False):
             st.session_state.page = "home"
@@ -832,19 +880,23 @@ def render_quiz():
         return
     
     if not st.session_state.quiz_responses:
-        st.markdown("""
-        <div style="text-align:center; max-width: 400px; margin: 2rem auto;">
-            <div style="font-size: 2rem; margin-bottom: 1rem;">📋</div>
-            <div style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: #ffffff;">Ready to discover your career fit?</div>
-            <div style="color: #9ca3af; font-size: 0.8rem;">Answer 10 questions about your preferences.</div>
-        </div>
-        """, unsafe_allow_html=True)
+        # Small centered block for quiz start - like name entry
+        col1, col2, col3 = st.columns([1, 1.2, 1])
+        with col2:
+            st.markdown("""
+            <div class="quiz-start-container">
+                <div class="quiz-start-card">
+                    <div class="quiz-start-icon">📋</div>
+                    <div class="quiz-start-title">Ready to discover your career fit?</div>
+                    <div class="quiz-start-desc">Answer 10 questions about your preferences and thinking style.</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            if st.button("🚀 Start Quiz", use_container_width=True):
+                st.session_state.quiz_responses = {q["id"]: None for q in QUESTIONS}
+                st.rerun()
         
-        if st.button("🚀 Start Quiz", use_container_width=True):
-            st.session_state.quiz_responses = {q["id"]: None for q in QUESTIONS}
-            st.rerun()
-        
-        # Back to Home button
         st.markdown("---")
         if st.button("← Back to Home", key="back_home_quiz_start", use_container_width=False):
             st.session_state.page = "home"
@@ -917,7 +969,7 @@ def render_quiz_results():
 
 
 # ============================================================
-# ABOUT PAGE - WITH BACK TO HOME BUTTON
+# ABOUT PAGE
 # ============================================================
 def render_about():
     st.markdown("""
@@ -986,7 +1038,7 @@ def render_about():
 
 
 # ============================================================
-# CONTACT PAGE - WITH BACK TO HOME BUTTON
+# CONTACT PAGE
 # ============================================================
 def render_contact():
     st.markdown("""
