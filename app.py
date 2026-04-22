@@ -913,6 +913,7 @@ def render_about():
     </div>
     """, unsafe_allow_html=True)
     
+    # Using st.markdown with proper HTML rendering
     st.markdown("""
     <div class="about-card">
         <div class="profile-header">
@@ -920,38 +921,53 @@ def render_about():
             <div class="profile-name">Talha Jobayer Zihan</div>
             <div class="profile-title">Researcher & AI/ML Engineer</div>
         </div>
-        
-        <div class="section-header">🔬 Research Interests</div>
-        <div>
-            <span class="interest-tag">Natural Language Processing (NLP)</span>
-            <span class="interest-tag">Computer Vision</span>
-            <span class="interest-tag">Cyber Security</span>
-        </div>
-        
-        <div class="section-header">🎓 Academic Affiliation</div>
-        <p style="color: #e5e7eb;">Department of Computer Science & Engineering<br>Rajshahi University of Engineering & Technology (RUET)</p>
-        
-        <div class="section-header">🚀 About This Platform</div>
-        <p style="color: #9ca3af; line-height: 1.6;">AI Career Platform is an intelligent career matching system designed to help job seekers in Bangladesh find the best AI/ML roles based on their CV content, skills, and career preferences.</p>
-        
-        <div class="section-header">✨ Features</div>
-        <ul style="color: #9ca3af; line-height: 1.8;">
-            <li>📄 AI-powered CV analysis and role matching</li>
-            <li>🎯 Job Description matching with real-time skill gap analysis</li>
-            <li>🧠 Career interest quiz to discover your ideal role</li>
-            <li>💰 Salary insights and market demand data</li>
-            <li>📈 Personalized career path recommendations</li>
-        </ul>
-        
-        <div class="section-header">🛠️ Technology Stack</div>
-        <div class="tech-stack">
-            <span class="tech-pill">Streamlit</span>
-            <span class="tech-pill">LangChain</span>
-            <span class="tech-pill">Groq LLaMA-3.3-70b</span>
-            <span class="tech-pill">FAISS</span>
-            <span class="tech-pill">HuggingFace</span>
-            <span class="tech-pill">Python</span>
-        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Research Interests
+    st.markdown('<div class="section-header">🔬 Research Interests</div>', unsafe_allow_html=True)
+    st.markdown("""
+    <div style="margin-bottom: 1rem;">
+        <span class="interest-tag">Natural Language Processing (NLP)</span>
+        <span class="interest-tag">Computer Vision</span>
+        <span class="interest-tag">Cyber Security</span>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Academic Affiliation
+    st.markdown('<div class="section-header">🎓 Academic Affiliation</div>', unsafe_allow_html=True)
+    st.markdown("""
+    <p style="color: #e5e7eb; margin-bottom: 1rem;">Department of Computer Science & Engineering<br>Rajshahi University of Engineering & Technology (RUET)</p>
+    """, unsafe_allow_html=True)
+    
+    # About Platform
+    st.markdown('<div class="section-header">🚀 About This Platform</div>', unsafe_allow_html=True)
+    st.markdown("""
+    <p style="color: #9ca3af; line-height: 1.6; margin-bottom: 1rem;">AI Career Platform is an intelligent career matching system designed to help job seekers in Bangladesh find the best AI/ML roles based on their CV content, skills, and career preferences.</p>
+    """, unsafe_allow_html=True)
+    
+    # Features
+    st.markdown('<div class="section-header">✨ Features</div>', unsafe_allow_html=True)
+    st.markdown("""
+    <ul style="color: #9ca3af; line-height: 1.8; margin-bottom: 1rem;">
+        <li>📄 AI-powered CV analysis and role matching</li>
+        <li>🎯 Job Description matching with real-time skill gap analysis</li>
+        <li>🧠 Career interest quiz to discover your ideal role</li>
+        <li>💰 Salary insights and market demand data</li>
+        <li>📈 Personalized career path recommendations</li>
+    </ul>
+    """, unsafe_allow_html=True)
+    
+    # Technology Stack
+    st.markdown('<div class="section-header">🛠️ Technology Stack</div>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="tech-stack">
+        <span class="tech-pill">Streamlit</span>
+        <span class="tech-pill">LangChain</span>
+        <span class="tech-pill">Groq LLaMA-3.3-70b</span>
+        <span class="tech-pill">FAISS</span>
+        <span class="tech-pill">HuggingFace</span>
+        <span class="tech-pill">Python</span>
     </div>
     """, unsafe_allow_html=True)
     
