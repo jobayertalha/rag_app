@@ -95,7 +95,7 @@ button[key="user_menu_btn"]:hover {
     border-color: #4b5563 !important;
 }
 
-/* Sign Out Button */
+/* Sign Out Button with Shutdown Icon */
 button[key="signout_option"] {
     background: #1f2937 !important;
     border: 1px solid #374151 !important;
@@ -241,6 +241,11 @@ button[key^="sidebar_"]:hover {
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
 }
 
+/* Fix Enter key for text input */
+.stTextInput > div > div > input {
+    padding: 0.6rem 1rem !important;
+}
+
 .stButton > button {
     background: #3b82f6 !important;
     border: none !important;
@@ -256,7 +261,7 @@ button[key^="sidebar_"]:hover {
     transform: translateY(-2px);
 }
 
-/* Contact & About Pages - Fixed Empty Blocks */
+/* Contact & About Pages */
 .contact-card, .about-card {
     background: #111827;
     border: 1px solid #1f2937;
@@ -389,10 +394,10 @@ button[key^="sidebar_"]:hover {
 
 /* Section Headers */
 .section-header {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     color: #ffffff;
-    margin: 1.5rem 0 1rem 0;
+    margin: 1.5rem 0 0.75rem 0;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid #1f2937;
 }
@@ -441,24 +446,6 @@ button[key^="sidebar_"]:hover {
     font-weight: 600;
     color: #ffffff;
     margin-bottom: 1rem;
-}
-
-/* Radio Buttons */
-.stRadio > div {
-    gap: 0.5rem;
-}
-
-.stRadio > div > label {
-    background: #1f2937;
-    padding: 0.5rem 1rem;
-    border-radius: 10px;
-    color: #e5e7eb;
-}
-
-/* Alert/Warning */
-.stAlert {
-    background: #1f2937 !important;
-    border: 1px solid #374151 !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -532,7 +519,8 @@ def render_sidebar():
     if st.session_state.show_user_menu:
         col1, col2 = st.sidebar.columns([1, 4])
         with col1:
-            st.markdown("🚪")
+            # Shutdown/Power logo
+            st.markdown("⏻")
         with col2:
             if st.button("Sign Out", key="signout_option", use_container_width=True):
                 sign_out()
@@ -561,7 +549,7 @@ def render_sidebar():
 
 
 # ============================================================
-# WELCOME SCREEN
+# WELCOME SCREEN - Fixed Enter key functionality
 # ============================================================
 def render_welcome():
     st.markdown("""
@@ -574,15 +562,19 @@ def render_welcome():
             <div style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #e5e7eb;">👋 Welcome! What's your name?</div>
     """, unsafe_allow_html=True)
     
-    name = st.text_input("Name", placeholder="e.g. Talha Jobayer", label_visibility="collapsed")
-    if st.button("✨ Get Started →", type="primary", use_container_width=True):
-        if name and name.strip():
-            st.session_state.candidate_name = name.strip()
-            st.session_state.name_entered = True
-            st.session_state.show_user_menu = False
-            st.rerun()
-        else:
-            st.error("Please enter your name")
+    # Use form to handle Enter key properly
+    with st.form(key="welcome_form"):
+        name = st.text_input("Name", placeholder="e.g. Talha Jobayer", label_visibility="collapsed")
+        submit_button = st.form_submit_button("✨ Get Started →", use_container_width=True, type="primary")
+        
+        if submit_button:
+            if name and name.strip():
+                st.session_state.candidate_name = name.strip()
+                st.session_state.name_entered = True
+                st.session_state.show_user_menu = False
+                st.rerun()
+            else:
+                st.error("Please enter your name")
     
     st.markdown("</div></div>", unsafe_allow_html=True)
 
@@ -903,7 +895,7 @@ def render_quiz_results():
 
 
 # ============================================================
-# ABOUT PAGE - Fixed empty blocks
+# ABOUT PAGE
 # ============================================================
 def render_about():
     st.markdown("""
@@ -913,7 +905,6 @@ def render_about():
     </div>
     """, unsafe_allow_html=True)
     
-    # Using st.markdown with proper HTML rendering
     st.markdown("""
     <div class="about-card">
         <div class="profile-header">
@@ -924,32 +915,28 @@ def render_about():
     </div>
     """, unsafe_allow_html=True)
     
-    # Research Interests
     st.markdown('<div class="section-header">🔬 Research Interests</div>', unsafe_allow_html=True)
     st.markdown("""
-    <div style="margin-bottom: 1rem;">
+    <div style="margin-bottom: 1.5rem;">
         <span class="interest-tag">Natural Language Processing (NLP)</span>
         <span class="interest-tag">Computer Vision</span>
         <span class="interest-tag">Cyber Security</span>
     </div>
     """, unsafe_allow_html=True)
     
-    # Academic Affiliation
     st.markdown('<div class="section-header">🎓 Academic Affiliation</div>', unsafe_allow_html=True)
     st.markdown("""
-    <p style="color: #e5e7eb; margin-bottom: 1rem;">Department of Computer Science & Engineering<br>Rajshahi University of Engineering & Technology (RUET)</p>
+    <p style="color: #e5e7eb; margin-bottom: 1.5rem;">Department of Computer Science & Engineering<br>Rajshahi University of Engineering & Technology (RUET)</p>
     """, unsafe_allow_html=True)
     
-    # About Platform
     st.markdown('<div class="section-header">🚀 About This Platform</div>', unsafe_allow_html=True)
     st.markdown("""
-    <p style="color: #9ca3af; line-height: 1.6; margin-bottom: 1rem;">AI Career Platform is an intelligent career matching system designed to help job seekers in Bangladesh find the best AI/ML roles based on their CV content, skills, and career preferences.</p>
+    <p style="color: #9ca3af; line-height: 1.6; margin-bottom: 1.5rem;">AI Career Platform is an intelligent career matching system designed to help job seekers in Bangladesh find the best AI/ML roles based on their CV content, skills, and career preferences.</p>
     """, unsafe_allow_html=True)
     
-    # Features
     st.markdown('<div class="section-header">✨ Features</div>', unsafe_allow_html=True)
     st.markdown("""
-    <ul style="color: #9ca3af; line-height: 1.8; margin-bottom: 1rem;">
+    <ul style="color: #9ca3af; line-height: 1.8; margin-bottom: 1.5rem;">
         <li>📄 AI-powered CV analysis and role matching</li>
         <li>🎯 Job Description matching with real-time skill gap analysis</li>
         <li>🧠 Career interest quiz to discover your ideal role</li>
@@ -958,7 +945,6 @@ def render_about():
     </ul>
     """, unsafe_allow_html=True)
     
-    # Technology Stack
     st.markdown('<div class="section-header">🛠️ Technology Stack</div>', unsafe_allow_html=True)
     st.markdown("""
     <div class="tech-stack">
@@ -976,7 +962,7 @@ def render_about():
 
 
 # ============================================================
-# CONTACT PAGE - Fixed empty blocks
+# CONTACT PAGE
 # ============================================================
 def render_contact():
     st.markdown("""
