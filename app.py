@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Professional Production-Ready Design - Clean & Modern
+FIXED: Navigation working, smaller name block, back to home buttons
 """
 
 import streamlit as st
@@ -46,21 +46,10 @@ footer {visibility: hidden;}
 [data-testid="stHeader"] {display: none;}
 [data-testid="stToolbar"] {display: none;}
 
-/* Make Sidebar Fixed - Never Hidden */
+/* Sidebar Styling */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0d1117 0%, #0a0e1a 100%);
     border-right: 1px solid #1f2937;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    height: 100vh !important;
-    z-index: 100 !important;
-    overflow-y: auto !important;
-}
-
-/* Main content margin to accommodate fixed sidebar */
-.main-content {
-    margin-left: 0;
 }
 
 /* Sidebar Brand */
@@ -153,6 +142,7 @@ button[key^="sidebar_"]:hover {
     padding: 2rem;
     transition: all 0.3s ease;
     margin-bottom: 1rem;
+    height: 100%;
 }
 
 .feature-card:hover {
@@ -403,18 +393,18 @@ button[key^="sidebar_"]:hover {
     border-bottom: 1px solid #1f2937;
 }
 
-/* Welcome Screen - FIXED: Smaller name entry block */
+/* Welcome Screen - FIXED: Much smaller name entry block */
 .welcome-container {
-    max-width: 450px;
-    margin: 80px auto;
+    max-width: 380px;
+    margin: 60px auto;
     text-align: center;
 }
 
 .welcome-title {
     font-family: 'Inter', sans-serif;
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     font-weight: 800;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
     color: #ffffff;
 }
 
@@ -425,14 +415,18 @@ button[key^="sidebar_"]:hover {
 .welcome-subtitle {
     color: #9ca3af;
     margin-bottom: 1.5rem;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 .welcome-card {
     background: #111827;
     border: 1px solid #1f2937;
-    border-radius: 20px;
-    padding: 1.5rem;
+    border-radius: 16px;
+    padding: 1.2rem;
+}
+
+.welcome-card .stTextInput {
+    margin-bottom: 0.5rem;
 }
 
 /* Quiz Styles */
@@ -448,6 +442,11 @@ button[key^="sidebar_"]:hover {
     font-weight: 600;
     color: #ffffff;
     margin-bottom: 1rem;
+}
+
+/* Back to Home button styling */
+.back-home-btn {
+    margin-top: 2rem;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -550,34 +549,36 @@ def render_sidebar():
 
 
 # ============================================================
-# WELCOME SCREEN - FIXED: Smaller and centered
+# WELCOME SCREEN - FIXED: Much smaller, centered
 # ============================================================
 def render_welcome():
-    st.markdown("""
-    <div class="welcome-container">
-        <div class="welcome-title">
-            AI <span class="welcome-gradient">Career</span> Platform
-        </div>
-        <p class="welcome-subtitle">Your AI-powered career companion for data science & AI/ML roles</p>
-        <div class="welcome-card">
-            <div style="font-size: 0.95rem; font-weight: 600; margin-bottom: 1rem; color: #e5e7eb;">👋 Welcome! What's your name?</div>
-    """, unsafe_allow_html=True)
+    # Use columns to center the small form
+    col1, col2, col3 = st.columns([1, 1.5, 1])
     
-    # Smaller name input with form
-    with st.form(key="welcome_form"):
-        name = st.text_input("Name", placeholder="e.g. Talha Jobayer", label_visibility="collapsed")
-        submit_button = st.form_submit_button("✨ Get Started →", use_container_width=True, type="primary")
+    with col2:
+        st.markdown("""
+        <div style="text-align: center;">
+            <div style="font-family: 'Inter', sans-serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">
+                AI <span style="color: #3b82f6;">Career</span> Platform
+            </div>
+            <p style="color: #9ca3af; margin-bottom: 1.5rem; font-size: 0.8rem;">Your AI-powered career companion</p>
+            <div style="background: #111827; border: 1px solid #1f2937; border-radius: 16px; padding: 1.2rem;">
+                <div style="font-size: 0.9rem; font-weight: 600; margin-bottom: 1rem; color: #e5e7eb;">👋 Welcome! What's your name?</div>
+        """, unsafe_allow_html=True)
         
-        if submit_button:
-            if name and name.strip():
-                st.session_state.candidate_name = name.strip()
-                st.session_state.name_entered = True
-                st.session_state.show_user_menu = False
-                st.rerun()
-            else:
-                st.error("Please enter your name")
-    
-    st.markdown("</div></div>", unsafe_allow_html=True)
+        with st.form(key="welcome_form"):
+            name = st.text_input("Name", placeholder="e.g. Talha", label_visibility="collapsed")
+            submit = st.form_submit_button("✨ Get Started →", use_container_width=True, type="primary")
+            
+            if submit:
+                if name and name.strip():
+                    st.session_state.candidate_name = name.strip()
+                    st.session_state.name_entered = True
+                    st.rerun()
+                else:
+                    st.error("Please enter your name")
+        
+        st.markdown("</div></div></div>", unsafe_allow_html=True)
 
 
 # ============================================================
@@ -601,7 +602,7 @@ def render_home():
         <div class="feature-card">
             <div class="feature-icon">📄</div>
             <div class="feature-title">Analyze My CV</div>
-            <div class="feature-desc">Upload your CV and get matched with the best AI/ML roles from our knowledge base.</div>
+            <div class="feature-desc">Upload your CV and get matched with the best AI/ML roles.</div>
             <div class="feature-tags">
                 <span class="feature-tag">Role Match</span>
                 <span class="feature-tag">Skills</span>
@@ -610,14 +611,15 @@ def render_home():
         </div>
         """, unsafe_allow_html=True)
         if st.button("📄 Analyze CV", key="home_cv", use_container_width=True):
-            nav_goto("analyze")
+            st.session_state.page = "analyze"
+            st.rerun()
     
     with col2:
         st.markdown("""
         <div class="feature-card">
             <div class="feature-icon">🎯</div>
             <div class="feature-title">Match with JD</div>
-            <div class="feature-desc">Paste a job description and see exactly how well your CV aligns.</div>
+            <div class="feature-desc">Paste a job description and see how well your CV aligns.</div>
             <div class="feature-tags">
                 <span class="feature-tag">Match %</span>
                 <span class="feature-tag">Missing Skills</span>
@@ -626,7 +628,8 @@ def render_home():
         </div>
         """, unsafe_allow_html=True)
         if st.button("🎯 JD Match", key="home_jd", use_container_width=True):
-            nav_goto("jd_match")
+            st.session_state.page = "jd_match"
+            st.rerun()
     
     with col3:
         st.markdown("""
@@ -642,11 +645,12 @@ def render_home():
         </div>
         """, unsafe_allow_html=True)
         if st.button("🧠 Take Quiz", key="home_quiz", use_container_width=True):
-            nav_goto("quiz")
+            st.session_state.page = "quiz"
+            st.rerun()
 
 
 # ============================================================
-# ANALYZE PAGE
+# ANALYZE PAGE - WITH BACK TO HOME BUTTON
 # ============================================================
 def render_analyze():
     st.markdown("""
@@ -677,6 +681,12 @@ def render_analyze():
     
     if st.session_state.retrieved:
         render_analysis_results()
+    
+    # Back to Home button
+    st.markdown("---")
+    if st.button("← Back to Home", key="back_home_analyze", use_container_width=False):
+        st.session_state.page = "home"
+        st.rerun()
 
 
 def render_analysis_results():
@@ -730,13 +740,10 @@ def render_analysis_results():
         st.markdown("---")
     
     st.markdown("</div>", unsafe_allow_html=True)
-    
-    if st.button("← Back to Home", use_container_width=True):
-        nav_goto("home")
 
 
 # ============================================================
-# JD MATCH PAGE
+# JD MATCH PAGE - WITH BACK TO HOME BUTTON
 # ============================================================
 def render_jd_match():
     st.markdown("""
@@ -767,6 +774,12 @@ def render_jd_match():
     
     if st.session_state.jd_match_result:
         render_jd_match_results()
+    
+    # Back to Home button
+    st.markdown("---")
+    if st.button("← Back to Home", key="back_home_jd", use_container_width=False):
+        st.session_state.page = "home"
+        st.rerun()
 
 
 def render_jd_match_results():
@@ -796,14 +809,10 @@ def render_jd_match_results():
         st.markdown("### 📊 Similar Roles from Database")
         for role in result["similar_roles"][:3]:
             st.markdown(f"**{role.get('title', role.get('role', 'Role'))}** at {role.get('company', 'Various')}")
-    
-    if st.button("← Back to Home", use_container_width=True):
-        st.session_state.jd_match_result = None
-        nav_goto("home")
 
 
 # ============================================================
-# QUIZ PAGE
+# QUIZ PAGE - WITH BACK TO HOME BUTTON
 # ============================================================
 def render_quiz():
     st.markdown("""
@@ -815,19 +824,30 @@ def render_quiz():
     
     if st.session_state.quiz_result:
         render_quiz_results()
+        # Back to Home button
+        st.markdown("---")
+        if st.button("← Back to Home", key="back_home_quiz", use_container_width=False):
+            st.session_state.page = "home"
+            st.rerun()
         return
     
     if not st.session_state.quiz_responses:
         st.markdown("""
-        <div style="text-align:center; max-width: 450px; margin: 2rem auto;">
-            <div style="font-size: 2.5rem; margin-bottom: 1rem;">📋</div>
-            <div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; color: #ffffff;">Ready to discover your career fit?</div>
-            <div style="color: #9ca3af; font-size: 0.85rem;">Answer 10 questions about your preferences and thinking style.</div>
+        <div style="text-align:center; max-width: 400px; margin: 2rem auto;">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">📋</div>
+            <div style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: #ffffff;">Ready to discover your career fit?</div>
+            <div style="color: #9ca3af; font-size: 0.8rem;">Answer 10 questions about your preferences.</div>
         </div>
         """, unsafe_allow_html=True)
         
         if st.button("🚀 Start Quiz", use_container_width=True):
             st.session_state.quiz_responses = {q["id"]: None for q in QUESTIONS}
+            st.rerun()
+        
+        # Back to Home button
+        st.markdown("---")
+        if st.button("← Back to Home", key="back_home_quiz_start", use_container_width=False):
+            st.session_state.page = "home"
             st.rerun()
         return
     
@@ -892,11 +912,12 @@ def render_quiz_results():
         if st.button("← Back to Home", use_container_width=True):
             st.session_state.quiz_responses = {}
             st.session_state.quiz_result = None
-            nav_goto("home")
+            st.session_state.page = "home"
+            st.rerun()
 
 
 # ============================================================
-# ABOUT PAGE
+# ABOUT PAGE - WITH BACK TO HOME BUTTON
 # ============================================================
 def render_about():
     st.markdown("""
@@ -958,12 +979,14 @@ def render_about():
     </div>
     """, unsafe_allow_html=True)
     
-    if st.button("← Back to Home", use_container_width=True):
-        nav_goto("home")
+    st.markdown("---")
+    if st.button("← Back to Home", key="back_home_about", use_container_width=False):
+        st.session_state.page = "home"
+        st.rerun()
 
 
 # ============================================================
-# CONTACT PAGE
+# CONTACT PAGE - WITH BACK TO HOME BUTTON
 # ============================================================
 def render_contact():
     st.markdown("""
@@ -1024,8 +1047,10 @@ def render_contact():
     </div>
     """, unsafe_allow_html=True)
     
-    if st.button("← Back to Home", use_container_width=True):
-        nav_goto("home")
+    st.markdown("---")
+    if st.button("← Back to Home", key="back_home_contact", use_container_width=False):
+        st.session_state.page = "home"
+        st.rerun()
 
 
 # ============================================================
