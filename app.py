@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Sidebar with Stacked Icons and Text - Working Version
+Fixed: Compact sidebar buttons and reduced top spacing
 """
 
 import streamlit as st
@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS
+# CSS - Compact Sidebar & Reduced Top Spacing
 # ============================================================
 st.markdown("""
 <style>
@@ -43,25 +43,26 @@ footer {visibility: hidden;}
 header {visibility: hidden;}
 [data-testid="stHeader"] {display: none;}
 
+/* Sidebar styling */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0d1117 0%, #0a0e1a 100%);
     border-right: 1px solid #1f2937;
 }
 
-/* Sidebar button styling for stacked layout */
+/* Compact sidebar buttons */
 [data-testid="stSidebar"] .stButton > button {
     background: transparent !important;
     border: none !important;
-    border-radius: 12px !important;
-    padding: 0.6rem 0.2rem !important;
-    margin-bottom: 0.3rem !important;
-    transition: all 0.3s ease !important;
+    border-radius: 10px !important;
+    padding: 0.4rem 0.2rem !important;
+    margin-bottom: 0.15rem !important;
+    transition: all 0.2s ease !important;
     color: #9ca3af !important;
-    font-size: 0.7rem !important;
+    font-size: 0.65rem !important;
     white-space: pre-line !important;
-    line-height: 1.4 !important;
+    line-height: 1.3 !important;
     height: auto !important;
-    min-height: 60px !important;
+    min-height: 50px !important;
 }
 
 [data-testid="stSidebar"] .stButton > button:hover {
@@ -74,27 +75,46 @@ header {visibility: hidden;}
     color: #ffffff !important;
 }
 
-/* Main content */
-.main-content {
-    padding: 2rem;
+/* Compact user name display */
+.sidebar-user {
+    background: #1f2937;
+    border-radius: 8px;
+    padding: 0.4rem 0.5rem;
+    margin-bottom: 0.8rem;
+    text-align: center;
+    font-size: 0.8rem;
 }
 
+/* Compact brand */
+.sidebar-brand {
+    text-align: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #1f2937;
+    margin-bottom: 1rem;
+}
+
+/* Main content - reduced top padding */
+.main-content {
+    padding: 0.5rem 2rem 2rem 2rem;
+}
+
+/* Main header with less top margin */
 .main-header {
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
     border-bottom: 2px solid #1f2937;
 }
 
 .main-header h1 {
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 700;
     color: #ffffff;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
 }
 
 .main-header p {
     color: #9ca3af;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
 /* Feature cards */
@@ -102,7 +122,7 @@ header {visibility: hidden;}
     background: #111827;
     border: 1px solid #1f2937;
     border-radius: 16px;
-    padding: 2rem;
+    padding: 1.5rem;
     transition: all 0.3s ease;
     height: 100%;
 }
@@ -114,35 +134,35 @@ header {visibility: hidden;}
 }
 
 .feature-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
 }
 
 .feature-title {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: #ffffff;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
 }
 
 .feature-desc {
     color: #9ca3af;
-    font-size: 0.85rem;
-    line-height: 1.5;
+    font-size: 0.8rem;
+    line-height: 1.4;
 }
 
 .feature-tags {
-    margin-top: 1rem;
+    margin-top: 0.75rem;
     display: flex;
-    gap: 0.5rem;
+    gap: 0.4rem;
     flex-wrap: wrap;
 }
 
 .feature-tag {
     background: #1f2937;
     border-radius: 20px;
-    padding: 0.25rem 0.75rem;
-    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.65rem;
     color: #60a5fa;
 }
 
@@ -156,11 +176,11 @@ header {visibility: hidden;}
 
 .match-score {
     text-align: center;
-    padding: 1.5rem;
+    padding: 1rem;
 }
 
 .match-percentage {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 800;
     color: #3b82f6;
 }
@@ -170,10 +190,10 @@ header {visibility: hidden;}
     background: #1f2937;
     border: 1px solid #374151;
     border-radius: 20px;
-    padding: 0.25rem 0.75rem;
-    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.7rem;
     color: #9ca3af;
-    margin: 0.25rem;
+    margin: 0.2rem;
 }
 
 .gap-chip {
@@ -194,14 +214,14 @@ header {visibility: hidden;}
     background: #111827;
     border: 1px solid #1f2937;
     border-radius: 16px;
-    padding: 2rem;
+    padding: 1.5rem;
 }
 
 .contact-item {
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 1rem 0;
+    padding: 0.8rem 0;
     border-bottom: 1px solid #1f2937;
 }
 
@@ -210,19 +230,21 @@ header {visibility: hidden;}
 }
 
 .contact-icon {
-    font-size: 1.3rem;
-    min-width: 45px;
+    font-size: 1.2rem;
+    min-width: 40px;
     color: #60a5fa;
 }
 
 .contact-label {
     font-weight: 600;
     color: #e5e7eb;
-    min-width: 100px;
+    min-width: 90px;
+    font-size: 0.85rem;
 }
 
 .contact-value {
     color: #9ca3af;
+    font-size: 0.85rem;
 }
 
 .contact-link {
@@ -234,14 +256,14 @@ header {visibility: hidden;}
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
-    margin-top: 1.5rem;
+    margin-top: 1rem;
 }
 
 .social-card {
     background: #1f2937;
     border: 1px solid #374151;
     border-radius: 12px;
-    padding: 1rem;
+    padding: 0.8rem;
     text-align: center;
     transition: all 0.3s ease;
     text-decoration: none;
@@ -253,13 +275,13 @@ header {visibility: hidden;}
 }
 
 .social-icon {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+    margin-bottom: 0.3rem;
 }
 
 .social-name {
     color: #e5e7eb;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 500;
 }
 
@@ -268,71 +290,71 @@ header {visibility: hidden;}
     background: #1f2937;
     border: 1px solid #374151;
     border-radius: 20px;
-    padding: 0.3rem 1rem;
-    font-size: 0.75rem;
+    padding: 0.25rem 0.8rem;
+    font-size: 0.7rem;
     color: #60a5fa;
-    margin: 0.25rem;
+    margin: 0.2rem;
 }
 
 .tech-stack {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 1rem;
+    gap: 0.4rem;
+    margin-top: 0.8rem;
 }
 
 .tech-pill {
     background: #1f2937;
     border: 1px solid #374151;
     border-radius: 20px;
-    padding: 0.25rem 0.75rem;
-    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.65rem;
     color: #9ca3af;
 }
 
 .profile-header {
     text-align: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
     border-bottom: 1px solid #1f2937;
 }
 
 .profile-icon {
-    font-size: 3.5rem;
-    margin-bottom: 0.5rem;
+    font-size: 3rem;
+    margin-bottom: 0.3rem;
 }
 
 .profile-name {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: #ffffff;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.2rem;
 }
 
 .profile-title {
     color: #60a5fa;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 .section-header {
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 600;
     color: #ffffff;
-    margin: 1.5rem 0 0.75rem 0;
-    padding-bottom: 0.5rem;
+    margin: 1rem 0 0.5rem 0;
+    padding-bottom: 0.4rem;
     border-bottom: 1px solid #1f2937;
 }
 
 .welcome-container {
     max-width: 380px;
-    margin: 80px auto;
+    margin: 60px auto;
     text-align: center;
 }
 
 .welcome-title {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: 800;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
     color: #ffffff;
 }
 
@@ -342,20 +364,20 @@ header {visibility: hidden;}
 
 .welcome-subtitle {
     color: #9ca3af;
-    margin-bottom: 1.5rem;
-    font-size: 0.8rem;
+    margin-bottom: 1.2rem;
+    font-size: 0.75rem;
 }
 
 .welcome-card {
     background: #111827;
     border: 1px solid #1f2937;
     border-radius: 16px;
-    padding: 1.2rem;
+    padding: 1rem;
 }
 
 .quiz-start-container {
     max-width: 380px;
-    margin: 40px auto;
+    margin: 30px auto;
     text-align: center;
 }
 
@@ -363,39 +385,40 @@ header {visibility: hidden;}
     background: #111827;
     border: 1px solid #1f2937;
     border-radius: 16px;
-    padding: 1.5rem;
+    padding: 1.2rem;
 }
 
 .quiz-start-icon {
-    font-size: 2rem;
-    margin-bottom: 0.75rem;
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
 }
 
 .quiz-start-title {
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 600;
     color: #ffffff;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.3rem;
 }
 
 .quiz-start-desc {
     color: #9ca3af;
-    font-size: 0.75rem;
-    margin-bottom: 1rem;
+    font-size: 0.7rem;
+    margin-bottom: 0.8rem;
 }
 
 .quiz-question {
     background: #111827;
     border: 1px solid #1f2937;
     border-radius: 16px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
+    padding: 1.2rem;
+    margin-bottom: 0.8rem;
 }
 
 .quiz-question-text {
     font-weight: 600;
     color: #ffffff;
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
+    font-size: 0.9rem;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -445,31 +468,30 @@ def sign_out():
 
 
 def render_sidebar():
-    """Sidebar with stacked icons and text - using simple button labels with newlines"""
+    """Compact sidebar with stacked icons and text"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
     
     with st.sidebar:
-        # Brand
+        # Compact Brand
         st.markdown("""
-        <div style="text-align: center; padding: 1.5rem 0; border-bottom: 1px solid #1f2937; margin-bottom: 1.5rem;">
-            <div style="font-size: 2rem;">🎯</div>
-            <div style="font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 700; color: #ffffff;">AI Career Platform</div>
+        <div class="sidebar-brand">
+            <div style="font-size: 1.8rem;">🎯</div>
+            <div style="font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 700; color: #ffffff;">AI Career Platform</div>
         </div>
         """, unsafe_allow_html=True)
         
-        # User name display
+        # Compact user name
         st.markdown(f"""
-        <div style="background: #1f2937; border-radius: 10px; padding: 0.6rem 1rem; margin-bottom: 1rem; text-align: center;">
+        <div class="sidebar-user">
             <span style="color: #e5e7eb;">👤 {first}</span>
         </div>
         """, unsafe_allow_html=True)
         
         st.markdown("---")
         
-        # Navigation buttons with stacked layout using newline character
-        # The \n\n creates a line break between icon and text
+        # Navigation buttons with stacked layout
         nav_items = [
             ("🏠\n\nHome", "home"),
             ("📄\n\nAnalyze CV", "analyze"),
@@ -488,7 +510,7 @@ def render_sidebar():
         
         st.markdown("---")
         
-        # Sign out button with stacked icon and text
+        # Sign out button
         if st.button("⏻\n\nSign Out", key="signout_btn", use_container_width=True):
             sign_out()
         
@@ -503,13 +525,13 @@ def render_welcome():
     
     with col2:
         st.markdown("""
-        <div style="text-align: center; margin-top: 100px;">
-            <div style="font-family: 'Inter', sans-serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">
-                AI <span style="color: #3b82f6;">Career</span> Platform
+        <div class="welcome-container">
+            <div class="welcome-title">
+                AI <span class="welcome-gradient">Career</span> Platform
             </div>
-            <p style="color: #9ca3af; margin-bottom: 1.5rem; font-size: 0.8rem;">Your AI-powered career companion</p>
-            <div style="background: #111827; border: 1px solid #1f2937; border-radius: 16px; padding: 1.2rem;">
-                <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; color: #e5e7eb;">👋 Welcome! What's your name?</div>
+            <p class="welcome-subtitle">Your AI-powered career companion</p>
+            <div class="welcome-card">
+                <div style="font-size: 0.8rem; font-weight: 600; margin-bottom: 0.8rem; color: #e5e7eb;">👋 Welcome! What's your name?</div>
         """, unsafe_allow_html=True)
         
         with st.form(key="welcome_form"):
@@ -647,9 +669,9 @@ def render_analysis_results():
     with col2:
         st.markdown(f"""
         <div class="match-score">
-            <div style="font-size: 0.85rem; color: #9ca3af; margin-bottom: 0.5rem;">MATCH SCORE</div>
+            <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 0.3rem;">MATCH SCORE</div>
             <div class="match-percentage">{top_match.get('match_pct', 0)}%</div>
-            <h3 style="color: #ffffff; margin-top: 0.5rem; font-size: 1.1rem;">{top_match.get('title', top_match.get('role', 'AI Professional'))}</h3>
+            <h3 style="color: #ffffff; margin-top: 0.3rem; font-size: 1rem;">{top_match.get('title', top_match.get('role', 'AI Professional'))}</h3>
         </div>
         """, unsafe_allow_html=True)
     
@@ -677,7 +699,7 @@ def render_analysis_results():
     st.markdown("### 🗺️ Career Path")
     for r in retrieved.get("all_matches", [])[:3]:
         st.markdown(f"""
-        <div style="margin-bottom: 1rem;">
+        <div style="margin-bottom: 0.8rem;">
             <strong>{r.get('title', r.get('role', 'Role'))}</strong> — {r.get('company', 'Various')} 
             <span style="color: #60a5fa;">({r.get('match_pct', 0)}% match)</span>
         </div>
@@ -746,9 +768,9 @@ def render_jd_match_results():
     st.markdown(f"""
     <div class="result-card">
         <div style="text-align:center;">
-            <div style="font-size: 0.85rem; color: #9ca3af;">MATCH SCORE</div>
-            <div style="font-size: 3rem; font-weight: 800; color: {color};">{pct}%</div>
-            <div style="font-size: 1rem; font-weight: 600; color: {color};">{status}</div>
+            <div style="font-size: 0.75rem; color: #9ca3af;">MATCH SCORE</div>
+            <div style="font-size: 2.5rem; font-weight: 800; color: {color};">{pct}%</div>
+            <div style="font-size: 0.9rem; font-weight: 600; color: {color};">{status}</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -837,9 +859,9 @@ def render_quiz_results():
     st.markdown(f"""
     <div class="result-card">
         <div style="text-align:center;">
-            <div style="font-size: 3rem; font-weight: 800; color: {color};">{pct}%</div>
-            <div style="font-size: 1.1rem; font-weight: 600; margin: 0.5rem 0; color: #ffffff;">Interest Level: {level}</div>
-            <div style="color: #9ca3af;">{result["message"]}</div>
+            <div style="font-size: 2.5rem; font-weight: 800; color: {color};">{pct}%</div>
+            <div style="font-size: 1rem; font-weight: 600; margin: 0.3rem 0; color: #ffffff;">Interest Level: {level}</div>
+            <div style="color: #9ca3af; font-size: 0.85rem;">{result["message"]}</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -892,7 +914,7 @@ def render_about():
     
     st.markdown('<div class="section-header">🔬 Research Interests</div>', unsafe_allow_html=True)
     st.markdown("""
-    <div style="margin-bottom: 1.5rem;">
+    <div style="margin-bottom: 1rem;">
         <span class="interest-tag">Natural Language Processing (NLP)</span>
         <span class="interest-tag">Computer Vision</span>
         <span class="interest-tag">Cyber Security</span>
@@ -901,17 +923,17 @@ def render_about():
     
     st.markdown('<div class="section-header">🎓 Academic Affiliation</div>', unsafe_allow_html=True)
     st.markdown("""
-    <p style="color: #e5e7eb; margin-bottom: 1.5rem;">Department of Computer Science & Engineering<br>Rajshahi University of Engineering & Technology (RUET)</p>
+    <p style="color: #e5e7eb; margin-bottom: 1rem; font-size: 0.85rem;">Department of Computer Science & Engineering<br>Rajshahi University of Engineering & Technology (RUET)</p>
     """, unsafe_allow_html=True)
     
     st.markdown('<div class="section-header">🚀 About This Platform</div>', unsafe_allow_html=True)
     st.markdown("""
-    <p style="color: #9ca3af; line-height: 1.6; margin-bottom: 1.5rem;">AI Career Platform is an intelligent career matching system designed to help job seekers in Bangladesh find the best AI/ML roles based on their CV content, skills, and career preferences.</p>
+    <p style="color: #9ca3af; line-height: 1.5; margin-bottom: 1rem; font-size: 0.85rem;">AI Career Platform is an intelligent career matching system designed to help job seekers in Bangladesh find the best AI/ML roles based on their CV content, skills, and career preferences.</p>
     """, unsafe_allow_html=True)
     
     st.markdown('<div class="section-header">✨ Features</div>', unsafe_allow_html=True)
     st.markdown("""
-    <ul style="color: #9ca3af; line-height: 1.8; margin-bottom: 1.5rem;">
+    <ul style="color: #9ca3af; line-height: 1.6; margin-bottom: 1rem; font-size: 0.8rem;">
         <li>📄 AI-powered CV analysis and role matching</li>
         <li>🎯 Job Description matching with real-time skill gap analysis</li>
         <li>🧠 Career interest quiz to discover your ideal role</li>
@@ -985,7 +1007,7 @@ def render_contact():
         </div>
     </div>
     
-    <div class="section-header" style="margin-top: 2rem; text-align: center;">Connect With Me</div>
+    <div class="section-header" style="margin-top: 1.5rem; text-align: center;">Connect With Me</div>
     <div class="social-grid">
         <a href="https://github.com/jobayertalha" target="_blank" class="social-card">
             <div class="social-icon">💻</div>
