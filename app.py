@@ -442,7 +442,7 @@ def sign_out():
 
 
 def render_sidebar():
-    """Simple working sidebar with shutdown icon"""
+    """Sidebar with stacked icons and text"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
@@ -458,39 +458,51 @@ def render_sidebar():
         
         # User name display
         st.markdown(f"""
-        <div style="background: #1f2937; border-radius: 10px; padding: 0.6rem 1rem; margin-bottom: 1rem;">
+        <div style="background: #1f2937; border-radius: 10px; padding: 0.6rem 1rem; margin-bottom: 1rem; text-align: center;">
             <span style="color: #e5e7eb;">👤 {first}</span>
         </div>
         """, unsafe_allow_html=True)
         
         st.markdown("---")
         
-        # Navigation buttons
+        # Navigation buttons with stacked icon and text
         nav_items = [
-            ("🏠 Home", "home"),
-            ("📄 Analyze CV", "analyze"),
-            ("🎯 JD Match", "jd_match"),
-            ("🧠 Quiz", "quiz"),
-            ("ℹ️ About", "about"),
-            ("📞 Contact", "contact")
+            ("🏠", "Home", "home"),
+            ("📄", "Analyze CV", "analyze"),
+            ("🎯", "JD Match", "jd_match"),
+            ("🧠", "Quiz", "quiz"),
+            ("ℹ️", "About", "about"),
+            ("📞", "Contact", "contact")
         ]
         
-        for label, page_key in nav_items:
+        for icon, label, page_key in nav_items:
+            button_html = f"""
+            <div style="text-align: center; padding: 0.5rem;">
+                <div style="font-size: 1.2rem; margin-bottom: 0.25rem;">{icon}</div>
+                <div style="font-size: 0.7rem;">{label}</div>
+            </div>
+            """
+            
             if current_page == page_key:
-                st.button(label, key=f"nav_{page_key}", use_container_width=True, type="primary")
+                st.button(button_html, key=f"nav_{page_key}", use_container_width=True, type="primary")
             else:
-                if st.button(label, key=f"nav_{page_key}", use_container_width=True):
+                if st.button(button_html, key=f"nav_{page_key}", use_container_width=True):
                     nav_goto(page_key)
         
         st.markdown("---")
         
-        # Sign out button with shutdown/power icon (⏻)
-        if st.button("⏻ Sign Out", key="signout_btn", use_container_width=True):
+        # Sign out button with stacked icon and text
+        signout_html = """
+        <div style="text-align: center; padding: 0.5rem;">
+            <div style="font-size: 1.2rem; margin-bottom: 0.25rem;">⏻</div>
+            <div style="font-size: 0.7rem;">Sign Out</div>
+        </div>
+        """
+        
+        if st.button(signout_html, key="signout_btn", use_container_width=True):
             sign_out()
         
         st.caption("© 2025 AI Career Platform")
-
-
 # ============================================================
 # WELCOME SCREEN
 # ============================================================
