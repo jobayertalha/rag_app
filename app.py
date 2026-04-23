@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-WORKING SIDEBAR - With Shutdown Icon
+Sidebar with Stacked Icons and Text - Working Version
 """
 
 import streamlit as st
@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# SIMPLE CLEAN CSS - NO SIDEBAR HIDING
+# CSS
 # ============================================================
 st.markdown("""
 <style>
@@ -37,15 +37,41 @@ st.markdown("""
     min-height: 100vh;
 }
 
-/* Hide only unnecessary elements */
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 .stDeployButton {display: none;}
+header {visibility: hidden;}
+[data-testid="stHeader"] {display: none;}
 
-/* Keep sidebar visible and styled */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0d1117 0%, #0a0e1a 100%);
     border-right: 1px solid #1f2937;
+}
+
+/* Sidebar button styling for stacked layout */
+[data-testid="stSidebar"] .stButton > button {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 0.6rem 0.2rem !important;
+    margin-bottom: 0.3rem !important;
+    transition: all 0.3s ease !important;
+    color: #9ca3af !important;
+    font-size: 0.7rem !important;
+    white-space: pre-line !important;
+    line-height: 1.4 !important;
+    height: auto !important;
+    min-height: 60px !important;
+}
+
+[data-testid="stSidebar"] .stButton > button:hover {
+    background: rgba(59, 130, 246, 0.15) !important;
+    color: #60a5fa !important;
+}
+
+[data-testid="stSidebar"] .stButton > button[kind="primary"] {
+    background: rgba(59, 130, 246, 0.25) !important;
+    color: #ffffff !important;
 }
 
 /* Main content */
@@ -53,7 +79,6 @@ footer {visibility: hidden;}
     padding: 2rem;
 }
 
-/* Main header */
 .main-header {
     margin-bottom: 2rem;
     padding-bottom: 1rem;
@@ -121,7 +146,6 @@ footer {visibility: hidden;}
     color: #60a5fa;
 }
 
-/* Result cards */
 .result-card {
     background: #111827;
     border: 1px solid #1f2937;
@@ -141,7 +165,6 @@ footer {visibility: hidden;}
     color: #3b82f6;
 }
 
-/* Skill chips */
 .skill-chip {
     display: inline-block;
     background: #1f2937;
@@ -159,7 +182,6 @@ footer {visibility: hidden;}
     color: #fca5a5;
 }
 
-/* Form inputs */
 .stTextInput > div > div > input,
 .stTextArea > div > div > textarea {
     background: #111827 !important;
@@ -168,23 +190,6 @@ footer {visibility: hidden;}
     color: #ffffff !important;
 }
 
-/* Buttons */
-.stButton > button {
-    background: #3b82f6 !important;
-    border: none !important;
-    border-radius: 12px !important;
-    color: white !important;
-    font-weight: 600 !important;
-    padding: 0.6rem 1.5rem !important;
-    transition: all 0.3s ease !important;
-}
-
-.stButton > button:hover {
-    background: #2563eb !important;
-    transform: translateY(-2px);
-}
-
-/* Contact & About pages */
 .contact-card, .about-card {
     background: #111827;
     border: 1px solid #1f2937;
@@ -318,7 +323,6 @@ footer {visibility: hidden;}
     border-bottom: 1px solid #1f2937;
 }
 
-/* Welcome screen */
 .welcome-container {
     max-width: 380px;
     margin: 80px auto;
@@ -349,7 +353,6 @@ footer {visibility: hidden;}
     padding: 1.2rem;
 }
 
-/* Quiz start block */
 .quiz-start-container {
     max-width: 380px;
     margin: 40px auto;
@@ -442,7 +445,7 @@ def sign_out():
 
 
 def render_sidebar():
-    """Sidebar with stacked icons and text"""
+    """Sidebar with stacked icons and text - using simple button labels with newlines"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
@@ -465,44 +468,33 @@ def render_sidebar():
         
         st.markdown("---")
         
-        # Navigation buttons with stacked icon and text
+        # Navigation buttons with stacked layout using newline character
+        # The \n\n creates a line break between icon and text
         nav_items = [
-            ("🏠", "Home", "home"),
-            ("📄", "Analyze CV", "analyze"),
-            ("🎯", "JD Match", "jd_match"),
-            ("🧠", "Quiz", "quiz"),
-            ("ℹ️", "About", "about"),
-            ("📞", "Contact", "contact")
+            ("🏠\n\nHome", "home"),
+            ("📄\n\nAnalyze CV", "analyze"),
+            ("🎯\n\nJD Match", "jd_match"),
+            ("🧠\n\nQuiz", "quiz"),
+            ("ℹ️\n\nAbout", "about"),
+            ("📞\n\nContact", "contact")
         ]
         
-        for icon, label, page_key in nav_items:
-            button_html = f"""
-            <div style="text-align: center; padding: 0.5rem;">
-                <div style="font-size: 1.2rem; margin-bottom: 0.25rem;">{icon}</div>
-                <div style="font-size: 0.7rem;">{label}</div>
-            </div>
-            """
-            
+        for label, page_key in nav_items:
             if current_page == page_key:
-                st.button(button_html, key=f"nav_{page_key}", use_container_width=True, type="primary")
+                st.button(label, key=f"nav_{page_key}", use_container_width=True, type="primary")
             else:
-                if st.button(button_html, key=f"nav_{page_key}", use_container_width=True):
+                if st.button(label, key=f"nav_{page_key}", use_container_width=True):
                     nav_goto(page_key)
         
         st.markdown("---")
         
         # Sign out button with stacked icon and text
-        signout_html = """
-        <div style="text-align: center; padding: 0.5rem;">
-            <div style="font-size: 1.2rem; margin-bottom: 0.25rem;">⏻</div>
-            <div style="font-size: 0.7rem;">Sign Out</div>
-        </div>
-        """
-        
-        if st.button(signout_html, key="signout_btn", use_container_width=True):
+        if st.button("⏻\n\nSign Out", key="signout_btn", use_container_width=True):
             sign_out()
         
         st.caption("© 2025 AI Career Platform")
+
+
 # ============================================================
 # WELCOME SCREEN
 # ============================================================
