@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Fixed: Compact sidebar buttons and reduced top spacing
+Ultra Compact Sidebar - No Scrolling Needed
 """
 
 import streamlit as st
@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS - Compact Sidebar & Reduced Top Spacing
+# CSS - Ultra Compact Sidebar
 # ============================================================
 st.markdown("""
 <style>
@@ -47,22 +47,23 @@ header {visibility: hidden;}
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0d1117 0%, #0a0e1a 100%);
     border-right: 1px solid #1f2937;
+    padding-top: 0.2rem !important;
 }
 
-/* Compact sidebar buttons */
+/* Ultra compact sidebar buttons */
 [data-testid="stSidebar"] .stButton > button {
     background: transparent !important;
     border: none !important;
-    border-radius: 10px !important;
-    padding: 0.4rem 0.2rem !important;
-    margin-bottom: 0.15rem !important;
+    border-radius: 8px !important;
+    padding: 0.25rem 0.2rem !important;
+    margin-bottom: 0.1rem !important;
     transition: all 0.2s ease !important;
     color: #9ca3af !important;
-    font-size: 0.65rem !important;
+    font-size: 0.6rem !important;
     white-space: pre-line !important;
-    line-height: 1.3 !important;
+    line-height: 1.2 !important;
     height: auto !important;
-    min-height: 50px !important;
+    min-height: 42px !important;
 }
 
 [data-testid="stSidebar"] .stButton > button:hover {
@@ -73,24 +74,6 @@ header {visibility: hidden;}
 [data-testid="stSidebar"] .stButton > button[kind="primary"] {
     background: rgba(59, 130, 246, 0.25) !important;
     color: #ffffff !important;
-}
-
-/* Compact user name display */
-.sidebar-user {
-    background: #1f2937;
-    border-radius: 8px;
-    padding: 0.4rem 0.5rem;
-    margin-bottom: 0.8rem;
-    text-align: center;
-    font-size: 0.8rem;
-}
-
-/* Compact brand */
-.sidebar-brand {
-    text-align: center;
-    padding: 1rem 0;
-    border-bottom: 1px solid #1f2937;
-    margin-bottom: 1rem;
 }
 
 /* Main content - reduced top padding */
@@ -468,30 +451,28 @@ def sign_out():
 
 
 def render_sidebar():
-    """Compact sidebar with stacked icons and text"""
+    """Ultra compact sidebar - fits without scrolling"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
     
     with st.sidebar:
-        # Compact Brand
+        # Ultra Compact Brand
         st.markdown("""
-        <div class="sidebar-brand">
-            <div style="font-size: 1.8rem;">🎯</div>
-            <div style="font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 700; color: #ffffff;">AI Career Platform</div>
+        <div style="text-align: center; padding: 0.8rem 0 0.6rem 0; border-bottom: 1px solid #1f2937; margin-bottom: 0.6rem;">
+            <div style="font-size: 1.5rem;">🎯</div>
+            <div style="font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 700; color: #ffffff;">AI Career Platform</div>
         </div>
         """, unsafe_allow_html=True)
         
-        # Compact user name
+        # Ultra Compact user name
         st.markdown(f"""
-        <div class="sidebar-user">
-            <span style="color: #e5e7eb;">👤 {first}</span>
+        <div style="background: #1f2937; border-radius: 8px; padding: 0.3rem 0.5rem; margin-bottom: 0.5rem; text-align: center;">
+            <span style="color: #e5e7eb; font-size: 0.75rem;">👤 {first}</span>
         </div>
         """, unsafe_allow_html=True)
         
-        st.markdown("---")
-        
-        # Navigation buttons with stacked layout
+        # Navigation buttons with stacked layout - more compact
         nav_items = [
             ("🏠\n\nHome", "home"),
             ("📄\n\nAnalyze CV", "analyze"),
@@ -508,13 +489,11 @@ def render_sidebar():
                 if st.button(label, key=f"nav_{page_key}", use_container_width=True):
                     nav_goto(page_key)
         
-        st.markdown("---")
-        
-        # Sign out button
+        # Sign out button - more compact
         if st.button("⏻\n\nSign Out", key="signout_btn", use_container_width=True):
             sign_out()
         
-        st.caption("© 2025 AI Career Platform")
+        st.caption("© 2025")
 
 
 # ============================================================
