@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Professional Colored Sidebar Buttons
+Professional Colored Sidebar Buttons with Backgrounds
 """
 
 import streamlit as st
@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS - Complete Styling with Professional Colored Sidebar
+# CSS - Professional Colored Sidebar Buttons
 # ============================================================
 st.markdown("""
 <style>
@@ -61,91 +61,130 @@ footer {visibility: hidden;}
     padding-top: 0.2rem !important;
 }
 
-/* Sidebar buttons */
+/* Sidebar buttons - with colored backgrounds */
 [data-testid="stSidebar"] .stButton > button {
-    background: transparent !important;
     border: none !important;
-    border-radius: 8px !important;
-    padding: 0.3rem 0.2rem !important;
-    margin-bottom: 0.1rem !important;
+    border-radius: 12px !important;
+    padding: 0.4rem 0.2rem !important;
+    margin-bottom: 0.3rem !important;
     transition: all 0.2s ease !important;
     white-space: pre-line !important;
     line-height: 1.2 !important;
     height: auto !important;
-    min-height: 48px !important;
+    min-height: 55px !important;
+    font-weight: 500 !important;
 }
 
-/* Home button color */
-[data-testid="stSidebar"] .stButton > button[kind="secondary"][key="nav_home"] {
-    color: #60a5fa !important;
+/* Home button - Deep Blue */
+[data-testid="stSidebar"] .stButton > button[key="nav_home"] {
+    background: linear-gradient(135deg, #1e3a5f, #1a3650) !important;
+    color: #93c5fd !important;
+    border: 1px solid #2563eb !important;
+}
+[data-testid="stSidebar"] .stButton > button[key="nav_home"]:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+    color: #ffffff !important;
 }
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_home"] {
-    background: rgba(59, 130, 246, 0.25) !important;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
     color: #ffffff !important;
-    border-left: 3px solid #3b82f6 !important;
+    border: 1px solid #60a5fa !important;
 }
 
-/* Analyze CV button color */
-[data-testid="stSidebar"] .stButton > button[kind="secondary"][key="nav_analyze"] {
-    color: #34d399 !important;
+/* Analyze CV button - Deep Green */
+[data-testid="stSidebar"] .stButton > button[key="nav_analyze"] {
+    background: linear-gradient(135deg, #14532d, #166534) !important;
+    color: #86efac !important;
+    border: 1px solid #16a34a !important;
+}
+[data-testid="stSidebar"] .stButton > button[key="nav_analyze"]:hover {
+    background: linear-gradient(135deg, #16a34a, #15803d) !important;
+    color: #ffffff !important;
 }
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_analyze"] {
-    background: rgba(16, 185, 129, 0.25) !important;
+    background: linear-gradient(135deg, #16a34a, #15803d) !important;
     color: #ffffff !important;
-    border-left: 3px solid #10b981 !important;
+    border: 1px solid #4ade80 !important;
 }
 
-/* JD Match button color */
-[data-testid="stSidebar"] .stButton > button[kind="secondary"][key="nav_jd_match"] {
-    color: #fbbf24 !important;
+/* JD Match button - Deep Amber/Orange */
+[data-testid="stSidebar"] .stButton > button[key="nav_jd_match"] {
+    background: linear-gradient(135deg, #78350f, #92400e) !important;
+    color: #fcd34d !important;
+    border: 1px solid #d97706 !important;
+}
+[data-testid="stSidebar"] .stButton > button[key="nav_jd_match"]:hover {
+    background: linear-gradient(135deg, #d97706, #b45309) !important;
+    color: #ffffff !important;
 }
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_jd_match"] {
-    background: rgba(245, 158, 11, 0.25) !important;
+    background: linear-gradient(135deg, #d97706, #b45309) !important;
     color: #ffffff !important;
-    border-left: 3px solid #f59e0b !important;
+    border: 1px solid #fbbf24 !important;
 }
 
-/* Quiz button color */
-[data-testid="stSidebar"] .stButton > button[kind="secondary"][key="nav_quiz"] {
-    color: #a78bfa !important;
+/* Quiz button - Deep Purple */
+[data-testid="stSidebar"] .stButton > button[key="nav_quiz"] {
+    background: linear-gradient(135deg, #4c1d95, #5b21b6) !important;
+    color: #c4b5fd !important;
+    border: 1px solid #8b5cf6 !important;
+}
+[data-testid="stSidebar"] .stButton > button[key="nav_quiz"]:hover {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
+    color: #ffffff !important;
 }
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_quiz"] {
-    background: rgba(139, 92, 246, 0.25) !important;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
     color: #ffffff !important;
-    border-left: 3px solid #8b5cf6 !important;
+    border: 1px solid #a78bfa !important;
 }
 
-/* About button color */
-[data-testid="stSidebar"] .stButton > button[kind="secondary"][key="nav_about"] {
-    color: #f472b6 !important;
+/* About button - Deep Pink */
+[data-testid="stSidebar"] .stButton > button[key="nav_about"] {
+    background: linear-gradient(135deg, #831843, #9d174d) !important;
+    color: #f9a8d4 !important;
+    border: 1px solid #ec4899 !important;
+}
+[data-testid="stSidebar"] .stButton > button[key="nav_about"]:hover {
+    background: linear-gradient(135deg, #ec4899, #db2777) !important;
+    color: #ffffff !important;
 }
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_about"] {
-    background: rgba(236, 72, 153, 0.25) !important;
+    background: linear-gradient(135deg, #ec4899, #db2777) !important;
     color: #ffffff !important;
-    border-left: 3px solid #ec4899 !important;
+    border: 1px solid #f472b6 !important;
 }
 
-/* Contact button color */
-[data-testid="stSidebar"] .stButton > button[kind="secondary"][key="nav_contact"] {
-    color: #22d3ee !important;
+/* Contact button - Deep Cyan */
+[data-testid="stSidebar"] .stButton > button[key="nav_contact"] {
+    background: linear-gradient(135deg, #164e63, #155e75) !important;
+    color: #67e8f9 !important;
+    border: 1px solid #06b6d4 !important;
+}
+[data-testid="stSidebar"] .stButton > button[key="nav_contact"]:hover {
+    background: linear-gradient(135deg, #06b6d4, #0891b2) !important;
+    color: #ffffff !important;
 }
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_contact"] {
-    background: rgba(6, 182, 212, 0.25) !important;
+    background: linear-gradient(135deg, #06b6d4, #0891b2) !important;
     color: #ffffff !important;
-    border-left: 3px solid #06b6d4 !important;
+    border: 1px solid #22d3ee !important;
 }
 
-/* Sign Out button */
+/* Sign Out button - Deep Red */
 [data-testid="stSidebar"] .stButton > button[key="signout_btn"] {
-    color: #f87171 !important;
+    background: linear-gradient(135deg, #7f1d1d, #991b1b) !important;
+    color: #fca5a5 !important;
+    border: 1px solid #ef4444 !important;
 }
 [data-testid="stSidebar"] .stButton > button[key="signout_btn"]:hover {
-    background: rgba(239, 68, 68, 0.15) !important;
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    color: #ffffff !important;
 }
 
-/* Hover effects */
+/* Hover effect - slight lift */
 [data-testid="stSidebar"] .stButton > button:hover {
-    transform: translateX(3px);
+    transform: translateY(-2px);
 }
 
 /* Main content */
@@ -545,7 +584,7 @@ def render_sidebar():
         
         # User name
         st.markdown(f"""
-        <div style="background: #1f2937; border-radius: 8px; padding: 0.3rem 0.5rem; margin-bottom: 0.5rem; text-align: center;">
+        <div style="background: #1f2937; border-radius: 8px; padding: 0.3rem 0.5rem; margin-bottom: 0.8rem; text-align: center;">
             <span style="color: #e5e7eb; font-size: 0.75rem;">👤 {first}</span>
         </div>
         """, unsafe_allow_html=True)
