@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Complete Working App with Toggleable Sidebar
+Professional Colored Sidebar Buttons
 """
 
 import streamlit as st
@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS - Complete Styling with Visible Collapse Button
+# CSS - Complete Styling with Professional Colored Sidebar
 # ============================================================
 st.markdown("""
 <style>
@@ -37,12 +37,11 @@ st.markdown("""
     min-height: 100vh;
 }
 
-/* Hide only unnecessary elements */
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 .stDeployButton {display: none;}
 
-/* Keep collapse button visible */
+/* Sidebar collapse button */
 [data-testid="stSidebarCollapseButton"] {
     display: flex !important;
     background: #1f2937 !important;
@@ -62,30 +61,91 @@ footer {visibility: hidden;}
     padding-top: 0.2rem !important;
 }
 
-/* Ultra compact sidebar buttons */
+/* Sidebar buttons */
 [data-testid="stSidebar"] .stButton > button {
     background: transparent !important;
     border: none !important;
     border-radius: 8px !important;
-    padding: 0.25rem 0.2rem !important;
+    padding: 0.3rem 0.2rem !important;
     margin-bottom: 0.1rem !important;
     transition: all 0.2s ease !important;
-    color: #9ca3af !important;
-    font-size: 0.6rem !important;
     white-space: pre-line !important;
     line-height: 1.2 !important;
     height: auto !important;
-    min-height: 42px !important;
+    min-height: 48px !important;
 }
 
-[data-testid="stSidebar"] .stButton > button:hover {
-    background: rgba(59, 130, 246, 0.15) !important;
+/* Home button color */
+[data-testid="stSidebar"] .stButton > button[kind="secondary"][key="nav_home"] {
     color: #60a5fa !important;
 }
-
-[data-testid="stSidebar"] .stButton > button[kind="primary"] {
+[data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_home"] {
     background: rgba(59, 130, 246, 0.25) !important;
     color: #ffffff !important;
+    border-left: 3px solid #3b82f6 !important;
+}
+
+/* Analyze CV button color */
+[data-testid="stSidebar"] .stButton > button[kind="secondary"][key="nav_analyze"] {
+    color: #34d399 !important;
+}
+[data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_analyze"] {
+    background: rgba(16, 185, 129, 0.25) !important;
+    color: #ffffff !important;
+    border-left: 3px solid #10b981 !important;
+}
+
+/* JD Match button color */
+[data-testid="stSidebar"] .stButton > button[kind="secondary"][key="nav_jd_match"] {
+    color: #fbbf24 !important;
+}
+[data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_jd_match"] {
+    background: rgba(245, 158, 11, 0.25) !important;
+    color: #ffffff !important;
+    border-left: 3px solid #f59e0b !important;
+}
+
+/* Quiz button color */
+[data-testid="stSidebar"] .stButton > button[kind="secondary"][key="nav_quiz"] {
+    color: #a78bfa !important;
+}
+[data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_quiz"] {
+    background: rgba(139, 92, 246, 0.25) !important;
+    color: #ffffff !important;
+    border-left: 3px solid #8b5cf6 !important;
+}
+
+/* About button color */
+[data-testid="stSidebar"] .stButton > button[kind="secondary"][key="nav_about"] {
+    color: #f472b6 !important;
+}
+[data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_about"] {
+    background: rgba(236, 72, 153, 0.25) !important;
+    color: #ffffff !important;
+    border-left: 3px solid #ec4899 !important;
+}
+
+/* Contact button color */
+[data-testid="stSidebar"] .stButton > button[kind="secondary"][key="nav_contact"] {
+    color: #22d3ee !important;
+}
+[data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_contact"] {
+    background: rgba(6, 182, 212, 0.25) !important;
+    color: #ffffff !important;
+    border-left: 3px solid #06b6d4 !important;
+}
+
+/* Sign Out button */
+[data-testid="stSidebar"] .stButton > button[key="signout_btn"] {
+    color: #f87171 !important;
+}
+[data-testid="stSidebar"] .stButton > button[key="signout_btn"]:hover {
+    background: rgba(239, 68, 68, 0.15) !important;
+}
+
+/* Hover effects */
+[data-testid="stSidebar"] .stButton > button:hover {
+    transform: translateX(3px);
 }
 
 /* Main content */
@@ -469,13 +529,13 @@ def sign_out():
 
 
 def render_sidebar():
-    """Ultra compact sidebar - fits without scrolling"""
+    """Sidebar with professional colored buttons"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
     
     with st.sidebar:
-        # Ultra Compact Brand
+        # Brand
         st.markdown("""
         <div style="text-align: center; padding: 0.8rem 0 0.6rem 0; border-bottom: 1px solid #1f2937; margin-bottom: 0.6rem;">
             <div style="font-size: 1.5rem;">🎯</div>
@@ -483,7 +543,7 @@ def render_sidebar():
         </div>
         """, unsafe_allow_html=True)
         
-        # Ultra Compact user name
+        # User name
         st.markdown(f"""
         <div style="background: #1f2937; border-radius: 8px; padding: 0.3rem 0.5rem; margin-bottom: 0.5rem; text-align: center;">
             <span style="color: #e5e7eb; font-size: 0.75rem;">👤 {first}</span>
