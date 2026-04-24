@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Ultra Compact Sidebar - No Scrolling Needed
+Complete Working App with Toggleable Sidebar
 """
 
 import streamlit as st
@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS - Ultra Compact Sidebar
+# CSS - Complete Styling with Visible Collapse Button
 # ============================================================
 st.markdown("""
 <style>
@@ -37,11 +37,23 @@ st.markdown("""
     min-height: 100vh;
 }
 
+/* Hide only unnecessary elements */
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 .stDeployButton {display: none;}
-header {visibility: hidden;}
-[data-testid="stHeader"] {display: none;}
+
+/* Keep collapse button visible */
+[data-testid="stSidebarCollapseButton"] {
+    display: flex !important;
+    background: #1f2937 !important;
+    border-radius: 8px !important;
+    margin: 0.5rem !important;
+    z-index: 999999 !important;
+}
+
+[data-testid="stSidebarCollapseButton"] svg {
+    fill: #60a5fa !important;
+}
 
 /* Sidebar styling */
 [data-testid="stSidebar"] {
@@ -76,12 +88,12 @@ header {visibility: hidden;}
     color: #ffffff !important;
 }
 
-/* Main content - reduced top padding */
+/* Main content */
 .main-content {
     padding: 0.5rem 2rem 2rem 2rem;
 }
 
-/* Main header with less top margin */
+/* Main header */
 .main-header {
     margin-bottom: 1.5rem;
     padding-bottom: 0.75rem;
@@ -149,6 +161,7 @@ header {visibility: hidden;}
     color: #60a5fa;
 }
 
+/* Result cards */
 .result-card {
     background: #111827;
     border: 1px solid #1f2937;
@@ -168,6 +181,7 @@ header {visibility: hidden;}
     color: #3b82f6;
 }
 
+/* Skill chips */
 .skill-chip {
     display: inline-block;
     background: #1f2937;
@@ -185,6 +199,7 @@ header {visibility: hidden;}
     color: #fca5a5;
 }
 
+/* Form elements */
 .stTextInput > div > div > input,
 .stTextArea > div > div > textarea {
     background: #111827 !important;
@@ -193,6 +208,7 @@ header {visibility: hidden;}
     color: #ffffff !important;
 }
 
+/* Contact & About pages */
 .contact-card, .about-card {
     background: #111827;
     border: 1px solid #1f2937;
@@ -328,6 +344,7 @@ header {visibility: hidden;}
     border-bottom: 1px solid #1f2937;
 }
 
+/* Welcome screen */
 .welcome-container {
     max-width: 380px;
     margin: 60px auto;
@@ -358,6 +375,7 @@ header {visibility: hidden;}
     padding: 1rem;
 }
 
+/* Quiz styles */
 .quiz-start-container {
     max-width: 380px;
     margin: 30px auto;
@@ -472,7 +490,7 @@ def render_sidebar():
         </div>
         """, unsafe_allow_html=True)
         
-        # Navigation buttons with stacked layout - more compact
+        # Navigation buttons with stacked layout
         nav_items = [
             ("🏠\n\nHome", "home"),
             ("📄\n\nAnalyze CV", "analyze"),
@@ -489,7 +507,7 @@ def render_sidebar():
                 if st.button(label, key=f"nav_{page_key}", use_container_width=True):
                     nav_goto(page_key)
         
-        # Sign out button - more compact
+        # Sign out button
         if st.button("⏻\n\nSign Out", key="signout_btn", use_container_width=True):
             sign_out()
         
