@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Professional Colored Sidebar Buttons with Backgrounds
+Professional Colored Sidebar Buttons - Smaller & Navy Sign Out
 """
 
 import streamlit as st
@@ -61,18 +61,19 @@ footer {visibility: hidden;}
     padding-top: 0.2rem !important;
 }
 
-/* Sidebar buttons - with colored backgrounds */
+/* Sidebar buttons - smaller size */
 [data-testid="stSidebar"] .stButton > button {
     border: none !important;
-    border-radius: 12px !important;
-    padding: 0.4rem 0.2rem !important;
-    margin-bottom: 0.3rem !important;
+    border-radius: 10px !important;
+    padding: 0.25rem 0.15rem !important;
+    margin-bottom: 0.2rem !important;
     transition: all 0.2s ease !important;
     white-space: pre-line !important;
-    line-height: 1.2 !important;
+    line-height: 1.1 !important;
     height: auto !important;
-    min-height: 55px !important;
+    min-height: 48px !important;
     font-weight: 500 !important;
+    font-size: 0.55rem !important;
 }
 
 /* Home button - Deep Blue */
@@ -171,14 +172,14 @@ footer {visibility: hidden;}
     border: 1px solid #22d3ee !important;
 }
 
-/* Sign Out button - Deep Red */
+/* Sign Out button - Deep Navy/Deep Sea Blue (instead of red) */
 [data-testid="stSidebar"] .stButton > button[key="signout_btn"] {
-    background: linear-gradient(135deg, #7f1d1d, #991b1b) !important;
-    color: #fca5a5 !important;
-    border: 1px solid #ef4444 !important;
+    background: linear-gradient(135deg, #0f2b4d, #1a3a5c) !important;
+    color: #90cdf4 !important;
+    border: 1px solid #2c5282 !important;
 }
 [data-testid="stSidebar"] .stButton > button[key="signout_btn"]:hover {
-    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    background: linear-gradient(135deg, #1e4a76, #2c5282) !important;
     color: #ffffff !important;
 }
 
@@ -576,16 +577,16 @@ def render_sidebar():
     with st.sidebar:
         # Brand
         st.markdown("""
-        <div style="text-align: center; padding: 0.8rem 0 0.6rem 0; border-bottom: 1px solid #1f2937; margin-bottom: 0.6rem;">
-            <div style="font-size: 1.5rem;">🎯</div>
-            <div style="font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 700; color: #ffffff;">AI Career Platform</div>
+        <div style="text-align: center; padding: 0.6rem 0 0.4rem 0; border-bottom: 1px solid #1f2937; margin-bottom: 0.5rem;">
+            <div style="font-size: 1.3rem;">🎯</div>
+            <div style="font-family: 'Inter', sans-serif; font-size: 0.65rem; font-weight: 700; color: #ffffff;">AI Career Platform</div>
         </div>
         """, unsafe_allow_html=True)
         
         # User name
         st.markdown(f"""
-        <div style="background: #1f2937; border-radius: 8px; padding: 0.3rem 0.5rem; margin-bottom: 0.8rem; text-align: center;">
-            <span style="color: #e5e7eb; font-size: 0.75rem;">👤 {first}</span>
+        <div style="background: #1f2937; border-radius: 8px; padding: 0.25rem 0.4rem; margin-bottom: 0.6rem; text-align: center;">
+            <span style="color: #e5e7eb; font-size: 0.7rem;">👤 {first}</span>
         </div>
         """, unsafe_allow_html=True)
         
