@@ -212,105 +212,119 @@ footer {{visibility: hidden;}}
 /* NAV BUTTONS */
 [data-testid="stSidebar"] .stButton > button {{
     border-radius: 10px !important;
-    padding: 0.35rem 0.2rem !important;
-    margin-bottom: 0.28rem !important;
+    padding: 0.55rem 0.4rem !important;
+    margin-bottom: 0.3rem !important;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    white-space: pre-line !important;
-    line-height: 1.25 !important;
+    white-space: normal !important;
+    line-height: 1.3 !important;
     height: auto !important;
-    min-height: 54px !important;
-    font-weight: 600 !important;
-    font-size: 0.62rem !important;
+    min-height: 52px !important;
+    font-weight: 700 !important;
+    font-size: 0.7rem !important;
     font-family: 'Space Grotesk', sans-serif !important;
-    letter-spacing: 0.03em !important;
-    background: transparent !important;
+    letter-spacing: 0.02em !important;
+    background: var(--bg-card2) !important;
     position: relative;
     overflow: hidden;
+    width: 100% !important;
+}}
+
+[data-testid="stSidebar"] .stButton > button p {{
+    color: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button:hover {{
-    transform: translateY(-2px) scale(1.02) !important;
-    box-shadow: 0 4px 20px var(--glow-blue) !important;
+    transform: translateX(3px) !important;
+    box-shadow: 0 4px 16px var(--glow-blue) !important;
 }}
 
 /* Nav button color overrides */
 [data-testid="stSidebar"] .stButton > button[key="nav_home"] {{
-    border: 1.5px solid var(--accent-blue) !important; color: var(--accent-blue) !important;
+    border: 2px solid var(--accent-blue) !important;
+    color: var(--accent-blue) !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="nav_home"]:hover,
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_home"] {{
-    background: rgba(37,99,235,0.12) !important; color: var(--accent-blue-dark) !important;
-    border: 1.5px solid var(--accent-blue) !important;
-    box-shadow: 0 0 16px rgba(37,99,235,0.2) !important;
+    background: var(--accent-blue) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--accent-blue) !important;
+    box-shadow: 0 0 16px rgba(37,99,235,0.35) !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button[key="nav_analyze"] {{
-    border: 1.5px solid var(--accent-green) !important; color: var(--accent-green) !important;
+    border: 2px solid var(--accent-green) !important;
+    color: var(--accent-green) !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="nav_analyze"]:hover,
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_analyze"] {{
-    background: rgba(4,120,87,0.1) !important; color: var(--accent-green) !important;
-    border: 1.5px solid var(--accent-green) !important;
-    box-shadow: 0 0 16px rgba(4,120,87,0.15) !important;
+    background: var(--accent-green) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--accent-green) !important;
+    box-shadow: 0 0 16px rgba(16,185,129,0.3) !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button[key="nav_jd_match"] {{
-    border: 1.5px solid var(--accent-amber) !important; color: var(--accent-amber) !important;
+    border: 2px solid var(--accent-amber) !important;
+    color: var(--accent-amber) !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="nav_jd_match"]:hover,
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_jd_match"] {{
-    background: rgba(180,83,9,0.1) !important; color: var(--accent-amber) !important;
-    border: 1.5px solid var(--accent-amber) !important;
-    box-shadow: 0 0 16px rgba(180,83,9,0.15) !important;
+    background: var(--accent-amber) !important; color: #ffffff !important;
+    border: 2px solid var(--accent-amber) !important;
+    box-shadow: 0 0 16px rgba(245,158,11,0.3) !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button[key="nav_quiz"] {{
-    border: 1.5px solid var(--accent-purple) !important; color: var(--accent-purple) !important;
+    border: 2px solid var(--accent-purple) !important; color: var(--accent-purple) !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="nav_quiz"]:hover,
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_quiz"] {{
-    background: rgba(109,40,217,0.1) !important; color: var(--accent-purple) !important;
-    border: 1.5px solid var(--accent-purple) !important;
-    box-shadow: 0 0 16px rgba(109,40,217,0.15) !important;
+    background: var(--accent-purple) !important; color: #ffffff !important;
+    border: 2px solid var(--accent-purple) !important;
+    box-shadow: 0 0 16px rgba(139,92,246,0.3) !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button[key="nav_about"] {{
-    border: 1.5px solid var(--accent-pink) !important; color: var(--accent-pink) !important;
+    border: 2px solid var(--accent-pink) !important; color: var(--accent-pink) !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="nav_about"]:hover,
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_about"] {{
-    background: rgba(190,24,93,0.1) !important; color: var(--accent-pink) !important;
-    border: 1.5px solid var(--accent-pink) !important;
-    box-shadow: 0 0 16px rgba(190,24,93,0.15) !important;
+    background: var(--accent-pink) !important; color: #ffffff !important;
+    border: 2px solid var(--accent-pink) !important;
+    box-shadow: 0 0 16px rgba(236,72,153,0.3) !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button[key="nav_contact"] {{
-    border: 1.5px solid var(--accent-cyan) !important; color: var(--accent-cyan) !important;
+    border: 2px solid var(--accent-cyan) !important; color: var(--accent-cyan) !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="nav_contact"]:hover,
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_contact"] {{
-    background: rgba(14,116,144,0.1) !important; color: var(--accent-cyan) !important;
-    border: 1.5px solid var(--accent-cyan) !important;
-    box-shadow: 0 0 16px rgba(14,116,144,0.15) !important;
+    background: var(--accent-cyan) !important; color: #ffffff !important;
+    border: 2px solid var(--accent-cyan) !important;
+    box-shadow: 0 0 16px rgba(6,182,212,0.3) !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button[key="signout_btn"] {{
-    border: 1.5px solid var(--text-muted) !important; color: var(--text-muted) !important;
+    border: 2px solid var(--text-muted) !important; color: var(--text-muted) !important;
+    background: transparent !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="signout_btn"]:hover {{
-    background: rgba(239,68,68,0.08) !important; color: #dc2626 !important;
-    border: 1.5px solid #dc2626 !important;
-    box-shadow: 0 0 14px rgba(220,38,38,0.15) !important;
+    background: #ef4444 !important; color: #ffffff !important;
+    border: 2px solid #ef4444 !important;
+    box-shadow: 0 0 14px rgba(239,68,68,0.3) !important;
 }}
 
 /* Dark mode toggle button */
 [data-testid="stSidebar"] .stButton > button[key="dark_toggle"] {{
-    border: 1.5px solid var(--border) !important;
+    border: 2px solid var(--border) !important;
     color: var(--text-secondary) !important;
-    background: var(--bg-card2) !important;
-    font-size: 0.6rem !important;
+    background: var(--bg-card) !important;
+    font-size: 0.68rem !important;
     min-height: 38px !important;
-    margin-bottom: 0.4rem !important;
+    margin-bottom: 0.5rem !important;
+    font-weight: 600 !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="dark_toggle"]:hover {{
     border-color: var(--accent-blue) !important;
@@ -327,20 +341,18 @@ footer {{visibility: hidden;}}
 
 /* Page header with gradient underline */
 .main-header {{
-    margin-bottom: 1.8rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.8rem;
     position: relative;
 }}
 
 .main-header::after {{
     content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    width: 80px;
-    height: 2px;
-    background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+    display: block;
+    margin-top: 0.7rem;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent-blue) 0%, var(--accent-cyan) 8%, var(--border) 30%, transparent 100%);
     border-radius: 2px;
 }}
 
@@ -732,14 +744,51 @@ hr {{ border-color: var(--border) !important; }}
 /* Caption */
 .stCaption {{ color: var(--text-muted) !important; font-size: 0.68rem !important; }}
 
-/* File uploader */
+/* File uploader — override Streamlit dark theme completely */
 [data-testid="stFileUploader"] {{
-    background: var(--bg-card2) !important;
-    border: 2px dashed var(--border) !important;
+    background: var(--bg-card) !important;
+    border: 2px dashed var(--border-glow) !important;
     border-radius: 14px !important;
     transition: border-color 0.2s ease !important;
 }}
 [data-testid="stFileUploader"]:hover {{ border-color: var(--accent-blue) !important; }}
+
+[data-testid="stFileUploader"] > div {{
+    background: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+}}
+
+[data-testid="stFileUploaderDropzone"] {{
+    background: var(--bg-card2) !important;
+    border: none !important;
+    border-radius: 12px !important;
+}}
+
+[data-testid="stFileUploaderDropzoneInstructions"] {{
+    color: var(--text-secondary) !important;
+}}
+
+[data-testid="stFileUploaderDropzoneInstructions"] svg {{
+    fill: var(--accent-blue) !important;
+    stroke: var(--accent-blue) !important;
+}}
+
+[data-testid="stFileUploaderDropzoneInstructions"] span,
+[data-testid="stFileUploaderDropzoneInstructions"] p,
+[data-testid="stFileUploaderDropzoneInstructions"] small {{
+    color: var(--text-secondary) !important;
+}}
+
+/* Upload button inside dropzone */
+[data-testid="stFileUploaderDropzone"] button {{
+    background: var(--accent-blue) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 8px !important;
+}}
+
+/* Spinner */
+.stSpinner > div {{ border-top-color: var(--accent-blue) !important; }}
 
 /* Success/Warning/Error */
 .stSuccess {{ background: rgba(16,185,129,0.1) !important; border-color: var(--accent-green) !important; color: #34d399 !important; }}
@@ -805,12 +854,12 @@ def render_sidebar():
 
         # Navigation buttons
         nav_items = [
-            ("🏠\n\nHome", "home"),
-            ("📄\n\nAnalyze CV", "analyze"),
-            ("🎯\n\nJD Match", "jd_match"),
-            ("🧠\n\nQuiz", "quiz"),
-            ("ℹ️\n\nAbout", "about"),
-            ("📞\n\nContact", "contact")
+            ("🏠  Home", "home"),
+            ("📄  Analyze CV", "analyze"),
+            ("🎯  JD Match", "jd_match"),
+            ("🧠  Quiz", "quiz"),
+            ("ℹ️  About", "about"),
+            ("📞  Contact", "contact")
         ]
 
         for label, page_key in nav_items:
@@ -821,7 +870,7 @@ def render_sidebar():
                     nav_goto(page_key)
 
         # Sign out
-        if st.button("⏻\n\nSign Out", key="signout_btn", use_container_width=True):
+        if st.button("⏻  Sign Out", key="signout_btn", use_container_width=True):
             sign_out()
 
         st.markdown(f"""
