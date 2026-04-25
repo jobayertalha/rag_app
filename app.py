@@ -209,129 +209,57 @@ footer {{visibility: hidden;}}
     box-shadow: inset 0 0 10px var(--glow-blue);
 }}
 
-/* NAV BUTTONS */
+/* ─── NAV BUTTONS: universal base ─── */
 [data-testid="stSidebar"] .stButton > button {{
     border-radius: 10px !important;
-    padding: 0.55rem 0.4rem !important;
-    margin-bottom: 0.3rem !important;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    padding: 0.6rem 1rem !important;
+    margin-bottom: 0.28rem !important;
+    transition: all 0.22s ease !important;
     white-space: normal !important;
-    line-height: 1.3 !important;
+    line-height: 1.4 !important;
     height: auto !important;
-    min-height: 52px !important;
+    min-height: 44px !important;
     font-weight: 700 !important;
-    font-size: 0.7rem !important;
+    font-size: 0.73rem !important;
     font-family: 'Space Grotesk', sans-serif !important;
     letter-spacing: 0.02em !important;
-    background: var(--bg-card2) !important;
-    position: relative;
-    overflow: hidden;
     width: 100% !important;
+    /* Solid visible default */
+    background: var(--bg-card2) !important;
+    border: 2px solid var(--accent-blue) !important;
+    color: var(--accent-blue) !important;
 }}
 
-[data-testid="stSidebar"] .stButton > button p {{
+/* Force all child text nodes to inherit color */
+[data-testid="stSidebar"] .stButton > button *,
+[data-testid="stSidebar"] .stButton > button p,
+[data-testid="stSidebar"] .stButton > button span,
+[data-testid="stSidebar"] .stButton > button div {{
     color: inherit !important;
     font-size: inherit !important;
     font-weight: inherit !important;
+    background: transparent !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button:hover {{
-    transform: translateX(3px) !important;
-    box-shadow: 0 4px 16px var(--glow-blue) !important;
-}}
-
-/* Nav button color overrides */
-[data-testid="stSidebar"] .stButton > button[key="nav_home"] {{
-    border: 2px solid var(--accent-blue) !important;
-    color: var(--accent-blue) !important;
-}}
-[data-testid="stSidebar"] .stButton > button[key="nav_home"]:hover,
-[data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_home"] {{
+    transform: translateX(4px) !important;
     background: var(--accent-blue) !important;
     color: #ffffff !important;
-    border: 2px solid var(--accent-blue) !important;
-    box-shadow: 0 0 16px rgba(37,99,235,0.35) !important;
-}}
-
-[data-testid="stSidebar"] .stButton > button[key="nav_analyze"] {{
-    border: 2px solid var(--accent-green) !important;
-    color: var(--accent-green) !important;
-}}
-[data-testid="stSidebar"] .stButton > button[key="nav_analyze"]:hover,
-[data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_analyze"] {{
-    background: var(--accent-green) !important;
-    color: #ffffff !important;
-    border: 2px solid var(--accent-green) !important;
-    box-shadow: 0 0 16px rgba(16,185,129,0.3) !important;
-}}
-
-[data-testid="stSidebar"] .stButton > button[key="nav_jd_match"] {{
-    border: 2px solid var(--accent-amber) !important;
-    color: var(--accent-amber) !important;
-}}
-[data-testid="stSidebar"] .stButton > button[key="nav_jd_match"]:hover,
-[data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_jd_match"] {{
-    background: var(--accent-amber) !important; color: #ffffff !important;
-    border: 2px solid var(--accent-amber) !important;
-    box-shadow: 0 0 16px rgba(245,158,11,0.3) !important;
-}}
-
-[data-testid="stSidebar"] .stButton > button[key="nav_quiz"] {{
-    border: 2px solid var(--accent-purple) !important; color: var(--accent-purple) !important;
-}}
-[data-testid="stSidebar"] .stButton > button[key="nav_quiz"]:hover,
-[data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_quiz"] {{
-    background: var(--accent-purple) !important; color: #ffffff !important;
-    border: 2px solid var(--accent-purple) !important;
-    box-shadow: 0 0 16px rgba(139,92,246,0.3) !important;
-}}
-
-[data-testid="stSidebar"] .stButton > button[key="nav_about"] {{
-    border: 2px solid var(--accent-pink) !important; color: var(--accent-pink) !important;
-}}
-[data-testid="stSidebar"] .stButton > button[key="nav_about"]:hover,
-[data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_about"] {{
-    background: var(--accent-pink) !important; color: #ffffff !important;
-    border: 2px solid var(--accent-pink) !important;
-    box-shadow: 0 0 16px rgba(236,72,153,0.3) !important;
-}}
-
-[data-testid="stSidebar"] .stButton > button[key="nav_contact"] {{
-    border: 2px solid var(--accent-cyan) !important; color: var(--accent-cyan) !important;
-}}
-[data-testid="stSidebar"] .stButton > button[key="nav_contact"]:hover,
-[data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_contact"] {{
-    background: var(--accent-cyan) !important; color: #ffffff !important;
-    border: 2px solid var(--accent-cyan) !important;
-    box-shadow: 0 0 16px rgba(6,182,212,0.3) !important;
-}}
-
-[data-testid="stSidebar"] .stButton > button[key="signout_btn"] {{
-    border: 2px solid var(--text-muted) !important; color: var(--text-muted) !important;
-    background: transparent !important;
-}}
-[data-testid="stSidebar"] .stButton > button[key="signout_btn"]:hover {{
-    background: #ef4444 !important; color: #ffffff !important;
-    border: 2px solid #ef4444 !important;
-    box-shadow: 0 0 14px rgba(239,68,68,0.3) !important;
-}}
-
-/* Dark mode toggle button */
-[data-testid="stSidebar"] .stButton > button[key="dark_toggle"] {{
-    border: 2px solid var(--border) !important;
-    color: var(--text-secondary) !important;
-    background: var(--bg-card) !important;
-    font-size: 0.68rem !important;
-    min-height: 38px !important;
-    margin-bottom: 0.5rem !important;
-    font-weight: 600 !important;
-}}
-[data-testid="stSidebar"] .stButton > button[key="dark_toggle"]:hover {{
     border-color: var(--accent-blue) !important;
-    color: var(--accent-blue) !important;
-    background: var(--glow-blue) !important;
-    box-shadow: 0 0 12px var(--glow-blue) !important;
-    transform: none !important;
+    box-shadow: 0 4px 20px var(--glow-blue) !important;
+}}
+
+/* ACTIVE page button rendered as type=primary */
+[data-testid="stSidebar"] .stButton > button[kind="primary"] {{
+    background: linear-gradient(135deg, var(--accent-blue-dark), var(--accent-blue)) !important;
+    color: #ffffff !important;
+    border: 2px solid transparent !important;
+    box-shadow: 0 4px 18px var(--glow-blue) !important;
+}}
+[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {{
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)) !important;
+    color: #ffffff !important;
+    transform: translateX(2px) !important;
 }}
 
 /* ─── MAIN CONTENT ─── */
@@ -830,6 +758,51 @@ def render_sidebar():
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
 
+    # Inline sidebar background color via JS-injected style (more reliable than CSS variable in sidebar)
+    sidebar_bg = T['sidebar_bg']
+    sidebar_border = T['border']
+    sb_extra = f"""
+    <style>
+    [data-testid="stSidebar"] > div:first-child {{
+        background: {sidebar_bg} !important;
+        border-right: 1px solid {sidebar_border} !important;
+    }}
+    /* Mode toggle: smaller, grey */
+    .mode-toggle-wrap .stButton > button {{
+        background: {T['bg_card']} !important;
+        border: 1.5px solid {T['border']} !important;
+        color: {T['text_secondary']} !important;
+        min-height: 36px !important;
+        font-size: 0.68rem !important;
+        text-align: center !important;
+        justify-content: center !important;
+        margin-bottom: 0.5rem !important;
+    }}
+    .mode-toggle-wrap .stButton > button:hover {{
+        background: {T['glow_blue']} !important;
+        border-color: {T['accent_blue']} !important;
+        color: {T['accent_blue']} !important;
+        transform: none !important;
+        box-shadow: none !important;
+    }}
+    /* Signout: red-tinted */
+    .signout-wrap .stButton > button {{
+        background: transparent !important;
+        border: 1.5px solid {T['text_muted']} !important;
+        color: {T['text_muted']} !important;
+        margin-top: 0.3rem !important;
+    }}
+    .signout-wrap .stButton > button:hover {{
+        background: #ef4444 !important;
+        border-color: #ef4444 !important;
+        color: #ffffff !important;
+        transform: none !important;
+        box-shadow: 0 4px 14px rgba(239,68,68,0.3) !important;
+    }}
+    </style>
+    """
+    st.markdown(sb_extra, unsafe_allow_html=True)
+
     with st.sidebar:
         # Brand
         st.markdown(f"""
@@ -844,13 +817,15 @@ def render_sidebar():
         <div class="user-chip">👤 &nbsp;{first}</div>
         """, unsafe_allow_html=True)
 
-        # Dark/Light toggle
+        # Dark/Light toggle — wrapped for targeted CSS
+        st.markdown('<div class="mode-toggle-wrap">', unsafe_allow_html=True)
         mode_label = f"{T['mode_icon']}  {T['mode_label']}"
         if st.button(mode_label, key="dark_toggle", use_container_width=True):
             st.session_state.dark_mode = not st.session_state.dark_mode
             st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
-        st.markdown("<div style='margin-bottom:0.4rem'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='margin-bottom:0.25rem'></div>", unsafe_allow_html=True)
 
         # Navigation buttons
         nav_items = [
@@ -869,12 +844,14 @@ def render_sidebar():
                 if st.button(label, key=f"nav_{page_key}", use_container_width=True):
                     nav_goto(page_key)
 
-        # Sign out
+        # Sign out — wrapped for targeted CSS
+        st.markdown('<div class="signout-wrap">', unsafe_allow_html=True)
         if st.button("⏻  Sign Out", key="signout_btn", use_container_width=True):
             sign_out()
+        st.markdown('</div>', unsafe_allow_html=True)
 
         st.markdown(f"""
-        <div style="text-align:center; margin-top:0.6rem; font-size:0.6rem; color: var(--text-muted);">
+        <div style="text-align:center; margin-top:0.6rem; font-size:0.6rem; color: {T['text_muted']};">
             © 2025 AI Career Platform
         </div>
         """, unsafe_allow_html=True)
