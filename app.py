@@ -91,7 +91,7 @@ def get_theme():
             "accent_purple": "#6d28d9",
             "accent_pink": "#be185d",
             "input_bg": "#ffffff",
-            "sidebar_bg": "linear-gradient(180deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%)",
+            "sidebar_bg": "linear-gradient(180deg, #ffffff 0%, #f8faff 100%)",
             "glow_blue": "rgba(37, 99, 235, 0.14)",
             "glow_cyan": "rgba(14, 116, 144, 0.1)",
             "hero_gradient": "linear-gradient(135deg, #dbeafe 0%, #eff6ff 50%, #e0ecff 100%)",
@@ -170,7 +170,7 @@ footer {{visibility: hidden;}}
 .sidebar-brand {{
     text-align: center;
     padding: 1rem 0.5rem 0.6rem;
-    border-bottom: 1px solid rgba(255,255,255,0.15);
+    border-bottom: 1px solid var(--border);
     margin-bottom: 0.6rem;
     position: relative;
 }}
@@ -179,34 +179,34 @@ footer {{visibility: hidden;}}
     font-size: 2rem;
     display: block;
     margin-bottom: 0.2rem;
-    filter: drop-shadow(0 0 8px rgba(255,255,255,0.3));
+    filter: drop-shadow(0 0 8px var(--glow-blue));
 }}
 
 .sidebar-brand-name {{
     font-family: 'Syne', sans-serif !important;
     font-size: 0.72rem;
     font-weight: 700;
-    color: #ffffff;
+    color: var(--text-primary);
     letter-spacing: 0.05em;
     text-transform: uppercase;
 }}
 
 .sidebar-brand-name span {{
-    color: #93c5fd;
+    color: var(--accent-blue);
 }}
 
 /* Sidebar user chip */
 .user-chip {{
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.22);
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
     border-radius: 30px;
     padding: 0.3rem 0.7rem;
     margin-bottom: 0.7rem;
     text-align: center;
     font-size: 0.7rem;
-    color: #e0eaff;
+    color: var(--text-secondary);
     font-weight: 500;
-    box-shadow: inset 0 0 10px rgba(255,255,255,0.05);
+    box-shadow: inset 0 0 10px var(--glow-blue);
 }}
 
 /* NAV BUTTONS */
@@ -223,100 +223,100 @@ footer {{visibility: hidden;}}
     font-size: 0.62rem !important;
     font-family: 'Space Grotesk', sans-serif !important;
     letter-spacing: 0.03em !important;
-    background: rgba(255,255,255,0.06) !important;
+    background: transparent !important;
     position: relative;
     overflow: hidden;
 }}
 
 [data-testid="stSidebar"] .stButton > button:hover {{
     transform: translateY(-2px) scale(1.02) !important;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.25) !important;
+    box-shadow: 0 4px 20px var(--glow-blue) !important;
 }}
 
 /* Nav button color overrides */
 [data-testid="stSidebar"] .stButton > button[key="nav_home"] {{
-    border: 1.5px solid #93c5fd !important; color: #ffffff !important;
+    border: 1.5px solid var(--accent-blue) !important; color: var(--accent-blue) !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="nav_home"]:hover,
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_home"] {{
-    background: rgba(147,197,253,0.25) !important; color: #ffffff !important;
-    border: 1.5px solid #bfdbfe !important;
-    box-shadow: 0 0 16px rgba(147,197,253,0.3) !important;
+    background: rgba(37,99,235,0.12) !important; color: var(--accent-blue-dark) !important;
+    border: 1.5px solid var(--accent-blue) !important;
+    box-shadow: 0 0 16px rgba(37,99,235,0.2) !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button[key="nav_analyze"] {{
-    border: 1.5px solid #6ee7b7 !important; color: #ffffff !important;
+    border: 1.5px solid var(--accent-green) !important; color: var(--accent-green) !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="nav_analyze"]:hover,
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_analyze"] {{
-    background: rgba(110,231,183,0.2) !important; color: #ffffff !important;
-    border: 1.5px solid #6ee7b7 !important;
-    box-shadow: 0 0 16px rgba(110,231,183,0.25) !important;
+    background: rgba(4,120,87,0.1) !important; color: var(--accent-green) !important;
+    border: 1.5px solid var(--accent-green) !important;
+    box-shadow: 0 0 16px rgba(4,120,87,0.15) !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button[key="nav_jd_match"] {{
-    border: 1.5px solid #fcd34d !important; color: #ffffff !important;
+    border: 1.5px solid var(--accent-amber) !important; color: var(--accent-amber) !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="nav_jd_match"]:hover,
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_jd_match"] {{
-    background: rgba(252,211,77,0.2) !important; color: #ffffff !important;
-    border: 1.5px solid #fde68a !important;
-    box-shadow: 0 0 16px rgba(252,211,77,0.25) !important;
+    background: rgba(180,83,9,0.1) !important; color: var(--accent-amber) !important;
+    border: 1.5px solid var(--accent-amber) !important;
+    box-shadow: 0 0 16px rgba(180,83,9,0.15) !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button[key="nav_quiz"] {{
-    border: 1.5px solid #c4b5fd !important; color: #ffffff !important;
+    border: 1.5px solid var(--accent-purple) !important; color: var(--accent-purple) !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="nav_quiz"]:hover,
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_quiz"] {{
-    background: rgba(196,181,253,0.2) !important; color: #ffffff !important;
-    border: 1.5px solid #ddd6fe !important;
-    box-shadow: 0 0 16px rgba(196,181,253,0.3) !important;
+    background: rgba(109,40,217,0.1) !important; color: var(--accent-purple) !important;
+    border: 1.5px solid var(--accent-purple) !important;
+    box-shadow: 0 0 16px rgba(109,40,217,0.15) !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button[key="nav_about"] {{
-    border: 1.5px solid #f9a8d4 !important; color: #ffffff !important;
+    border: 1.5px solid var(--accent-pink) !important; color: var(--accent-pink) !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="nav_about"]:hover,
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_about"] {{
-    background: rgba(249,168,212,0.2) !important; color: #ffffff !important;
-    border: 1.5px solid #fbcfe8 !important;
-    box-shadow: 0 0 16px rgba(249,168,212,0.3) !important;
+    background: rgba(190,24,93,0.1) !important; color: var(--accent-pink) !important;
+    border: 1.5px solid var(--accent-pink) !important;
+    box-shadow: 0 0 16px rgba(190,24,93,0.15) !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button[key="nav_contact"] {{
-    border: 1.5px solid #67e8f9 !important; color: #ffffff !important;
+    border: 1.5px solid var(--accent-cyan) !important; color: var(--accent-cyan) !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="nav_contact"]:hover,
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_contact"] {{
-    background: rgba(103,232,249,0.2) !important; color: #ffffff !important;
-    border: 1.5px solid #a5f3fc !important;
-    box-shadow: 0 0 16px rgba(103,232,249,0.25) !important;
+    background: rgba(14,116,144,0.1) !important; color: var(--accent-cyan) !important;
+    border: 1.5px solid var(--accent-cyan) !important;
+    box-shadow: 0 0 16px rgba(14,116,144,0.15) !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button[key="signout_btn"] {{
-    border: 1.5px solid rgba(255,255,255,0.3) !important; color: rgba(255,255,255,0.65) !important;
+    border: 1.5px solid var(--text-muted) !important; color: var(--text-muted) !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="signout_btn"]:hover {{
-    background: rgba(239,68,68,0.25) !important; color: #fca5a5 !important;
-    border: 1.5px solid #f87171 !important;
-    box-shadow: 0 0 14px rgba(239,68,68,0.3) !important;
+    background: rgba(239,68,68,0.08) !important; color: #dc2626 !important;
+    border: 1.5px solid #dc2626 !important;
+    box-shadow: 0 0 14px rgba(220,38,38,0.15) !important;
 }}
 
 /* Dark mode toggle button */
 [data-testid="stSidebar"] .stButton > button[key="dark_toggle"] {{
-    border: 1.5px solid rgba(255,255,255,0.25) !important;
-    color: #e0eaff !important;
-    background: rgba(255,255,255,0.1) !important;
+    border: 1.5px solid var(--border) !important;
+    color: var(--text-secondary) !important;
+    background: var(--bg-card2) !important;
     font-size: 0.6rem !important;
     min-height: 38px !important;
     margin-bottom: 0.4rem !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="dark_toggle"]:hover {{
-    border-color: rgba(255,255,255,0.5) !important;
-    color: #ffffff !important;
-    background: rgba(255,255,255,0.18) !important;
-    box-shadow: 0 0 12px rgba(255,255,255,0.1) !important;
+    border-color: var(--accent-blue) !important;
+    color: var(--accent-blue) !important;
+    background: var(--glow-blue) !important;
+    box-shadow: 0 0 12px var(--glow-blue) !important;
     transform: none !important;
 }}
 
@@ -825,7 +825,7 @@ def render_sidebar():
             sign_out()
 
         st.markdown(f"""
-        <div style="text-align:center; margin-top:0.6rem; font-size:0.6rem; color: rgba(255,255,255,0.4);">
+        <div style="text-align:center; margin-top:0.6rem; font-size:0.6rem; color: var(--text-muted);">
             © 2025 AI Career Platform
         </div>
         """, unsafe_allow_html=True)
