@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Professional Sidebar Buttons with White/Gray Borders (Like Reference Image)
+Clean White & Blue Theme (Like Reference Image)
 """
 
 import streamlit as st
@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS - Sidebar Buttons with White/Gray Borders (Like Reference Image)
+# CSS - Clean White & Blue Theme (Like Reference Image)
 # ============================================================
 st.markdown("""
 <style>
@@ -33,7 +33,7 @@ st.markdown("""
 }
 
 .stApp {
-    background: #0a0e1a;
+    background: #ffffff;
     min-height: 100vh;
 }
 
@@ -44,24 +44,24 @@ footer {visibility: hidden;}
 /* Sidebar collapse button */
 [data-testid="stSidebarCollapseButton"] {
     display: flex !important;
-    background: #1f2937 !important;
+    background: #f0f2f5 !important;
     border-radius: 8px !important;
     margin: 0.5rem !important;
     z-index: 999999 !important;
 }
 
 [data-testid="stSidebarCollapseButton"] svg {
-    fill: #60a5fa !important;
+    fill: #1a73e8 !important;
 }
 
 /* Sidebar styling */
 [data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0d1117 0%, #0a0e1a 100%);
-    border-right: 1px solid #1f2937;
+    background: #f8f9fa;
+    border-right: 1px solid #e8eaed;
     padding-top: 0.2rem !important;
 }
 
-/* Sidebar buttons - white/gray border like reference image */
+/* Sidebar buttons - clean white/blue theme */
 [data-testid="stSidebar"] .stButton > button {
     border-radius: 10px !important;
     padding: 0.5rem 0.25rem !important;
@@ -74,27 +74,27 @@ footer {visibility: hidden;}
     font-weight: 500 !important;
     font-size: 0.7rem !important;
     background: transparent !important;
-    border: 1px solid #4b5563 !important;
-    color: #e5e7eb !important;
+    border: 1px solid #dadce0 !important;
+    color: #3c4043 !important;
 }
 
 [data-testid="stSidebar"] .stButton > button:hover {
-    background: rgba(75, 85, 99, 0.2) !important;
-    border-color: #6b7280 !important;
-    color: #ffffff !important;
+    background: rgba(26, 115, 232, 0.04) !important;
+    border-color: #1a73e8 !important;
+    color: #1a73e8 !important;
     transform: translateY(-1px);
 }
 
 [data-testid="stSidebar"] .stButton > button[kind="primary"] {
-    background: rgba(59, 130, 246, 0.15) !important;
-    border: 1px solid #60a5fa !important;
-    color: #60a5fa !important;
+    background: rgba(26, 115, 232, 0.08) !important;
+    border: 1px solid #1a73e8 !important;
+    color: #1a73e8 !important;
 }
 
 [data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
-    background: rgba(59, 130, 246, 0.25) !important;
-    border-color: #93c5fd !important;
-    color: #93c5fd !important;
+    background: rgba(26, 115, 232, 0.12) !important;
+    border-color: #1557b0 !important;
+    color: #1557b0 !important;
 }
 
 /* Main content */
@@ -106,25 +106,25 @@ footer {visibility: hidden;}
 .main-header {
     margin-bottom: 1.5rem;
     padding-bottom: 0.75rem;
-    border-bottom: 2px solid #1f2937;
+    border-bottom: 2px solid #e8eaed;
 }
 
 .main-header h1 {
     font-size: 1.8rem;
     font-weight: 700;
-    color: #ffffff;
+    color: #202124;
     margin-bottom: 0.25rem;
 }
 
 .main-header p {
-    color: #9ca3af;
+    color: #5f6368;
     font-size: 0.9rem;
 }
 
 /* Feature cards */
 .feature-card {
-    background: #111827;
-    border: 1px solid #1f2937;
+    background: #ffffff;
+    border: 1px solid #e8eaed;
     border-radius: 16px;
     padding: 1.5rem;
     transition: all 0.3s ease;
@@ -133,8 +133,8 @@ footer {visibility: hidden;}
 
 .feature-card:hover {
     transform: translateY(-4px);
-    border-color: #3b82f6;
-    box-shadow: 0 20px 40px rgba(59, 130, 246, 0.1);
+    border-color: #1a73e8;
+    box-shadow: 0 20px 40px rgba(26, 115, 232, 0.1);
 }
 
 .feature-icon {
@@ -145,12 +145,12 @@ footer {visibility: hidden;}
 .feature-title {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #ffffff;
+    color: #202124;
     margin-bottom: 0.5rem;
 }
 
 .feature-desc {
-    color: #9ca3af;
+    color: #5f6368;
     font-size: 0.8rem;
     line-height: 1.4;
 }
@@ -163,17 +163,17 @@ footer {visibility: hidden;}
 }
 
 .feature-tag {
-    background: #1f2937;
+    background: #f0f2f5;
     border-radius: 20px;
     padding: 0.2rem 0.6rem;
     font-size: 0.65rem;
-    color: #60a5fa;
+    color: #1a73e8;
 }
 
 /* Result cards */
 .result-card {
-    background: #111827;
-    border: 1px solid #1f2937;
+    background: #ffffff;
+    border: 1px solid #e8eaed;
     border-radius: 16px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
@@ -187,40 +187,59 @@ footer {visibility: hidden;}
 .match-percentage {
     font-size: 2.5rem;
     font-weight: 800;
-    color: #3b82f6;
+    color: #1a73e8;
 }
 
 /* Skill chips */
 .skill-chip {
     display: inline-block;
-    background: #1f2937;
-    border: 1px solid #374151;
+    background: #f0f2f5;
+    border: 1px solid #dadce0;
     border-radius: 20px;
     padding: 0.2rem 0.6rem;
     font-size: 0.7rem;
-    color: #9ca3af;
+    color: #3c4043;
     margin: 0.2rem;
 }
 
 .gap-chip {
-    background: #1f2937;
-    border-color: #7f1d1d;
-    color: #fca5a5;
+    background: #fce8e6;
+    border-color: #ea868f;
+    color: #c5221f;
 }
 
 /* Form elements */
 .stTextInput > div > div > input,
 .stTextArea > div > div > textarea {
-    background: #111827 !important;
-    border: 1px solid #1f2937 !important;
+    background: #ffffff !important;
+    border: 1px solid #dadce0 !important;
     border-radius: 12px !important;
-    color: #ffffff !important;
+    color: #202124 !important;
+}
+
+.stTextInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus {
+    border-color: #1a73e8 !important;
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2) !important;
+}
+
+/* Button styling */
+.stButton > button {
+    background: #1a73e8 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+}
+
+.stButton > button:hover {
+    background: #1557b0 !important;
 }
 
 /* Contact & About pages */
 .contact-card, .about-card {
-    background: #111827;
-    border: 1px solid #1f2937;
+    background: #ffffff;
+    border: 1px solid #e8eaed;
     border-radius: 16px;
     padding: 1.5rem;
 }
@@ -230,7 +249,7 @@ footer {visibility: hidden;}
     align-items: center;
     gap: 1rem;
     padding: 0.8rem 0;
-    border-bottom: 1px solid #1f2937;
+    border-bottom: 1px solid #e8eaed;
 }
 
 .contact-item:last-child {
@@ -240,23 +259,23 @@ footer {visibility: hidden;}
 .contact-icon {
     font-size: 1.2rem;
     min-width: 40px;
-    color: #60a5fa;
+    color: #1a73e8;
 }
 
 .contact-label {
     font-weight: 600;
-    color: #e5e7eb;
+    color: #202124;
     min-width: 90px;
     font-size: 0.85rem;
 }
 
 .contact-value {
-    color: #9ca3af;
+    color: #5f6368;
     font-size: 0.85rem;
 }
 
 .contact-link {
-    color: #60a5fa;
+    color: #1a73e8;
     text-decoration: none;
 }
 
@@ -268,8 +287,8 @@ footer {visibility: hidden;}
 }
 
 .social-card {
-    background: #1f2937;
-    border: 1px solid #374151;
+    background: #f8f9fa;
+    border: 1px solid #e8eaed;
     border-radius: 12px;
     padding: 0.8rem;
     text-align: center;
@@ -278,7 +297,7 @@ footer {visibility: hidden;}
 }
 
 .social-card:hover {
-    background: #374151;
+    background: #f0f2f5;
     transform: translateY(-3px);
 }
 
@@ -288,19 +307,19 @@ footer {visibility: hidden;}
 }
 
 .social-name {
-    color: #e5e7eb;
+    color: #3c4043;
     font-size: 0.75rem;
     font-weight: 500;
 }
 
 .interest-tag {
     display: inline-block;
-    background: #1f2937;
-    border: 1px solid #374151;
+    background: #f0f2f5;
+    border: 1px solid #dadce0;
     border-radius: 20px;
     padding: 0.25rem 0.8rem;
     font-size: 0.7rem;
-    color: #60a5fa;
+    color: #1a73e8;
     margin: 0.2rem;
 }
 
@@ -312,19 +331,19 @@ footer {visibility: hidden;}
 }
 
 .tech-pill {
-    background: #1f2937;
-    border: 1px solid #374151;
+    background: #f0f2f5;
+    border: 1px solid #dadce0;
     border-radius: 20px;
     padding: 0.2rem 0.6rem;
     font-size: 0.65rem;
-    color: #9ca3af;
+    color: #3c4043;
 }
 
 .profile-header {
     text-align: center;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid #1f2937;
+    border-bottom: 1px solid #e8eaed;
 }
 
 .profile-icon {
@@ -335,22 +354,22 @@ footer {visibility: hidden;}
 .profile-name {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #ffffff;
+    color: #202124;
     margin-bottom: 0.2rem;
 }
 
 .profile-title {
-    color: #60a5fa;
+    color: #1a73e8;
     font-size: 0.8rem;
 }
 
 .section-header {
     font-size: 0.9rem;
     font-weight: 600;
-    color: #ffffff;
+    color: #202124;
     margin: 1rem 0 0.5rem 0;
     padding-bottom: 0.4rem;
-    border-bottom: 1px solid #1f2937;
+    border-bottom: 1px solid #e8eaed;
 }
 
 /* Welcome screen */
@@ -361,27 +380,32 @@ footer {visibility: hidden;}
 }
 
 .welcome-title {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
     font-weight: 800;
     margin-bottom: 0.4rem;
-    color: #ffffff;
+    color: #202124;
 }
 
 .welcome-gradient {
-    color: #3b82f6;
+    color: #1a73e8;
+    background: linear-gradient(135deg, #1a73e8, #4285f4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .welcome-subtitle {
-    color: #9ca3af;
+    color: #5f6368;
     margin-bottom: 1.2rem;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
 }
 
 .welcome-card {
-    background: #111827;
-    border: 1px solid #1f2937;
+    background: #ffffff;
+    border: 1px solid #e8eaed;
     border-radius: 16px;
-    padding: 1rem;
+    padding: 1.2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 /* Quiz styles */
@@ -392,10 +416,11 @@ footer {visibility: hidden;}
 }
 
 .quiz-start-card {
-    background: #111827;
-    border: 1px solid #1f2937;
+    background: #ffffff;
+    border: 1px solid #e8eaed;
     border-radius: 16px;
     padding: 1.2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .quiz-start-icon {
@@ -406,19 +431,19 @@ footer {visibility: hidden;}
 .quiz-start-title {
     font-size: 0.9rem;
     font-weight: 600;
-    color: #ffffff;
+    color: #202124;
     margin-bottom: 0.3rem;
 }
 
 .quiz-start-desc {
-    color: #9ca3af;
+    color: #5f6368;
     font-size: 0.7rem;
     margin-bottom: 0.8rem;
 }
 
 .quiz-question {
-    background: #111827;
-    border: 1px solid #1f2937;
+    background: #ffffff;
+    border: 1px solid #e8eaed;
     border-radius: 16px;
     padding: 1.2rem;
     margin-bottom: 0.8rem;
@@ -426,9 +451,31 @@ footer {visibility: hidden;}
 
 .quiz-question-text {
     font-weight: 600;
-    color: #ffffff;
+    color: #202124;
     margin-bottom: 0.8rem;
     font-size: 0.9rem;
+}
+
+/* Radio buttons */
+.stRadio > div {
+    gap: 0.5rem;
+}
+
+.stRadio label {
+    color: #3c4043 !important;
+    font-size: 0.8rem !important;
+}
+
+/* Success/Warning/Info boxes */
+.stAlert {
+    border-radius: 12px !important;
+}
+
+/* Expander */
+.streamlit-expanderHeader {
+    color: #202124 !important;
+    background: #f8f9fa !important;
+    border-radius: 12px !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -478,35 +525,35 @@ def sign_out():
 
 
 def render_sidebar():
-    """Sidebar with white/gray border buttons like reference image"""
+    """Sidebar with clean white/blue theme"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
     
     with st.sidebar:
-        # Brand
+        # Brand - Clean white/blue
         st.markdown("""
-        <div style="text-align: center; padding: 0.6rem 0 0.4rem 0; border-bottom: 1px solid #1f2937; margin-bottom: 0.5rem;">
-            <div style="font-size: 1.3rem;">🎯</div>
-            <div style="font-family: 'Inter', sans-serif; font-size: 0.65rem; font-weight: 700; color: #ffffff;">AI Career Platform</div>
+        <div style="text-align: center; padding: 0.8rem 0 0.6rem 0; border-bottom: 1px solid #e8eaed; margin-bottom: 0.8rem;">
+            <div style="font-size: 1.8rem; margin-bottom: 0.2rem;">🎯</div>
+            <div style="font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 700; background: linear-gradient(135deg, #1a73e8, #4285f4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">AI Career Platform</div>
         </div>
         """, unsafe_allow_html=True)
         
         # User name
         st.markdown(f"""
-        <div style="background: #1f2937; border-radius: 8px; padding: 0.25rem 0.4rem; margin-bottom: 0.6rem; text-align: center;">
-            <span style="color: #e5e7eb; font-size: 0.7rem;">👤 {first}</span>
+        <div style="background: #f0f2f5; border-radius: 20px; padding: 0.35rem 0.6rem; margin-bottom: 0.8rem; text-align: center;">
+            <span style="color: #1a73e8; font-size: 0.75rem; font-weight: 500;">👤 {first}</span>
         </div>
         """, unsafe_allow_html=True)
         
         # Navigation buttons
         nav_items = [
-            ("🏠\n\nHome", "home"),
-            ("📄\n\nAnalyze CV", "analyze"),
-            ("🎯\n\nJD Match", "jd_match"),
-            ("🧠\n\nQuiz", "quiz"),
-            ("ℹ️\n\nAbout", "about"),
-            ("📞\n\nContact", "contact")
+            ("🏠 Home", "home"),
+            ("📄 Analyze CV", "analyze"),
+            ("🎯 JD Match", "jd_match"),
+            ("🧠 Quiz", "quiz"),
+            ("ℹ️ About", "about"),
+            ("📞 Contact", "contact")
         ]
         
         for label, page_key in nav_items:
@@ -516,11 +563,13 @@ def render_sidebar():
                 if st.button(label, key=f"nav_{page_key}", use_container_width=True):
                     nav_goto(page_key)
         
+        st.markdown("<div style='margin: 0.8rem 0;'></div>", unsafe_allow_html=True)
+        
         # Sign out button
-        if st.button("⏻\n\nSign Out", key="signout_btn", use_container_width=True):
+        if st.button("⏻ Sign Out", key="signout_btn", use_container_width=True):
             sign_out()
         
-        st.caption("© 2025")
+        st.caption("© 2025 AI Career Platform")
 
 
 # ============================================================
@@ -537,7 +586,7 @@ def render_welcome():
             </div>
             <p class="welcome-subtitle">Your AI-powered career companion</p>
             <div class="welcome-card">
-                <div style="font-size: 0.8rem; font-weight: 600; margin-bottom: 0.8rem; color: #e5e7eb;">👋 Welcome! What's your name?</div>
+                <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.8rem; color: #202124;">👋 Welcome! What's your name?</div>
         """, unsafe_allow_html=True)
         
         with st.form(key="welcome_form"):
@@ -675,9 +724,9 @@ def render_analysis_results():
     with col2:
         st.markdown(f"""
         <div class="match-score">
-            <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 0.3rem;">MATCH SCORE</div>
+            <div style="font-size: 0.75rem; color: #5f6368; margin-bottom: 0.3rem;">MATCH SCORE</div>
             <div class="match-percentage">{top_match.get('match_pct', 0)}%</div>
-            <h3 style="color: #ffffff; margin-top: 0.3rem; font-size: 1rem;">{top_match.get('title', top_match.get('role', 'AI Professional'))}</h3>
+            <h3 style="color: #202124; margin-top: 0.3rem; font-size: 1rem;">{top_match.get('title', top_match.get('role', 'AI Professional'))}</h3>
         </div>
         """, unsafe_allow_html=True)
     
@@ -707,7 +756,7 @@ def render_analysis_results():
         st.markdown(f"""
         <div style="margin-bottom: 0.8rem;">
             <strong>{r.get('title', r.get('role', 'Role'))}</strong> — {r.get('company', 'Various')} 
-            <span style="color: #60a5fa;">({r.get('match_pct', 0)}% match)</span>
+            <span style="color: #1a73e8;">({r.get('match_pct', 0)}% match)</span>
         </div>
         """, unsafe_allow_html=True)
         if r.get("salary_min"):
@@ -763,18 +812,18 @@ def render_jd_match_results():
     pct = result.get("match_pct", 0)
     
     if pct < 30:
-        color, status = "#ef4444", "Low Match"
+        color, status = "#c5221f", "Low Match"
     elif pct < 60:
-        color, status = "#f59e0b", "Partial Match"
+        color, status = "#e37400", "Partial Match"
     elif pct < 80:
-        color, status = "#10b981", "Good Match"
+        color, status = "#188038", "Good Match"
     else:
-        color, status = "#3b82f6", "Excellent Match!"
+        color, status = "#1a73e8", "Excellent Match!"
     
     st.markdown(f"""
     <div class="result-card">
         <div style="text-align:center;">
-            <div style="font-size: 0.75rem; color: #9ca3af;">MATCH SCORE</div>
+            <div style="font-size: 0.75rem; color: #5f6368;">MATCH SCORE</div>
             <div style="font-size: 2.5rem; font-weight: 800; color: {color};">{pct}%</div>
             <div style="font-size: 0.9rem; font-weight: 600; color: {color};">{status}</div>
         </div>
@@ -860,14 +909,14 @@ def render_quiz_results():
     result = st.session_state.quiz_result
     pct = result["pct"]
     level = result["level"]
-    color = "#3b82f6" if level == "HIGH" else ("#f59e0b" if level == "MEDIUM" else "#ef4444")
+    color = "#1a73e8" if level == "HIGH" else ("#e37400" if level == "MEDIUM" else "#c5221f")
     
     st.markdown(f"""
     <div class="result-card">
         <div style="text-align:center;">
             <div style="font-size: 2.5rem; font-weight: 800; color: {color};">{pct}%</div>
-            <div style="font-size: 1rem; font-weight: 600; margin: 0.3rem 0; color: #ffffff;">Interest Level: {level}</div>
-            <div style="color: #9ca3af; font-size: 0.85rem;">{result["message"]}</div>
+            <div style="font-size: 1rem; font-weight: 600; margin: 0.3rem 0; color: #202124;">Interest Level: {level}</div>
+            <div style="color: #5f6368; font-size: 0.85rem;">{result["message"]}</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -929,17 +978,17 @@ def render_about():
     
     st.markdown('<div class="section-header">🎓 Academic Affiliation</div>', unsafe_allow_html=True)
     st.markdown("""
-    <p style="color: #e5e7eb; margin-bottom: 1rem; font-size: 0.85rem;">Department of Computer Science & Engineering<br>Rajshahi University of Engineering & Technology (RUET)</p>
+    <p style="color: #3c4043; margin-bottom: 1rem; font-size: 0.85rem;">Department of Computer Science & Engineering<br>Rajshahi University of Engineering & Technology (RUET)</p>
     """, unsafe_allow_html=True)
     
     st.markdown('<div class="section-header">🚀 About This Platform</div>', unsafe_allow_html=True)
     st.markdown("""
-    <p style="color: #9ca3af; line-height: 1.5; margin-bottom: 1rem; font-size: 0.85rem;">AI Career Platform is an intelligent career matching system designed to help job seekers in Bangladesh find the best AI/ML roles based on their CV content, skills, and career preferences.</p>
+    <p style="color: #5f6368; line-height: 1.5; margin-bottom: 1rem; font-size: 0.85rem;">AI Career Platform is an intelligent career matching system designed to help job seekers in Bangladesh find the best AI/ML roles based on their CV content, skills, and career preferences.</p>
     """, unsafe_allow_html=True)
     
     st.markdown('<div class="section-header">✨ Features</div>', unsafe_allow_html=True)
     st.markdown("""
-    <ul style="color: #9ca3af; line-height: 1.6; margin-bottom: 1rem; font-size: 0.8rem;">
+    <ul style="color: #5f6368; line-height: 1.6; margin-bottom: 1rem; font-size: 0.8rem;">
         <li>📄 AI-powered CV analysis and role matching</li>
         <li>🎯 Job Description matching with real-time skill gap analysis</li>
         <li>🧠 Career interest quiz to discover your ideal role</li>
