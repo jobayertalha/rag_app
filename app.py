@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Professional Sidebar Buttons with Colored Borders (Like Reference Image)
+Professional Sidebar Buttons with White/Gray Borders (Like Reference Image)
 """
 
 import streamlit as st
@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS - Sidebar Buttons with Colored Borders (White marked style)
+# CSS - Sidebar Buttons with White/Gray Borders (Like Reference Image)
 # ============================================================
 st.markdown("""
 <style>
@@ -61,124 +61,40 @@ footer {visibility: hidden;}
     padding-top: 0.2rem !important;
 }
 
-/* Sidebar buttons - with colored borders like reference image */
+/* Sidebar buttons - white/gray border like reference image */
 [data-testid="stSidebar"] .stButton > button {
     border-radius: 10px !important;
-    padding: 0.3rem 0.15rem !important;
-    margin-bottom: 0.25rem !important;
+    padding: 0.5rem 0.25rem !important;
+    margin-bottom: 0.35rem !important;
     transition: all 0.2s ease !important;
     white-space: pre-line !important;
-    line-height: 1.2 !important;
+    line-height: 1.3 !important;
     height: auto !important;
-    min-height: 52px !important;
+    min-height: 56px !important;
     font-weight: 500 !important;
-    font-size: 0.6rem !important;
+    font-size: 0.7rem !important;
     background: transparent !important;
+    border: 1px solid #4b5563 !important;
+    color: #e5e7eb !important;
 }
 
-/* Home button - Blue */
-[data-testid="stSidebar"] .stButton > button[key="nav_home"] {
-    border: 1.5px solid #3b82f6 !important;
-    color: #3b82f6 !important;
-}
-[data-testid="stSidebar"] .stButton > button[key="nav_home"]:hover {
-    background: rgba(59, 130, 246, 0.15) !important;
-    color: #60a5fa !important;
-}
-[data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_home"] {
-    background: rgba(59, 130, 246, 0.2) !important;
-    border: 1.5px solid #3b82f6 !important;
-    color: #60a5fa !important;
-}
-
-/* Analyze CV button - Emerald/Green */
-[data-testid="stSidebar"] .stButton > button[key="nav_analyze"] {
-    border: 1.5px solid #10b981 !important;
-    color: #10b981 !important;
-}
-[data-testid="stSidebar"] .stButton > button[key="nav_analyze"]:hover {
-    background: rgba(16, 185, 129, 0.15) !important;
-    color: #34d399 !important;
-}
-[data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_analyze"] {
-    background: rgba(16, 185, 129, 0.2) !important;
-    border: 1.5px solid #10b981 !important;
-    color: #34d399 !important;
-}
-
-/* JD Match button - Amber/Orange */
-[data-testid="stSidebar"] .stButton > button[key="nav_jd_match"] {
-    border: 1.5px solid #f59e0b !important;
-    color: #f59e0b !important;
-}
-[data-testid="stSidebar"] .stButton > button[key="nav_jd_match"]:hover {
-    background: rgba(245, 158, 11, 0.15) !important;
-    color: #fbbf24 !important;
-}
-[data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_jd_match"] {
-    background: rgba(245, 158, 11, 0.2) !important;
-    border: 1.5px solid #f59e0b !important;
-    color: #fbbf24 !important;
-}
-
-/* Quiz button - Purple */
-[data-testid="stSidebar"] .stButton > button[key="nav_quiz"] {
-    border: 1.5px solid #8b5cf6 !important;
-    color: #8b5cf6 !important;
-}
-[data-testid="stSidebar"] .stButton > button[key="nav_quiz"]:hover {
-    background: rgba(139, 92, 246, 0.15) !important;
-    color: #a78bfa !important;
-}
-[data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_quiz"] {
-    background: rgba(139, 92, 246, 0.2) !important;
-    border: 1.5px solid #8b5cf6 !important;
-    color: #a78bfa !important;
-}
-
-/* About button - Pink */
-[data-testid="stSidebar"] .stButton > button[key="nav_about"] {
-    border: 1.5px solid #ec4899 !important;
-    color: #ec4899 !important;
-}
-[data-testid="stSidebar"] .stButton > button[key="nav_about"]:hover {
-    background: rgba(236, 72, 153, 0.15) !important;
-    color: #f472b6 !important;
-}
-[data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_about"] {
-    background: rgba(236, 72, 153, 0.2) !important;
-    border: 1.5px solid #ec4899 !important;
-    color: #f472b6 !important;
-}
-
-/* Contact button - Cyan */
-[data-testid="stSidebar"] .stButton > button[key="nav_contact"] {
-    border: 1.5px solid #06b6d4 !important;
-    color: #06b6d4 !important;
-}
-[data-testid="stSidebar"] .stButton > button[key="nav_contact"]:hover {
-    background: rgba(6, 182, 212, 0.15) !important;
-    color: #22d3ee !important;
-}
-[data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_contact"] {
-    background: rgba(6, 182, 212, 0.2) !important;
-    border: 1.5px solid #06b6d4 !important;
-    color: #22d3ee !important;
-}
-
-/* Sign Out button - Navy Blue */
-[data-testid="stSidebar"] .stButton > button[key="signout_btn"] {
-    border: 1.5px solid #3b82f6 !important;
-    color: #3b82f6 !important;
-}
-[data-testid="stSidebar"] .stButton > button[key="signout_btn"]:hover {
-    background: rgba(59, 130, 246, 0.15) !important;
-    color: #60a5fa !important;
-}
-
-/* Hover effect */
 [data-testid="stSidebar"] .stButton > button:hover {
-    transform: translateY(-2px);
+    background: rgba(75, 85, 99, 0.2) !important;
+    border-color: #6b7280 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+}
+
+[data-testid="stSidebar"] .stButton > button[kind="primary"] {
+    background: rgba(59, 130, 246, 0.15) !important;
+    border: 1px solid #60a5fa !important;
+    color: #60a5fa !important;
+}
+
+[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
+    background: rgba(59, 130, 246, 0.25) !important;
+    border-color: #93c5fd !important;
+    color: #93c5fd !important;
 }
 
 /* Main content */
@@ -562,7 +478,7 @@ def sign_out():
 
 
 def render_sidebar():
-    """Sidebar with colored border buttons"""
+    """Sidebar with white/gray border buttons like reference image"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
