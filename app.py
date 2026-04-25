@@ -743,6 +743,22 @@ hr {{ border-color: var(--border) !important; }}
     box-shadow: 0 8px 32px var(--glow-blue) !important;
     transform: translateY(-2px) !important;
 }}
+
+/* Back to Home & secondary buttons */
+.stButton > button[kind="secondary"] {{
+    background: var(--bg-card2) !important;
+    border: 2px solid var(--accent-blue) !important;
+    color: var(--accent-blue) !important;
+    font-weight: 600 !important;
+}}
+.stButton > button[kind="secondary"]:hover {{
+    background: var(--accent-blue) !important;
+    color: #ffffff !important;
+    border-color: var(--accent-blue) !important;
+    box-shadow: 0 4px 16px var(--glow-blue) !important;
+    transform: translateY(-2px) !important;
+}}
+
 @keyframes glowPulse {{
     0%, 100% {{ box-shadow: 0 0 10px var(--glow-blue); }}
     50% {{ box-shadow: 0 0 24px var(--glow-blue), 0 0 40px var(--glow-cyan); }}
