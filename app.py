@@ -157,14 +157,14 @@ footer {{visibility: hidden;}}
 
 [data-testid="stSidebarCollapseButton"] {{
     display: flex !important;
-    background: {T['bg_primary']} !important;
-    border: 2px solid {T['border_glow']} !important;
+    background: {T['accent_blue']} !important;
+    border: 2px solid {T['accent_blue']} !important;
     border-radius: 8px !important;
     margin: 0.5rem !important;
     z-index: 999999 !important;
 }}
 [data-testid="stSidebarCollapseButton"] svg {{
-    fill: {T['text_primary']} !important;
+    fill: #ffffff !important;
 }}
 
 /* Brand header in sidebar */
