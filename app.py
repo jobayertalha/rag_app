@@ -73,29 +73,29 @@ def get_theme():
         }
     else:
         return {
-            "bg_primary": "#f0f4ff",
-            "bg_secondary": "#e8eef8",
+            "bg_primary": "#eef2fb",
+            "bg_secondary": "#e2e9f8",
             "bg_card": "#ffffff",
-            "bg_card2": "#f8faff",
-            "border": "#c8d8f0",
-            "border_glow": "#3b82f6",
-            "text_primary": "#0f172a",
-            "text_secondary": "#334d6e",
-            "text_muted": "#64748b",
+            "bg_card2": "#f4f7ff",
+            "border": "#b8cdf0",
+            "border_glow": "#2563eb",
+            "text_primary": "#0c1526",
+            "text_secondary": "#253d63",
+            "text_muted": "#5a749e",
             "accent_blue": "#2563eb",
-            "accent_blue_bright": "#3b82f6",
-            "accent_blue_dark": "#1d4ed8",
-            "accent_cyan": "#0891b2",
-            "accent_green": "#059669",
-            "accent_amber": "#d97706",
-            "accent_purple": "#7c3aed",
-            "accent_pink": "#db2777",
+            "accent_blue_bright": "#1d4ed8",
+            "accent_blue_dark": "#1e3a8a",
+            "accent_cyan": "#0e7490",
+            "accent_green": "#047857",
+            "accent_amber": "#b45309",
+            "accent_purple": "#6d28d9",
+            "accent_pink": "#be185d",
             "input_bg": "#ffffff",
-            "sidebar_bg": "linear-gradient(180deg, #ddeaff 0%, #edf3ff 60%, #dce7ff 100%)",
-            "glow_blue": "rgba(59, 130, 246, 0.12)",
-            "glow_cyan": "rgba(8, 145, 178, 0.1)",
-            "hero_gradient": "linear-gradient(135deg, #e8f0fe 0%, #dce9ff 50%, #eaf1ff 100%)",
-            "card_hover_shadow": "0 8px 40px rgba(37, 99, 235, 0.15), 0 2px 12px rgba(0,0,0,0.08)",
+            "sidebar_bg": "linear-gradient(180deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%)",
+            "glow_blue": "rgba(37, 99, 235, 0.14)",
+            "glow_cyan": "rgba(14, 116, 144, 0.1)",
+            "hero_gradient": "linear-gradient(135deg, #dbeafe 0%, #eff6ff 50%, #e0ecff 100%)",
+            "card_hover_shadow": "0 8px 40px rgba(37, 99, 235, 0.18), 0 2px 12px rgba(0,0,0,0.08)",
             "mode_icon": "🌙",
             "mode_label": "Dark Mode",
         }
@@ -170,7 +170,7 @@ footer {{visibility: hidden;}}
 .sidebar-brand {{
     text-align: center;
     padding: 1rem 0.5rem 0.6rem;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid rgba(255,255,255,0.15);
     margin-bottom: 0.6rem;
     position: relative;
 }}
@@ -179,34 +179,34 @@ footer {{visibility: hidden;}}
     font-size: 2rem;
     display: block;
     margin-bottom: 0.2rem;
-    filter: drop-shadow(0 0 8px {T['glow_blue']});
+    filter: drop-shadow(0 0 8px rgba(255,255,255,0.3));
 }}
 
 .sidebar-brand-name {{
     font-family: 'Syne', sans-serif !important;
     font-size: 0.72rem;
     font-weight: 700;
-    color: var(--text-primary);
+    color: #ffffff;
     letter-spacing: 0.05em;
     text-transform: uppercase;
 }}
 
 .sidebar-brand-name span {{
-    color: var(--accent-blue-bright);
+    color: #93c5fd;
 }}
 
 /* Sidebar user chip */
 .user-chip {{
-    background: var(--bg-card);
-    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.22);
     border-radius: 30px;
     padding: 0.3rem 0.7rem;
     margin-bottom: 0.7rem;
     text-align: center;
     font-size: 0.7rem;
-    color: var(--text-secondary);
+    color: #e0eaff;
     font-weight: 500;
-    box-shadow: inset 0 0 12px var(--glow-blue);
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.05);
 }}
 
 /* NAV BUTTONS */
@@ -223,100 +223,100 @@ footer {{visibility: hidden;}}
     font-size: 0.62rem !important;
     font-family: 'Space Grotesk', sans-serif !important;
     letter-spacing: 0.03em !important;
-    background: transparent !important;
+    background: rgba(255,255,255,0.06) !important;
     position: relative;
     overflow: hidden;
 }}
 
 [data-testid="stSidebar"] .stButton > button:hover {{
     transform: translateY(-2px) scale(1.02) !important;
-    box-shadow: 0 4px 20px var(--glow-blue) !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25) !important;
 }}
 
 /* Nav button color overrides */
 [data-testid="stSidebar"] .stButton > button[key="nav_home"] {{
-    border: 1.5px solid var(--accent-blue) !important; color: var(--accent-blue) !important;
+    border: 1.5px solid #93c5fd !important; color: #ffffff !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="nav_home"]:hover,
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_home"] {{
-    background: rgba(59,130,246,0.15) !important; color: var(--accent-blue-bright) !important;
-    border: 1.5px solid var(--accent-blue-bright) !important;
-    box-shadow: 0 0 16px rgba(59,130,246,0.3) !important;
+    background: rgba(147,197,253,0.25) !important; color: #ffffff !important;
+    border: 1.5px solid #bfdbfe !important;
+    box-shadow: 0 0 16px rgba(147,197,253,0.3) !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button[key="nav_analyze"] {{
-    border: 1.5px solid var(--accent-green) !important; color: var(--accent-green) !important;
+    border: 1.5px solid #6ee7b7 !important; color: #ffffff !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="nav_analyze"]:hover,
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_analyze"] {{
-    background: rgba(16,185,129,0.15) !important; color: #34d399 !important;
-    border: 1.5px solid var(--accent-green) !important;
-    box-shadow: 0 0 16px rgba(16,185,129,0.25) !important;
+    background: rgba(110,231,183,0.2) !important; color: #ffffff !important;
+    border: 1.5px solid #6ee7b7 !important;
+    box-shadow: 0 0 16px rgba(110,231,183,0.25) !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button[key="nav_jd_match"] {{
-    border: 1.5px solid var(--accent-amber) !important; color: var(--accent-amber) !important;
+    border: 1.5px solid #fcd34d !important; color: #ffffff !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="nav_jd_match"]:hover,
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_jd_match"] {{
-    background: rgba(245,158,11,0.15) !important; color: #fbbf24 !important;
-    border: 1.5px solid var(--accent-amber) !important;
-    box-shadow: 0 0 16px rgba(245,158,11,0.25) !important;
+    background: rgba(252,211,77,0.2) !important; color: #ffffff !important;
+    border: 1.5px solid #fde68a !important;
+    box-shadow: 0 0 16px rgba(252,211,77,0.25) !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button[key="nav_quiz"] {{
-    border: 1.5px solid var(--accent-purple) !important; color: var(--accent-purple) !important;
+    border: 1.5px solid #c4b5fd !important; color: #ffffff !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="nav_quiz"]:hover,
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_quiz"] {{
-    background: rgba(139,92,246,0.15) !important; color: #a78bfa !important;
-    border: 1.5px solid var(--accent-purple) !important;
-    box-shadow: 0 0 16px rgba(139,92,246,0.25) !important;
+    background: rgba(196,181,253,0.2) !important; color: #ffffff !important;
+    border: 1.5px solid #ddd6fe !important;
+    box-shadow: 0 0 16px rgba(196,181,253,0.3) !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button[key="nav_about"] {{
-    border: 1.5px solid var(--accent-pink) !important; color: var(--accent-pink) !important;
+    border: 1.5px solid #f9a8d4 !important; color: #ffffff !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="nav_about"]:hover,
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_about"] {{
-    background: rgba(236,72,153,0.15) !important; color: #f472b6 !important;
-    border: 1.5px solid var(--accent-pink) !important;
-    box-shadow: 0 0 16px rgba(236,72,153,0.25) !important;
+    background: rgba(249,168,212,0.2) !important; color: #ffffff !important;
+    border: 1.5px solid #fbcfe8 !important;
+    box-shadow: 0 0 16px rgba(249,168,212,0.3) !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button[key="nav_contact"] {{
-    border: 1.5px solid var(--accent-cyan) !important; color: var(--accent-cyan) !important;
+    border: 1.5px solid #67e8f9 !important; color: #ffffff !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="nav_contact"]:hover,
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_contact"] {{
-    background: rgba(6,182,212,0.15) !important; color: #22d3ee !important;
-    border: 1.5px solid var(--accent-cyan) !important;
-    box-shadow: 0 0 16px rgba(6,182,212,0.25) !important;
+    background: rgba(103,232,249,0.2) !important; color: #ffffff !important;
+    border: 1.5px solid #a5f3fc !important;
+    box-shadow: 0 0 16px rgba(103,232,249,0.25) !important;
 }}
 
 [data-testid="stSidebar"] .stButton > button[key="signout_btn"] {{
-    border: 1.5px solid var(--text-muted) !important; color: var(--text-muted) !important;
+    border: 1.5px solid rgba(255,255,255,0.3) !important; color: rgba(255,255,255,0.65) !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="signout_btn"]:hover {{
-    background: rgba(239,68,68,0.1) !important; color: #f87171 !important;
-    border: 1.5px solid #ef4444 !important;
-    box-shadow: 0 0 14px rgba(239,68,68,0.2) !important;
+    background: rgba(239,68,68,0.25) !important; color: #fca5a5 !important;
+    border: 1.5px solid #f87171 !important;
+    box-shadow: 0 0 14px rgba(239,68,68,0.3) !important;
 }}
 
 /* Dark mode toggle button */
 [data-testid="stSidebar"] .stButton > button[key="dark_toggle"] {{
-    border: 1.5px solid var(--border) !important;
-    color: var(--text-secondary) !important;
-    background: var(--bg-card2) !important;
+    border: 1.5px solid rgba(255,255,255,0.25) !important;
+    color: #e0eaff !important;
+    background: rgba(255,255,255,0.1) !important;
     font-size: 0.6rem !important;
     min-height: 38px !important;
     margin-bottom: 0.4rem !important;
 }}
 [data-testid="stSidebar"] .stButton > button[key="dark_toggle"]:hover {{
-    border-color: var(--accent-blue) !important;
-    color: var(--accent-blue) !important;
-    background: var(--glow-blue) !important;
-    box-shadow: 0 0 12px var(--glow-blue) !important;
+    border-color: rgba(255,255,255,0.5) !important;
+    color: #ffffff !important;
+    background: rgba(255,255,255,0.18) !important;
+    box-shadow: 0 0 12px rgba(255,255,255,0.1) !important;
     transform: none !important;
 }}
 
@@ -825,7 +825,7 @@ def render_sidebar():
             sign_out()
 
         st.markdown(f"""
-        <div style="text-align:center; margin-top:0.6rem; font-size:0.6rem; color: var(--text-muted);">
+        <div style="text-align:center; margin-top:0.6rem; font-size:0.6rem; color: rgba(255,255,255,0.4);">
             © 2025 AI Career Platform
         </div>
         """, unsafe_allow_html=True)
