@@ -1,6 +1,6 @@
 """
 app.py — AI Career Platform
-Professional Colored Sidebar Buttons - Smaller & Navy Sign Out
+Professional Sidebar Buttons with Colored Borders (Like Reference Image)
 """
 
 import streamlit as st
@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS - Professional Colored Sidebar Buttons
+# CSS - Sidebar Buttons with Colored Borders (White marked style)
 # ============================================================
 st.markdown("""
 <style>
@@ -61,129 +61,122 @@ footer {visibility: hidden;}
     padding-top: 0.2rem !important;
 }
 
-/* Sidebar buttons - smaller size */
+/* Sidebar buttons - with colored borders like reference image */
 [data-testid="stSidebar"] .stButton > button {
-    border: none !important;
     border-radius: 10px !important;
-    padding: 0.25rem 0.15rem !important;
-    margin-bottom: 0.2rem !important;
+    padding: 0.3rem 0.15rem !important;
+    margin-bottom: 0.25rem !important;
     transition: all 0.2s ease !important;
     white-space: pre-line !important;
-    line-height: 1.1 !important;
+    line-height: 1.2 !important;
     height: auto !important;
-    min-height: 48px !important;
+    min-height: 52px !important;
     font-weight: 500 !important;
-    font-size: 0.55rem !important;
+    font-size: 0.6rem !important;
+    background: transparent !important;
 }
 
-/* Home button - Deep Blue */
+/* Home button - Blue */
 [data-testid="stSidebar"] .stButton > button[key="nav_home"] {
-    background: linear-gradient(135deg, #1e3a5f, #1a3650) !important;
-    color: #93c5fd !important;
-    border: 1px solid #2563eb !important;
+    border: 1.5px solid #3b82f6 !important;
+    color: #3b82f6 !important;
 }
 [data-testid="stSidebar"] .stButton > button[key="nav_home"]:hover {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-    color: #ffffff !important;
+    background: rgba(59, 130, 246, 0.15) !important;
+    color: #60a5fa !important;
 }
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_home"] {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-    color: #ffffff !important;
-    border: 1px solid #60a5fa !important;
+    background: rgba(59, 130, 246, 0.2) !important;
+    border: 1.5px solid #3b82f6 !important;
+    color: #60a5fa !important;
 }
 
-/* Analyze CV button - Deep Green */
+/* Analyze CV button - Emerald/Green */
 [data-testid="stSidebar"] .stButton > button[key="nav_analyze"] {
-    background: linear-gradient(135deg, #14532d, #166534) !important;
-    color: #86efac !important;
-    border: 1px solid #16a34a !important;
+    border: 1.5px solid #10b981 !important;
+    color: #10b981 !important;
 }
 [data-testid="stSidebar"] .stButton > button[key="nav_analyze"]:hover {
-    background: linear-gradient(135deg, #16a34a, #15803d) !important;
-    color: #ffffff !important;
+    background: rgba(16, 185, 129, 0.15) !important;
+    color: #34d399 !important;
 }
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_analyze"] {
-    background: linear-gradient(135deg, #16a34a, #15803d) !important;
-    color: #ffffff !important;
-    border: 1px solid #4ade80 !important;
+    background: rgba(16, 185, 129, 0.2) !important;
+    border: 1.5px solid #10b981 !important;
+    color: #34d399 !important;
 }
 
-/* JD Match button - Deep Amber/Orange */
+/* JD Match button - Amber/Orange */
 [data-testid="stSidebar"] .stButton > button[key="nav_jd_match"] {
-    background: linear-gradient(135deg, #78350f, #92400e) !important;
-    color: #fcd34d !important;
-    border: 1px solid #d97706 !important;
+    border: 1.5px solid #f59e0b !important;
+    color: #f59e0b !important;
 }
 [data-testid="stSidebar"] .stButton > button[key="nav_jd_match"]:hover {
-    background: linear-gradient(135deg, #d97706, #b45309) !important;
-    color: #ffffff !important;
+    background: rgba(245, 158, 11, 0.15) !important;
+    color: #fbbf24 !important;
 }
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_jd_match"] {
-    background: linear-gradient(135deg, #d97706, #b45309) !important;
-    color: #ffffff !important;
-    border: 1px solid #fbbf24 !important;
+    background: rgba(245, 158, 11, 0.2) !important;
+    border: 1.5px solid #f59e0b !important;
+    color: #fbbf24 !important;
 }
 
-/* Quiz button - Deep Purple */
+/* Quiz button - Purple */
 [data-testid="stSidebar"] .stButton > button[key="nav_quiz"] {
-    background: linear-gradient(135deg, #4c1d95, #5b21b6) !important;
-    color: #c4b5fd !important;
-    border: 1px solid #8b5cf6 !important;
+    border: 1.5px solid #8b5cf6 !important;
+    color: #8b5cf6 !important;
 }
 [data-testid="stSidebar"] .stButton > button[key="nav_quiz"]:hover {
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
-    color: #ffffff !important;
+    background: rgba(139, 92, 246, 0.15) !important;
+    color: #a78bfa !important;
 }
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_quiz"] {
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
-    color: #ffffff !important;
-    border: 1px solid #a78bfa !important;
+    background: rgba(139, 92, 246, 0.2) !important;
+    border: 1.5px solid #8b5cf6 !important;
+    color: #a78bfa !important;
 }
 
-/* About button - Deep Pink */
+/* About button - Pink */
 [data-testid="stSidebar"] .stButton > button[key="nav_about"] {
-    background: linear-gradient(135deg, #831843, #9d174d) !important;
-    color: #f9a8d4 !important;
-    border: 1px solid #ec4899 !important;
+    border: 1.5px solid #ec4899 !important;
+    color: #ec4899 !important;
 }
 [data-testid="stSidebar"] .stButton > button[key="nav_about"]:hover {
-    background: linear-gradient(135deg, #ec4899, #db2777) !important;
-    color: #ffffff !important;
+    background: rgba(236, 72, 153, 0.15) !important;
+    color: #f472b6 !important;
 }
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_about"] {
-    background: linear-gradient(135deg, #ec4899, #db2777) !important;
-    color: #ffffff !important;
-    border: 1px solid #f472b6 !important;
+    background: rgba(236, 72, 153, 0.2) !important;
+    border: 1.5px solid #ec4899 !important;
+    color: #f472b6 !important;
 }
 
-/* Contact button - Deep Cyan */
+/* Contact button - Cyan */
 [data-testid="stSidebar"] .stButton > button[key="nav_contact"] {
-    background: linear-gradient(135deg, #164e63, #155e75) !important;
-    color: #67e8f9 !important;
-    border: 1px solid #06b6d4 !important;
+    border: 1.5px solid #06b6d4 !important;
+    color: #06b6d4 !important;
 }
 [data-testid="stSidebar"] .stButton > button[key="nav_contact"]:hover {
-    background: linear-gradient(135deg, #06b6d4, #0891b2) !important;
-    color: #ffffff !important;
+    background: rgba(6, 182, 212, 0.15) !important;
+    color: #22d3ee !important;
 }
 [data-testid="stSidebar"] .stButton > button[kind="primary"][key="nav_contact"] {
-    background: linear-gradient(135deg, #06b6d4, #0891b2) !important;
-    color: #ffffff !important;
-    border: 1px solid #22d3ee !important;
+    background: rgba(6, 182, 212, 0.2) !important;
+    border: 1.5px solid #06b6d4 !important;
+    color: #22d3ee !important;
 }
 
-/* Sign Out button - Deep Navy/Deep Sea Blue (instead of red) */
+/* Sign Out button - Navy Blue */
 [data-testid="stSidebar"] .stButton > button[key="signout_btn"] {
-    background: linear-gradient(135deg, #0f2b4d, #1a3a5c) !important;
-    color: #90cdf4 !important;
-    border: 1px solid #2c5282 !important;
+    border: 1.5px solid #3b82f6 !important;
+    color: #3b82f6 !important;
 }
 [data-testid="stSidebar"] .stButton > button[key="signout_btn"]:hover {
-    background: linear-gradient(135deg, #1e4a76, #2c5282) !important;
-    color: #ffffff !important;
+    background: rgba(59, 130, 246, 0.15) !important;
+    color: #60a5fa !important;
 }
 
-/* Hover effect - slight lift */
+/* Hover effect */
 [data-testid="stSidebar"] .stButton > button:hover {
     transform: translateY(-2px);
 }
@@ -569,7 +562,7 @@ def sign_out():
 
 
 def render_sidebar():
-    """Sidebar with professional colored buttons"""
+    """Sidebar with colored border buttons"""
     name = st.session_state.candidate_name
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
@@ -590,7 +583,7 @@ def render_sidebar():
         </div>
         """, unsafe_allow_html=True)
         
-        # Navigation buttons with stacked layout
+        # Navigation buttons
         nav_items = [
             ("🏠\n\nHome", "home"),
             ("📄\n\nAnalyze CV", "analyze"),
