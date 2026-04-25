@@ -157,13 +157,14 @@ footer {{visibility: hidden;}}
 
 [data-testid="stSidebarCollapseButton"] {{
     display: flex !important;
-    background: var(--bg-card) !important;
+    background: {T['bg_primary']} !important;
+    border: 2px solid {T['border_glow']} !important;
     border-radius: 8px !important;
     margin: 0.5rem !important;
     z-index: 999999 !important;
 }}
 [data-testid="stSidebarCollapseButton"] svg {{
-    fill: var(--accent-blue) !important;
+    fill: {T['text_primary']} !important;
 }}
 
 /* Brand header in sidebar */
@@ -723,7 +724,25 @@ hr {{ border-color: var(--border) !important; }}
 .stWarning {{ background: rgba(245,158,11,0.1) !important; border-color: var(--accent-amber) !important; }}
 .stError {{ background: rgba(239,68,68,0.1) !important; border-color: #ef4444 !important; }}
 
-/* Glow pulse for hero badge */
+/* Welcome form submit button */
+.welcome-card .stButton > button,
+.welcome-card button[kind="primaryFormSubmit"],
+[data-testid="stForm"] button[kind="primaryFormSubmit"],
+[data-testid="stForm"] .stButton > button {{
+    background: linear-gradient(135deg, var(--accent-blue-dark), var(--accent-blue)) !important;
+    border: none !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 20px var(--glow-blue) !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+}}
+[data-testid="stForm"] button[kind="primaryFormSubmit"]:hover,
+[data-testid="stForm"] .stButton > button:hover {{
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)) !important;
+    box-shadow: 0 8px 32px var(--glow-blue) !important;
+    transform: translateY(-2px) !important;
+}}
 @keyframes glowPulse {{
     0%, 100% {{ box-shadow: 0 0 10px var(--glow-blue); }}
     50% {{ box-shadow: 0 0 24px var(--glow-blue), 0 0 40px var(--glow-cyan); }}
