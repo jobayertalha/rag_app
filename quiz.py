@@ -149,23 +149,22 @@ def get_shuffled_questions():
     return shuffled
 
 
-def calculate_interest_score(responses: dict) -> dict:
+def calculate_interest_score(responses: dict, questions_list: list = None) -> dict:
     """
     responses: {question_display_id: selected_option_index}
+    questions_list: the list of questions used for this quiz session
     Returns score, level, and recommendations.
     Score range: 0-30 (10 questions × max 3 points each)
     """
     total_score = 0
     category_scores = {}
     
-    # Get current questions (store in session state if needed)
-    if "current_quiz_questions" not in st.session_state:
-        st.session_state.current_quiz_questions = get_shuffled_questions()
+    # Use provided questions list, otherwise fallback to base questions
+    if questions_list is None:
+        questions_list = BASE_QUESTIONS[:10]
     
-    questions = st.session_state.current_quiz_questions
-    
-    for q in questions:
-        qid = q["display_id"]
+    for q in questions_list:
+        qid = q.get("display_id", q["id"])
         selected = responses.get(qid, -1)
         if selected >= 0 and selected < len(q["scores"]):
             score = q["scores"][selected]
@@ -261,15 +260,10 @@ def calculate_interest_score(responses: dict) -> dict:
         "icon": icon,
         "recommendation": recommendation,
         "category_scores": category_scores,
-        "questions_used": len(questions)
+        "questions_used": len(questions_list)
     }
 
 
 def reset_quiz():
-    """Reset quiz state and generate new shuffled questions."""
-    if "current_quiz_questions" in st.session_state:
-        del st.session_state.current_quiz_questions
-    if "quiz_responses" in st.session_state:
-        st.session_state.quiz_responses = {}
-    if "quiz_result" in st.session_state:
-        st.session_state.quiz_result = None
+    """Reset quiz state (to be called from app.py)"""
+    pass  # This will be handled by app.py session state
