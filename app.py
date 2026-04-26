@@ -1468,7 +1468,7 @@ def render_quiz_results():
 
     bar_width = (score / max_score) * 100 if max_score > 0 else 0
     
-    # Main score card
+    # ========== 1. MAIN SCORE CARD (TOP) ==========
     st.markdown(f"""
     <div class="result-card" style="text-align:center;">
         <div style="font-size:0.68rem; font-weight:700; color:{color}; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.5rem;">
@@ -1487,7 +1487,7 @@ def render_quiz_results():
     </div>
     """, unsafe_allow_html=True)
     
-    # Score interpretation banner
+    # ========== 2. RECOMMENDATION BANNER ==========
     if score >= 21:
         st.success(f"🎯 **Recommendation:** Focus on AI/ML field. Your score of {score}/30 indicates strong alignment!")
     elif score >= 10:
@@ -1495,19 +1495,26 @@ def render_quiz_results():
     else:
         st.error(f"⚡ **Recommendation:** AI/ML may not be your best fit. Your score of {score}/30 suggests exploring other paths.")
 
-    # Detailed Analysis Card - Clean formatting
+    # ========== 3. DETAILED SCORE ANALYSIS ==========
+    # Clean the detailed analysis text
+    detailed_text = rec["detailed_analysis"]
+    # Convert markdown-like formatting to HTML
+    detailed_text = detailed_text.replace('**', '<strong>').replace('</strong>', '</strong>')
+    detailed_text = detailed_text.replace('\n\n', '</p><p>')
+    detailed_text = f'<p>{detailed_text}</p>'
+    
     st.markdown(f"""
     <div class="result-card">
         <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.8rem; font-size:1rem; font-family:'Syne',sans-serif;">
             📊 Detailed Score Analysis
         </div>
         <div style="color:var(--text-secondary); font-size:0.88rem; line-height:1.8;">
-            {rec["detailed_analysis"].replace('**', '<strong>').replace('</strong>', '</strong>')}
+            {detailed_text}
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # Two columns for roles and next steps
+    # ========== 4. ROLES AND NEXT STEPS (SIDE BY SIDE) ==========
     col1, col2 = st.columns(2)
     
     with col1:
@@ -1528,40 +1535,76 @@ def render_quiz_results():
             st.markdown(f"- {step}")
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # Category breakdown at the bottom
+    # ========== 5. CATEGORY BREAKDOWN (BOTTOM) ==========
     if result.get("category_scores"):
         st.markdown("""
         <div class="result-card">
             <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.8rem; font-size:0.95rem;">📊 Interest Breakdown by Category</div>
         """, unsafe_allow_html=True)
         
-        for cat, data in result["category_scores"].items():
-            cat_pct = int((data["score"] / max(data["max_possible"], 1)) * 100) if data["max_possible"] > 0 else 0
-            
-            if cat_pct >= 70:
-                cat_color = "#10b981"
-                cat_emoji = "🔥"
-            elif cat_pct >= 40:
-                cat_color = "#f59e0b"
-                cat_emoji = "📌"
-            else:
-                cat_color = "#ef4444"
-                cat_emoji = "⚠️"
-            
-            st.markdown(f"""
-            <div style="margin-bottom:1rem;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:0.3rem;">
-                    <span style="font-size:0.78rem; font-weight:600; color:var(--text-primary);">{cat_emoji} {cat}</span>
-                    <span style="font-size:0.72rem; font-weight:600; color:{cat_color};">{cat_pct}%</span>
+        # Create 2 columns for categories to save space
+        cat_items = list(result["category_scores"].items())
+        mid_point = len(cat_items) // 2
+        
+        col_left, col_right = st.columns(2)
+        
+        with col_left:
+            for cat, data in cat_items[:mid_point]:
+                cat_pct = int((data["score"] / max(data["max_possible"], 1)) * 100) if data["max_possible"] > 0 else 0
+                
+                if cat_pct >= 70:
+                    cat_color = "#10b981"
+                    cat_emoji = "🔥"
+                elif cat_pct >= 40:
+                    cat_color = "#f59e0b"
+                    cat_emoji = "📌"
+                else:
+                    cat_color = "#ef4444"
+                    cat_emoji = "⚠️"
+                
+                st.markdown(f"""
+                <div style="margin-bottom:1rem;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:0.3rem;">
+                        <span style="font-size:0.78rem; font-weight:600; color:var(--text-primary);">{cat_emoji} {cat}</span>
+                        <span style="font-size:0.72rem; font-weight:600; color:{cat_color};">{cat_pct}%</span>
+                    </div>
+                    <div style="background:var(--bg-card2); border-radius:10px; height:8px; overflow:hidden;">
+                        <div style="width:{cat_pct}%; height:100%; background:linear-gradient(90deg, {cat_color}, {cat_color}99); border-radius:10px;"></div>
+                    </div>
+                    <div style="font-size:0.65rem; color:var(--text-muted); margin-top:0.2rem;">
+                        Score: {data["score"]}/{data["max_possible"]}
+                    </div>
                 </div>
-                <div style="background:var(--bg-card2); border-radius:10px; height:8px; overflow:hidden;">
-                    <div style="width:{cat_pct}%; height:100%; background:linear-gradient(90deg, {cat_color}, {cat_color}99); border-radius:10px;"></div>
+                """, unsafe_allow_html=True)
+        
+        with col_right:
+            for cat, data in cat_items[mid_point:]:
+                cat_pct = int((data["score"] / max(data["max_possible"], 1)) * 100) if data["max_possible"] > 0 else 0
+                
+                if cat_pct >= 70:
+                    cat_color = "#10b981"
+                    cat_emoji = "🔥"
+                elif cat_pct >= 40:
+                    cat_color = "#f59e0b"
+                    cat_emoji = "📌"
+                else:
+                    cat_color = "#ef4444"
+                    cat_emoji = "⚠️"
+                
+                st.markdown(f"""
+                <div style="margin-bottom:1rem;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:0.3rem;">
+                        <span style="font-size:0.78rem; font-weight:600; color:var(--text-primary);">{cat_emoji} {cat}</span>
+                        <span style="font-size:0.72rem; font-weight:600; color:{cat_color};">{cat_pct}%</span>
+                    </div>
+                    <div style="background:var(--bg-card2); border-radius:10px; height:8px; overflow:hidden;">
+                        <div style="width:{cat_pct}%; height:100%; background:linear-gradient(90deg, {cat_color}, {cat_color}99); border-radius:10px;"></div>
+                    </div>
+                    <div style="font-size:0.65rem; color:var(--text-muted); margin-top:0.2rem;">
+                        Score: {data["score"]}/{data["max_possible"]}
+                    </div>
                 </div>
-                <div style="font-size:0.65rem; color:var(--text-muted); margin-top:0.2rem;">
-                    Score: {data["score"]}/{data["max_possible"]}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
         
         st.markdown("</div>", unsafe_allow_html=True)
 
