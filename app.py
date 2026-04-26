@@ -1358,56 +1358,53 @@ def render_quiz():
     if quiz_started and st.session_state.current_quiz_questions is not None:
         questions = st.session_state.current_quiz_questions
         
-        # Create a form for the quiz
-        with st.form(key="quiz_form"):
-            # Store responses temporarily
-            temp_responses = {}
+        # Initialize responses dict if empty
+        if not st.session_state.quiz_responses:
+            st.session_state.quiz_responses = {}
+        
+        # Display questions without a form first to capture responses in real-time
+        for q in questions:
+            qid = q["display_id"]
+            st.markdown(f"""
+            <div class="quiz-question">
+                <div class="quiz-question-text">{qid}. {q["question"]}</div>
+            </div>
+            """, unsafe_allow_html=True)
             
-            for q in questions:
-                qid = q["display_id"]
-                st.markdown(f"""
-                <div class="quiz-question">
-                    <div class="quiz-question-text">{qid}. {q["question"]}</div>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                # Get previously stored value
-                previous_value = st.session_state.quiz_responses.get(qid)
-                previous_index = previous_value if previous_value is not None else None
-                
-                # Radio button - use previous value if exists
-                response = st.radio(
-                    f"q{qid}",
-                    options=q["options"],
-                    key=f"quiz_radio_{qid}",
-                    label_visibility="collapsed",
-                    index=previous_index
-                )
-                
-                # Find the index of selected option
-                if response:
-                    selected_index = q["options"].index(response)
-                    temp_responses[qid] = selected_index
+            # Get previously stored value
+            previous_value = st.session_state.quiz_responses.get(qid)
             
-            # Update session state with all responses
-            for qid, value in temp_responses.items():
-                st.session_state.quiz_responses[qid] = value
+            # Radio button
+            response = st.radio(
+                f"q{qid}",
+                options=q["options"],
+                key=f"quiz_radio_{qid}",
+                label_visibility="collapsed",
+                index=previous_value if previous_value is not None else 0
+            )
             
-            # Check if all questions answered
-            all_answered = len(st.session_state.quiz_responses) == len(questions)
-            
-            if not all_answered:
-                answered = len(st.session_state.quiz_responses)
-                st.warning(f"⚠️ Please answer all {len(questions)} questions ({answered}/{len(questions)} completed)")
-            
-            # Submit button - disabled until all answered
-            submit_btn = st.form_submit_button("📊 Get Results", use_container_width=True, type="primary", disabled=not all_answered)
-            
-            if submit_btn and all_answered:
-                from quiz import calculate_interest_score
-                result = calculate_interest_score(st.session_state.quiz_responses, st.session_state.current_quiz_questions)
-                st.session_state.quiz_result = result
-                st.rerun()
+            # Store the response index immediately
+            if response:
+                selected_index = q["options"].index(response)
+                st.session_state.quiz_responses[qid] = selected_index
+        
+        # Check if all questions answered
+        all_answered = len(st.session_state.quiz_responses) == len(questions)
+        
+        # Show progress
+        st.info(f"📊 Progress: {len(st.session_state.quiz_responses)}/{len(questions)} questions answered")
+        
+        # Show button (not in form) that enables when all answered
+        col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+        with col_btn2:
+            if all_answered:
+                if st.button("📊 Get Results", use_container_width=True, type="primary"):
+                    from quiz import calculate_interest_score
+                    result = calculate_interest_score(st.session_state.quiz_responses, st.session_state.current_quiz_questions)
+                    st.session_state.quiz_result = result
+                    st.rerun()
+            else:
+                st.button("📊 Get Results", use_container_width=True, disabled=True, type="primary")
         
         st.markdown("</div>", unsafe_allow_html=True)
         return
