@@ -1010,18 +1010,32 @@ def render_analyze():
         uploaded = st.file_uploader("Upload CV (PDF)", type=["pdf"], label_visibility="collapsed")
         if uploaded and st.button("🚀 Start Analysis", use_container_width=True, type="primary"):
             with st.spinner("Analyzing your CV..."):
-                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-                    tmp.write(uploaded.read())
-                    cv_text = extract_cv_text(tmp.name)
-                    os.unlink(tmp.name)
-                st.session_state.cv_text = cv_text
-                st.session_state.retrieved = retrieve_context(cv_text, "", k=5)
-                st.session_state.agent = build_agent(cv_text, "", st.session_state.candidate_name)
-                st.session_state.analysis_raw = run_agent(
-                    st.session_state.agent,
-                    "Analyse this CV. Follow tags: TOP_ROLE, MATCH_PCT, WHY_RIGHT, SKILL_GAPS, RESUME_ADD, CAREER_PATH"
-                )
-            st.rerun()
+                try:
+                    # Write to tmp, close it first, THEN read — fixes EmptyFileError on Streamlit Cloud
+                    tmp_path = None
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                        tmp.write(uploaded.read())
+                        tmp_path = tmp.name
+                    # File is now closed — safe to read with pypdf
+                    cv_text = extract_cv_text(tmp_path)
+                    os.unlink(tmp_path)
+
+                    if not cv_text or len(cv_text.strip()) < 20:
+                        st.error("⚠️ Could not extract text from your PDF. Please ensure it's a text-based PDF (not scanned image).")
+                    else:
+                        st.session_state.cv_text = cv_text
+                        st.session_state.retrieved = retrieve_context(cv_text, "", k=5)
+                        st.session_state.agent = build_agent(cv_text, "", st.session_state.candidate_name)
+                        st.session_state.chat_history = []  # reset chat on new CV
+                        st.session_state.analysis_raw = run_agent(
+                            st.session_state.agent,
+                            "Analyse this CV. Follow tags: TOP_ROLE, MATCH_PCT, WHY_RIGHT, SKILL_GAPS, RESUME_ADD, CAREER_PATH"
+                        )
+                        st.rerun()
+                except Exception as e:
+                    if tmp_path and os.path.exists(tmp_path):
+                        os.unlink(tmp_path)
+                    st.error(f"⚠️ Error reading PDF: {str(e)[:200]}. Please try a different PDF file.")
 
     if st.session_state.retrieved:
         render_analysis_results()
@@ -1037,6 +1051,8 @@ def render_analysis_results():
     retrieved = st.session_state.retrieved
     top_match = retrieved.get("top_match", {})
     readiness = retrieved.get("readiness", {})
+    analysis_raw = st.session_state.get("analysis_raw", "")
+    has_ai_exp = retrieved.get("has_ai_experience", False)
 
     st.markdown('<div class="result-card">', unsafe_allow_html=True)
 
@@ -1044,43 +1060,110 @@ def render_analysis_results():
     with col2:
         st.markdown(f"""
         <div class="match-score">
-            <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.3rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase;">Match Score</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.3rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase;">Top Role Match</div>
             <div class="match-percentage">{top_match.get('match_pct', 0)}%</div>
             <h3 style="color: var(--text-primary); margin-top: 0.4rem; font-size: 1rem; font-family:'Syne',sans-serif; font-weight:700;">{top_match.get('title', top_match.get('role', 'AI Professional'))}</h3>
+            <div style="color: var(--text-muted); font-size: 0.75rem;">{top_match.get('company', '')} · {top_match.get('location', 'Dhaka')}</div>
         </div>
         """, unsafe_allow_html=True)
 
+    # Readiness score
     score = readiness.get("total_score", 0)
+    level = readiness.get("level", "")
+    rec = readiness.get("recommendation", "")
     if score < 30:
-        st.warning("🔴 **Readiness Score:** {}% — Focus on building fundamentals".format(score))
+        st.error(f"🔴 **AI/ML Readiness: {score}%** ({level}) — {rec}")
     elif score < 60:
-        st.warning("🟡 **Readiness Score:** {}% — Keep building your skills".format(score))
+        st.warning(f"🟡 **AI/ML Readiness: {score}%** ({level}) — {rec}")
     else:
-        st.success("🟢 **Readiness Score:** {}% — You're ready to apply!".format(score))
+        st.success(f"🟢 **AI/ML Readiness: {score}%** ({level}) — {rec}")
 
+    if not has_ai_exp:
+        st.info("💡 **Tip:** No AI/ML work experience detected in your CV. Adding relevant projects or internships will significantly boost your match score.")
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # Skill gaps & resume additions
     col1, col2 = st.columns(2)
     with col1:
         gaps = retrieved.get("skill_gaps", [])
         if gaps:
-            st.markdown("**❌ Skill Gaps**")
-            st.markdown(" ".join(f"<span class='skill-chip gap-chip'>{g}</span>" for g in gaps[:6]), unsafe_allow_html=True)
+            st.markdown(f"""
+            <div class="result-card">
+                <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.6rem; font-size:0.85rem;">❌ Skill Gaps</div>
+                {"".join(f"<span class='skill-chip gap-chip'>{g}</span>" for g in gaps[:6])}
+            </div>
+            """, unsafe_allow_html=True)
 
     with col2:
         recs = retrieved.get("resume_skills", [])
         if recs:
-            st.markdown("**➕ Recommended Additions**")
-            st.markdown(" ".join(f"<span class='skill-chip'>+ {sk}</span>" for sk in recs[:6]), unsafe_allow_html=True)
+            st.markdown(f"""
+            <div class="result-card">
+                <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.6rem; font-size:0.85rem;">➕ Add to Resume</div>
+                {"".join(f"<span class='skill-chip'>+ {sk}</span>" for sk in recs[:6])}
+            </div>
+            """, unsafe_allow_html=True)
 
-    st.markdown("### 🗺️ Career Path")
-    for r in retrieved.get("all_matches", [])[:3]:
+    # All matched roles
+    st.markdown(f"""
+    <div class="result-card">
+        <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.8rem; font-size:0.9rem; font-family:'Syne',sans-serif;">🗺️ Matched Roles</div>
+    """, unsafe_allow_html=True)
+    for r in retrieved.get("all_matches", [])[:4]:
+        sal_min = r.get('salary_min', 0)
+        sal_max = r.get('salary_max', 0)
+        sal_str = f"৳{sal_min:,}–৳{sal_max:,}/mo" if sal_min else ""
         st.markdown(f"""
-        <div style="margin-bottom: 0.8rem; padding: 0.7rem 1rem; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 10px;">
-            <strong style="color:var(--text-primary);">{r.get('title', r.get('role', 'Role'))}</strong> — {r.get('company', 'Various')} 
-            <span style="color: var(--accent-blue-bright); font-weight:600;">({r.get('match_pct', 0)}% match)</span>
+        <div style="margin-bottom: 0.7rem; padding: 0.7rem 1rem; background: var(--bg-card2); border: 1px solid var(--border); border-left: 3px solid var(--accent-blue); border-radius: 10px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <strong style="color:var(--text-primary);">{r.get('title', r.get('role', 'Role'))}</strong>
+                <span style="color:var(--text-muted); font-size:0.75rem;"> · {r.get('company', 'Various')}</span>
+            </div>
+            <div style="text-align:right;">
+                <span style="color: var(--accent-blue-bright); font-weight:700; font-size:0.85rem;">{r.get('match_pct', 0)}%</span>
+                <div style="color:var(--text-muted); font-size:0.7rem;">{sal_str}</div>
+            </div>
         </div>
         """, unsafe_allow_html=True)
-        if r.get("salary_min"):
-            st.caption(f"💰 ৳{r['salary_min']:,} – ৳{r['salary_max']:,}/month")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # LLM Analysis
+    if analysis_raw:
+        st.markdown(f"""
+        <div class="result-card">
+            <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.8rem; font-size:0.9rem; font-family:'Syne',sans-serif;">🤖 AI Career Analysis</div>
+        """, unsafe_allow_html=True)
+        st.markdown(analysis_raw)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # AI Chat
+    st.markdown(f"""
+    <div class="result-card">
+        <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.6rem; font-size:0.9rem; font-family:'Syne',sans-serif;">💬 Ask Your Career Advisor</div>
+        <div style="color:var(--text-secondary); font-size:0.78rem; margin-bottom:0.8rem;">Ask anything about your CV, career path, skill gaps, or job search strategy.</div>
+    """, unsafe_allow_html=True)
+
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
+
+    for msg in st.session_state.chat_history[-6:]:
+        role_icon = "🧑" if msg["role"] == "user" else "🤖"
+        bg = "var(--glow-blue)" if msg["role"] == "user" else "var(--bg-card2)"
+        st.markdown(f"""
+        <div style="padding:0.6rem 0.9rem; background:{bg}; border:1px solid var(--border); border-radius:10px; margin-bottom:0.4rem; font-size:0.82rem; color:var(--text-primary);">
+            <strong>{role_icon}</strong> {msg["content"]}
+        </div>
+        """, unsafe_allow_html=True)
+
+    chat_input = st.text_input("Your question", placeholder="e.g. What skills should I learn first?", key="chat_input", label_visibility="collapsed")
+    if st.button("Send →", key="chat_send", type="primary"):
+        if chat_input and st.session_state.agent:
+            with st.spinner("Thinking..."):
+                reply = run_agent(st.session_state.agent, chat_input)
+            st.session_state.chat_history.append({"role": "user", "content": chat_input})
+            st.session_state.chat_history.append({"role": "assistant", "content": reply})
+            st.rerun()
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -1105,13 +1188,25 @@ def render_jd_match():
 
     if uploaded and jd_text and st.button("🎯 Calculate Match", use_container_width=True, type="primary"):
         with st.spinner("Calculating match..."):
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-                tmp.write(uploaded.read())
-                cv_text = extract_cv_text(tmp.name)
-                os.unlink(tmp.name)
-            st.session_state.cv_text = cv_text
-            st.session_state.jd_match_result = match_cv_with_jd(cv_text, jd_text)
-        st.rerun()
+            try:
+                tmp_path = None
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                    tmp.write(uploaded.read())
+                    tmp_path = tmp.name
+                # File closed — safe to read
+                cv_text = extract_cv_text(tmp_path)
+                os.unlink(tmp_path)
+
+                if not cv_text or len(cv_text.strip()) < 20:
+                    st.error("⚠️ Could not extract text from your PDF. Please ensure it's a text-based PDF (not scanned image).")
+                else:
+                    st.session_state.cv_text = cv_text
+                    st.session_state.jd_match_result = match_cv_with_jd(cv_text, jd_text)
+                    st.rerun()
+            except Exception as e:
+                if tmp_path and os.path.exists(tmp_path):
+                    os.unlink(tmp_path)
+                st.error(f"⚠️ Error reading PDF: {str(e)[:200]}. Please try a different PDF file.")
 
     if st.session_state.jd_match_result:
         render_jd_match_results()
