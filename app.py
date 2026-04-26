@@ -998,6 +998,7 @@ def render_analysis_results():
 # ============================================================
 # JD MATCH PAGE
 # ============================================================
+
 def render_jd_match():
     st.markdown("""
     <div class="main-content">
@@ -1014,7 +1015,7 @@ def render_jd_match():
         jd_text = st.text_area("Job Description", height=200, placeholder="Paste the full job description here...")
 
     if uploaded and jd_text and st.button("🎯 Calculate Match", use_container_width=True, type="primary"):
-        with st.spinner("Calculating match..."):
+        with st.spinner("Calculating match and analyzing..."):
             try:
                 tmp_path = None
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
@@ -1027,6 +1028,10 @@ def render_jd_match():
                     st.error("⚠️ Could not extract text from your PDF. Please ensure it's a text-based PDF (not scanned image).")
                 else:
                     st.session_state.cv_text = cv_text
+                    st.session_state.jd_text_for_match = jd_text
+                    # Initialize agent if not already done
+                    if not st.session_state.agent:
+                        st.session_state.agent = build_agent(cv_text, jd_text, st.session_state.candidate_name)
                     st.session_state.jd_match_result = match_cv_with_jd(cv_text, jd_text)
                     st.rerun()
             except Exception as e:
@@ -1043,39 +1048,272 @@ def render_jd_match():
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-
 def render_jd_match_results():
     result = st.session_state.jd_match_result
     pct = result.get("match_pct", 0)
-
-    if pct < 30:
-        color, status = "#ef4444", "Low Match"
-    elif pct < 60:
-        color, status = "#f59e0b", "Partial Match"
-    elif pct < 80:
-        color, status = "#10b981", "Good Match"
+    cv_text = st.session_state.get("cv_text", "")
+    jd_text = st.session_state.get("jd_text_for_match", "")
+    
+    # Get detailed analysis from the agent if available
+    if cv_text and jd_text and st.session_state.agent:
+        with st.spinner("Analyzing JD match in detail..."):
+            jd_analysis = run_agent(
+                st.session_state.agent,
+                f"""Analyze this job description match. My CV matches this JD at {pct}%. 
+                JD: {jd_text[:1500]}
+                
+                Provide structured analysis with these tags:
+                JD_MATCH_STRENGTH: [strengths of my CV for this role]
+                JD_GAPS: [what's missing]
+                JD_ACTION_PLAN: [3 specific things to do]
+                JD_VERDICT: [Should I apply? 1-2 sentences]
+                """
+            )
     else:
-        color, status = "#3b82f6", "Excellent Match!"
+        jd_analysis = ""
 
+    # Determine match quality colors and messages
+    if pct < 30:
+        color, status, icon, message = "#ef4444", "Low Match", "⚠️", "This role may require significant skill development before applying."
+        bg_intensity = "rgba(239,68,68,0.08)"
+        border_color = "rgba(239,68,68,0.3)"
+    elif pct < 60:
+        color, status, icon, message = "#f59e0b", "Partial Match", "📌", "You have some relevant skills. Focus on closing the identified gaps."
+        bg_intensity = "rgba(245,158,11,0.08)"
+        border_color = "rgba(245,158,11,0.3)"
+    elif pct < 80:
+        color, status, icon, message = "#10b981", "Good Match", "✅", "Strong alignment! Tailor your application to highlight matching skills."
+        bg_intensity = "rgba(16,185,129,0.08)"
+        border_color = "rgba(16,185,129,0.3)"
+    else:
+        color, status, icon, message = "#3b82f6", "Excellent Match!", "🎯", "You're highly qualified. Apply confidently and customize your cover letter."
+        bg_intensity = "rgba(59,130,246,0.08)"
+        border_color = "rgba(59,130,246,0.3)"
+
+    # Main score card with detailed context
     st.markdown(f"""
-    <div class="result-card">
-        <div style="text-align:center;">
-            <div style="font-size:0.72rem; color:var(--text-muted); font-weight:600; letter-spacing:0.1em; text-transform:uppercase;">Match Score</div>
-            <div style="font-family:'Syne',sans-serif; font-size:3rem; font-weight:800; color:{color}; line-height:1.1;">{pct}%</div>
-            <div style="font-size:0.9rem; font-weight:600; color:{color}; margin-top:0.3rem;">{status}</div>
+    <div class="result-card" style="text-align:center; padding:2rem 1.5rem;">
+        <div style="font-size:0.68rem; font-weight:700; color:{color}; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.5rem;">
+            {icon} JD Match Analysis
+        </div>
+        <div style="font-family:'Syne',sans-serif; font-size:4rem; font-weight:900; line-height:1;
+                    background:linear-gradient(135deg,{color},{color}99);
+                    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+                    filter:drop-shadow(0 0 20px {color}40); margin-bottom:0.5rem;">
+            {pct}%
+        </div>
+        <div style="font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:700; color:var(--text-primary); margin-bottom:0.5rem;">
+            {status}
+        </div>
+        <div style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:1rem; max-width:500px; margin-left:auto; margin-right:auto;">
+            {message}
+        </div>
+        <div style="background:var(--bg-card2); border:1px solid var(--border); border-radius:30px; height:8px; overflow:hidden; margin:0 2rem 1rem;">
+            <div style="width:{pct}%; height:100%; background:linear-gradient(90deg, {color}, {color}cc); border-radius:30px;
+                        transition:width 0.8s ease;"></div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    if result.get("similar_roles"):
-        st.markdown("### 📊 Similar Roles from Database")
+    # Skill Match Breakdown
+    if cv_text and result.get("similar_roles"):
+        cv_lower = cv_text.lower()
+        all_required_skills = []
         for role in result["similar_roles"][:3]:
+            all_required_skills.extend(role.get("skills", []))
+        unique_skills = list(dict.fromkeys(all_required_skills))[:12]
+        
+        matched_skills = []
+        missing_skills = []
+        partial_skills = []
+        
+        for skill in unique_skills:
+            skill_lower = skill.lower()
+            if skill_lower in cv_lower:
+                matched_skills.append(skill)
+            elif any(word in cv_lower for word in skill_lower.split() if len(word) > 3):
+                partial_skills.append(skill)
+            else:
+                missing_skills.append(skill)
+        
+        match_ratio = len(matched_skills) / max(len(unique_skills), 1)
+        
+        st.markdown(f"""
+        <div class="result-card">
+            <div style="font-weight:700; color:var(--text-primary); margin-bottom:1rem; font-size:0.9rem; font-family:'Syne',sans-serif;">
+                🔍 Skill Match Breakdown
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:1rem;">
+                <div style="text-align:center; padding:0.5rem; background:rgba(16,185,129,0.1); border-radius:10px;">
+                    <div style="font-size:1.3rem; font-weight:800; color:#10b981;">{len(matched_skills)}</div>
+                    <div style="font-size:0.68rem; color:var(--text-muted);">Matched</div>
+                </div>
+                <div style="text-align:center; padding:0.5rem; background:rgba(245,158,11,0.1); border-radius:10px;">
+                    <div style="font-size:1.3rem; font-weight:800; color:#f59e0b;">{len(partial_skills)}</div>
+                    <div style="font-size:0.68rem; color:var(--text-muted);">Partial</div>
+                </div>
+                <div style="text-align:center; padding:0.5rem; background:rgba(239,68,68,0.1); border-radius:10px;">
+                    <div style="font-size:1.3rem; font-weight:800; color:#ef4444;">{len(missing_skills)}</div>
+                    <div style="font-size:0.68rem; color:var(--text-muted);">Missing</div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        if matched_skills:
+            skills_chips = "".join(f"<span class='skill-chip' style='background:rgba(16,185,129,0.15); border-color:#10b981;'>✓ {s}</span>" for s in matched_skills[:8])
             st.markdown(f"""
-            <div style="padding:0.7rem 1rem; background:var(--bg-card); border:1px solid var(--border); border-radius:10px; margin-bottom:0.5rem; color:var(--text-primary);">
-                <strong>{role.get('title', role.get('role', 'Role'))}</strong>
-                <span style="color:var(--text-muted);"> at {role.get('company', 'Various')}</span>
+            <div style="margin-top:0.8rem;">
+                <div style="font-size:0.72rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.4rem;">✅ Skills You Have</div>
+                <div style="display:flex; flex-wrap:wrap; gap:0.3rem;">{skills_chips}</div>
             </div>
             """, unsafe_allow_html=True)
+        
+        if missing_skills:
+            missing_chips = "".join(f"<span class='skill-chip gap-chip'>✗ {s}</span>" for s in missing_skills[:8])
+            st.markdown(f"""
+            <div style="margin-top:0.8rem;">
+                <div style="font-size:0.72rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.4rem;">❌ Skills to Develop</div>
+                <div style="display:flex; flex-wrap:wrap; gap:0.3rem;">{missing_chips}</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # Similar Roles with context
+    if result.get("similar_roles"):
+        st.markdown("""
+        <div class="result-card">
+            <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.8rem; font-size:0.9rem; font-family:'Syne',sans-serif;">
+                📊 Similar Roles You May Qualify For
+            </div>
+        """, unsafe_allow_html=True)
+        
+        for i, role in enumerate(result["similar_roles"][:4]):
+            role_title = role.get('title', role.get('role', 'Role'))
+            role_company = role.get('company', 'Various')
+            role_score = role.get('match_pct', 0)
+            sal_min = role.get('salary_min', 0)
+            sal_max = role.get('salary_max', 0)
+            sal_str = f"৳{sal_min:,}–৳{sal_max:,}/mo" if sal_min else "Salary not specified"
+            
+            # Determine if this role is better match than current JD
+            comparison = ""
+            if role_score > pct + 10:
+                comparison = f"<span style='color:#10b981; font-size:0.65rem;'>▲ Better fit than this JD</span>"
+            elif role_score > pct:
+                comparison = f"<span style='color:#f59e0b; font-size:0.65rem;'>▲ Slightly better fit</span>"
+            elif role_score < pct - 10:
+                comparison = f"<span style='color:#ef4444; font-size:0.65rem;'>▼ This JD fits you better</span>"
+            
+            st.markdown(f"""
+            <div style="margin-bottom:0.7rem; padding:0.8rem 1rem; background:var(--bg-card2); border:1px solid var(--border); 
+                        border-left:3px solid {'#10b981' if role_score > pct else '#3b82f6'}; border-radius:10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+                    <div>
+                        <strong style="color:var(--text-primary); font-size:0.88rem;">{role_title}</strong>
+                        <span style="color:var(--text-muted); font-size:0.72rem;"> · {role_company}</span>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="color:{'#10b981' if role_score > pct else '#3b82f6'}; font-weight:700; font-size:0.85rem;">{role_score}% match</span>
+                        <div style="color:var(--text-muted); font-size:0.65rem;">{sal_str}</div>
+                    </div>
+                </div>
+                {f"<div style='margin-top:0.4rem;'>{comparison}</div>" if comparison else ""}
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # Actionable Recommendations
+    st.markdown(f"""
+    <div class="result-card" style="border-left:4px solid {color};">
+        <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.6rem; font-size:0.88rem; font-family:'Syne',sans-serif;">
+            💡 Actionable Recommendations
+        </div>
+        <div style="color:var(--text-primary); font-size:0.85rem; line-height:1.6; margin-bottom:0.8rem;">
+            {_generate_jd_recommendation(pct, result)}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # LLM Analysis if available
+    if jd_analysis:
+        st.markdown("""
+        <div class="result-card">
+            <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.7rem; font-size:0.88rem; font-family:'Syne',sans-serif;">
+                🤖 AI Career Advisor Insights
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Parse and display LLM analysis
+        def parse_jd_tag(text, tag):
+            pattern = rf'{tag}:\s*(.*?)(?=\n[A-Z_]+:|$)'
+            m = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
+            return m.group(1).strip() if m else ""
+        
+        strengths = parse_jd_tag(jd_analysis, "JD_MATCH_STRENGTH")
+        gaps = parse_jd_tag(jd_analysis, "JD_GAPS")
+        action_plan = parse_jd_tag(jd_analysis, "JD_ACTION_PLAN")
+        verdict = parse_jd_tag(jd_analysis, "JD_VERDICT")
+        
+        if strengths:
+            st.markdown(f"""
+            <div style="margin-bottom:0.8rem;">
+                <div style="font-size:0.72rem; font-weight:700; color:var(--accent-green); margin-bottom:0.3rem;">✨ Your Strengths</div>
+                <div style="color:var(--text-secondary); font-size:0.82rem; line-height:1.5;">{strengths}</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        if gaps:
+            st.markdown(f"""
+            <div style="margin-bottom:0.8rem;">
+                <div style="font-size:0.72rem; font-weight:700; color:var(--accent-amber); margin-bottom:0.3rem;">📋 Gaps to Address</div>
+                <div style="color:var(--text-secondary); font-size:0.82rem; line-height:1.5;">{gaps}</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        if action_plan:
+            st.markdown(f"""
+            <div style="margin-bottom:0.8rem;">
+                <div style="font-size:0.72rem; font-weight:700; color:var(--accent-blue); margin-bottom:0.3rem;">🚀 Next Steps</div>
+                <div style="color:var(--text-secondary); font-size:0.82rem; line-height:1.5;">{action_plan}</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        if verdict:
+            st.markdown(f"""
+            <div style="margin-top:0.5rem; padding-top:0.5rem; border-top:1px solid var(--border);">
+                <div style="font-size:0.72rem; font-weight:700; color:{color}; margin-bottom:0.3rem;">🎯 Verdict</div>
+                <div style="color:var(--text-primary); font-size:0.85rem; line-height:1.5;">{verdict}</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+    
+    # Back button
+    st.markdown("---")
+    if st.button("← Back to Home", key="back_home_jd"):
+        nav_goto("home")
+
+def _generate_jd_recommendation(pct: int, result: dict) -> str:
+    """Generate contextual recommendations based on match score."""
+    if pct < 30:
+        return """**Hold off on applying** — Focus on building foundational skills first. 
+        Complete 2-3 relevant projects and earn certifications in the required technologies. 
+        Consider applying for internships or junior roles to gain experience."""
+    elif pct < 60:
+        return """**Apply with tailored approach** — Your application needs customization. 
+        Highlight the skills you do have prominently. Create a portfolio project addressing their specific needs. 
+        Use the skill gaps above as a learning roadmap for the next 2-3 months."""
+    elif pct < 80:
+        return """**Strong candidate — Apply now!** Customize your CV to emphasize matching skills. 
+        Write a targeted cover letter addressing how your experience solves their problems. 
+        Prepare specific examples from your past work that relate to their requirements."""
+    else:
+        return """**Excellent fit — Priority application!** You're highly qualified. 
+        Apply immediately and follow up within a week. Prepare for interviews by reviewing their tech stack. 
+        Consider reaching out to current employees for referral — you have strong alignment.""" 
+
 
 
 # ============================================================
