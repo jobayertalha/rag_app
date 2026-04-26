@@ -1336,17 +1336,15 @@ def render_quiz():
         with col1:
             if st.button("🔄 Take Quiz Again", use_container_width=True):
                 # COMPLETELY reset everything
-                st.session_state.quiz_result = None
-                st.session_state.quiz_responses = {}
-                st.session_state.current_quiz_questions = None
-                st.session_state.quiz_started = False
+                for key in ["quiz_result", "quiz_responses", "current_quiz_questions", "quiz_started"]:
+                    if key in st.session_state:
+                        del st.session_state[key]
                 st.rerun()
         with col2:
             if st.button("← Back to Home", use_container_width=True):
-                st.session_state.quiz_result = None
-                st.session_state.quiz_responses = {}
-                st.session_state.current_quiz_questions = None
-                st.session_state.quiz_started = False
+                for key in ["quiz_result", "quiz_responses", "current_quiz_questions", "quiz_started"]:
+                    if key in st.session_state:
+                        del st.session_state[key]
                 nav_goto("home")
         st.markdown("</div>", unsafe_allow_html=True)
         return
@@ -1358,63 +1356,69 @@ def render_quiz():
     if quiz_started and st.session_state.get("current_quiz_questions") is not None:
         questions = st.session_state.current_quiz_questions
         
-        # Initialize or get responses
+        # Initialize responses if not exists
         if "quiz_responses" not in st.session_state:
             st.session_state.quiz_responses = {}
         
-        # Create a form for the quiz
-        with st.form(key="quiz_answers_form"):
-            # Display questions
-            for q in questions:
-                qid = q["display_id"]
-                st.markdown(f"""
-                <div class="quiz-question">
-                    <div class="quiz-question-text">{qid}. {q["question"]}</div>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                # Get current stored answer for this question
-                current_answer = st.session_state.quiz_responses.get(qid)
-                
-                # Radio button with NO pre-selected answer (index=None)
-                response = st.radio(
-                    f"question_{qid}",
-                    options=q["options"],
-                    label_visibility="collapsed",
-                    index=None,  # NO pre-selected answer!
-                    key=f"radio_{qid}"
-                )
-                
-                # Store in session state when user selects an answer
-                if response is not None:
-                    selected_index = q["options"].index(response)
+        # Display questions - NO form, track answers in real-time
+        for q in questions:
+            qid = q["display_id"]
+            st.markdown(f"""
+            <div class="quiz-question">
+                <div class="quiz-question-text">{qid}. {q["question"]}</div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Get current stored answer for this question
+            current_answer = st.session_state.quiz_responses.get(qid)
+            
+            # Radio button with unique key
+            radio_key = f"quiz_radio_{qid}"
+            
+            # Radio button - shows current selection, index=None for no pre-selection
+            response = st.radio(
+                radio_key,
+                options=q["options"],
+                label_visibility="collapsed",
+                index=current_answer if current_answer is not None else None,
+                key=radio_key
+            )
+            
+            # Store answer immediately when selected
+            if response is not None:
+                selected_index = q["options"].index(response)
+                if current_answer != selected_index:
                     st.session_state.quiz_responses[qid] = selected_index
-            
-            # Count ACTUALLY answered questions (where value is not None)
-            answered_count = 0
-            for q in questions:
-                qid = q["display_id"]
-                if st.session_state.quiz_responses.get(qid) is not None:
-                    answered_count += 1
-            
-            all_answered = answered_count == len(questions)
-            
-            # Show progress
-            if not all_answered:
-                st.warning(f"📊 Progress: {answered_count}/{len(questions)} questions answered")
+                    st.rerun()
+        
+        # Count ACTUALLY answered questions (where value is not None)
+        answered_count = 0
+        for q in questions:
+            qid = q["display_id"]
+            if st.session_state.quiz_responses.get(qid) is not None:
+                answered_count += 1
+        
+        all_answered = answered_count == len(questions)
+        
+        # Show progress
+        if not all_answered:
+            st.warning(f"📊 Progress: {answered_count}/{len(questions)} questions answered")
+        else:
+            st.success(f"✅ All {len(questions)} questions answered! Click 'Get Results' below.")
+        
+        # Center the button
+        col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+        with col_btn2:
+            if all_answered:
+                if st.button("📊 Get Results", use_container_width=True, type="primary"):
+                    from quiz import calculate_interest_score
+                    # Filter out None values before calculating
+                    valid_responses = {k: v for k, v in st.session_state.quiz_responses.items() if v is not None}
+                    result = calculate_interest_score(valid_responses, st.session_state.current_quiz_questions)
+                    st.session_state.quiz_result = result
+                    st.rerun()
             else:
-                st.success(f"✅ All {len(questions)} questions answered! Click 'Get Results' below.")
-            
-            # Submit button - disabled until all questions are actually answered
-            submitted = st.form_submit_button("📊 Get Results", use_container_width=True, type="primary", disabled=not all_answered)
-            
-            if submitted and all_answered:
-                from quiz import calculate_interest_score
-                # Filter out None values before calculating
-                valid_responses = {k: v for k, v in st.session_state.quiz_responses.items() if v is not None}
-                result = calculate_interest_score(valid_responses, st.session_state.current_quiz_questions)
-                st.session_state.quiz_result = result
-                st.rerun()
+                st.button("📊 Get Results", use_container_width=True, disabled=True, type="primary")
         
         st.markdown("</div>", unsafe_allow_html=True)
         return
@@ -1435,6 +1439,10 @@ def render_quiz():
         if st.button("🚀 Start Quiz", use_container_width=True, type="primary"):
             from quiz import get_shuffled_questions
             # Clean start - remove any old state
+            for key in ["quiz_responses", "quiz_result", "current_quiz_questions", "quiz_started"]:
+                if key in st.session_state:
+                    del st.session_state[key]
+            # Generate new shuffled questions
             st.session_state.current_quiz_questions = get_shuffled_questions()
             st.session_state.quiz_responses = {}  # Empty dict!
             st.session_state.quiz_started = True
@@ -1443,10 +1451,9 @@ def render_quiz():
 
     st.markdown("---")
     if st.button("← Back to Home", key="back_home_quiz_start"):
-        st.session_state.quiz_started = False
-        st.session_state.quiz_responses = {}
-        st.session_state.current_quiz_questions = None
-        st.session_state.quiz_result = None
+        for key in ["quiz_result", "quiz_responses", "current_quiz_questions", "quiz_started"]:
+            if key in st.session_state:
+                del st.session_state[key]
         nav_goto("home")
 
     st.markdown("</div>", unsafe_allow_html=True)
