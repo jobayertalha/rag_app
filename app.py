@@ -134,27 +134,17 @@ st.markdown(f"""
 }}
 
 * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-
-html, body, [class*="css"] {{
-    font-family: 'Space Grotesk', sans-serif !important;
-}}
-
-.stApp {{
-    background: var(--bg-primary) !important;
-    min-height: 100vh;
-}}
-
+html, body, [class*="css"] {{ font-family: 'Space Grotesk', sans-serif !important; }}
+.stApp {{ background: var(--bg-primary) !important; min-height: 100vh; }}
 #MainMenu {{visibility: hidden;}}
 footer {{visibility: hidden;}}
 .stDeployButton {{display: none;}}
 
-/* ─── SIDEBAR ─── */
 [data-testid="stSidebar"] {{
     background: {T['sidebar_bg']} !important;
     border-right: 1px solid var(--border) !important;
     padding-top: 0 !important;
 }}
-
 [data-testid="stSidebarCollapseButton"] {{
     display: flex !important;
     background: {T['accent_blue']} !important;
@@ -163,624 +153,182 @@ footer {{visibility: hidden;}}
     margin: 0.5rem !important;
     z-index: 999999 !important;
 }}
-[data-testid="stSidebarCollapseButton"] svg {{
-    fill: #ffffff !important;
-}}
+[data-testid="stSidebarCollapseButton"] svg {{ fill: #ffffff !important; }}
 
-/* Brand header in sidebar */
 .sidebar-brand {{
-    text-align: center;
-    padding: 1rem 0.5rem 0.6rem;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 0.6rem;
-    position: relative;
+    text-align: center; padding: 1rem 0.5rem 0.6rem;
+    border-bottom: 1px solid var(--border); margin-bottom: 0.6rem; position: relative;
 }}
+.sidebar-brand-logo {{ font-size: 2rem; display: block; margin-bottom: 0.2rem; filter: drop-shadow(0 0 8px var(--glow-blue)); }}
+.sidebar-brand-name {{ font-family: 'Syne', sans-serif !important; font-size: 0.72rem; font-weight: 700; color: var(--text-primary); letter-spacing: 0.05em; text-transform: uppercase; }}
+.sidebar-brand-name span {{ color: var(--accent-blue); }}
 
-.sidebar-brand-logo {{
-    font-size: 2rem;
-    display: block;
-    margin-bottom: 0.2rem;
-    filter: drop-shadow(0 0 8px var(--glow-blue));
-}}
-
-.sidebar-brand-name {{
-    font-family: 'Syne', sans-serif !important;
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-}}
-
-.sidebar-brand-name span {{
-    color: var(--accent-blue);
-}}
-
-/* Sidebar user chip */
 .user-chip {{
-    background: var(--bg-card2);
-    border: 1px solid var(--border);
-    border-radius: 30px;
-    padding: 0.3rem 0.7rem;
-    margin-bottom: 0.7rem;
-    text-align: center;
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-    font-weight: 500;
+    background: var(--bg-card2); border: 1px solid var(--border); border-radius: 30px;
+    padding: 0.3rem 0.7rem; margin-bottom: 0.7rem; text-align: center;
+    font-size: 0.7rem; color: var(--text-secondary); font-weight: 500;
     box-shadow: inset 0 0 10px var(--glow-blue);
 }}
 
-/* ─── NAV BUTTONS: universal base ─── */
 [data-testid="stSidebar"] .stButton > button {{
-    border-radius: 10px !important;
-    padding: 0.6rem 1rem !important;
-    margin-bottom: 0.28rem !important;
-    transition: all 0.22s ease !important;
-    white-space: normal !important;
-    line-height: 1.4 !important;
-    height: auto !important;
-    min-height: 44px !important;
-    font-weight: 700 !important;
-    font-size: 0.73rem !important;
-    font-family: 'Space Grotesk', sans-serif !important;
-    letter-spacing: 0.02em !important;
-    width: 100% !important;
-    /* Solid visible default */
-    background: var(--bg-card2) !important;
-    border: 2px solid var(--accent-blue) !important;
-    color: var(--accent-blue) !important;
+    border-radius: 10px !important; padding: 0.6rem 1rem !important; margin-bottom: 0.28rem !important;
+    transition: all 0.22s ease !important; white-space: normal !important; line-height: 1.4 !important;
+    height: auto !important; min-height: 44px !important; font-weight: 700 !important;
+    font-size: 0.73rem !important; font-family: 'Space Grotesk', sans-serif !important;
+    letter-spacing: 0.02em !important; width: 100% !important;
+    background: var(--bg-card2) !important; border: 2px solid var(--accent-blue) !important; color: var(--accent-blue) !important;
 }}
-
-/* Force all child text nodes to inherit color */
-[data-testid="stSidebar"] .stButton > button *,
-[data-testid="stSidebar"] .stButton > button p,
-[data-testid="stSidebar"] .stButton > button span,
-[data-testid="stSidebar"] .stButton > button div {{
-    color: inherit !important;
-    font-size: inherit !important;
-    font-weight: inherit !important;
-    background: transparent !important;
+[data-testid="stSidebar"] .stButton > button *, [data-testid="stSidebar"] .stButton > button p,
+[data-testid="stSidebar"] .stButton > button span, [data-testid="stSidebar"] .stButton > button div {{
+    color: inherit !important; font-size: inherit !important; font-weight: inherit !important; background: transparent !important;
 }}
-
 [data-testid="stSidebar"] .stButton > button:hover {{
-    transform: translateX(4px) !important;
-    background: var(--accent-blue) !important;
-    color: #ffffff !important;
-    border-color: var(--accent-blue) !important;
-    box-shadow: 0 4px 20px var(--glow-blue) !important;
+    transform: translateX(4px) !important; background: var(--accent-blue) !important;
+    color: #ffffff !important; border-color: var(--accent-blue) !important; box-shadow: 0 4px 20px var(--glow-blue) !important;
 }}
-
-/* ACTIVE page button rendered as type=primary */
 [data-testid="stSidebar"] .stButton > button[kind="primary"] {{
     background: linear-gradient(135deg, var(--accent-blue-dark), var(--accent-blue)) !important;
-    color: #ffffff !important;
-    border: 2px solid transparent !important;
-    box-shadow: 0 4px 18px var(--glow-blue) !important;
+    color: #ffffff !important; border: 2px solid transparent !important; box-shadow: 0 4px 18px var(--glow-blue) !important;
 }}
 [data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {{
     background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)) !important;
-    color: #ffffff !important;
-    transform: translateX(2px) !important;
+    color: #ffffff !important; transform: translateX(2px) !important;
 }}
 
-/* ─── MAIN CONTENT ─── */
-.main-content {{
-    padding: 0.5rem 2rem 2rem 2rem;
-}}
-
-/* Page header with gradient underline */
-.main-header {{
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.8rem;
-    position: relative;
-}}
-
+.main-content {{ padding: 0.5rem 2rem 2rem 2rem; }}
+.main-header {{ margin-bottom: 1.5rem; padding-bottom: 0.8rem; position: relative; }}
 .main-header::after {{
-    content: '';
-    display: block;
-    margin-top: 0.7rem;
-    width: 100%;
-    height: 1px;
+    content: ''; display: block; margin-top: 0.7rem; width: 100%; height: 1px;
     background: linear-gradient(90deg, var(--accent-blue) 0%, var(--accent-cyan) 8%, var(--border) 30%, transparent 100%);
     border-radius: 2px;
 }}
+.main-header h1 {{ font-family: 'Syne', sans-serif !important; font-size: 1.85rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.3rem; letter-spacing: -0.02em; }}
+.main-header h1 .hl {{ background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }}
+.main-header p {{ color: var(--text-secondary); font-size: 0.88rem; }}
 
-.main-header h1 {{
-    font-family: 'Syne', sans-serif !important;
-    font-size: 1.85rem;
-    font-weight: 800;
-    color: var(--text-primary);
-    margin-bottom: 0.3rem;
-    letter-spacing: -0.02em;
-}}
-
-.main-header h1 .hl {{
-    background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}}
-
-.main-header p {{
-    color: var(--text-secondary);
-    font-size: 0.88rem;
-}}
-
-/* ─── FEATURE CARDS ─── */
 .feature-card {{
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 1.5rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    height: 100%;
-    position: relative;
-    overflow: hidden;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px;
+    padding: 1.5rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); height: 100%; position: relative; overflow: hidden;
 }}
-
 .feature-card::before {{
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan), var(--accent-blue));
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan), var(--accent-blue)); opacity: 0; transition: opacity 0.3s ease;
 }}
+.feature-card:hover {{ transform: translateY(-6px); border-color: var(--border-glow); box-shadow: var(--card-hover-shadow); }}
+.feature-card:hover::before {{ opacity: 1; }}
+.feature-icon {{ font-size: 2.2rem; margin-bottom: 0.8rem; display: block; filter: drop-shadow(0 0 6px var(--glow-blue)); }}
+.feature-title {{ font-family: 'Syne', sans-serif !important; font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem; letter-spacing: -0.01em; }}
+.feature-desc {{ color: var(--text-secondary); font-size: 0.8rem; line-height: 1.55; }}
+.feature-tags {{ margin-top: 0.85rem; display: flex; gap: 0.4rem; flex-wrap: wrap; }}
+.feature-tag {{ background: var(--glow-blue); border: 1px solid var(--border-glow); border-radius: 20px; padding: 0.2rem 0.65rem; font-size: 0.62rem; color: var(--accent-blue-bright); font-weight: 600; letter-spacing: 0.03em; }}
 
-.feature-card:hover {{
-    transform: translateY(-6px);
-    border-color: var(--border-glow);
-    box-shadow: var(--card-hover-shadow);
-}}
-
-.feature-card:hover::before {{
-    opacity: 1;
-}}
-
-.feature-icon {{
-    font-size: 2.2rem;
-    margin-bottom: 0.8rem;
-    display: block;
-    filter: drop-shadow(0 0 6px var(--glow-blue));
-}}
-
-.feature-title {{
-    font-family: 'Syne', sans-serif !important;
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
-    letter-spacing: -0.01em;
-}}
-
-.feature-desc {{
-    color: var(--text-secondary);
-    font-size: 0.8rem;
-    line-height: 1.55;
-}}
-
-.feature-tags {{
-    margin-top: 0.85rem;
-    display: flex;
-    gap: 0.4rem;
-    flex-wrap: wrap;
-}}
-
-.feature-tag {{
-    background: var(--glow-blue);
-    border: 1px solid var(--border-glow);
-    border-radius: 20px;
-    padding: 0.2rem 0.65rem;
-    font-size: 0.62rem;
-    color: var(--accent-blue-bright);
-    font-weight: 600;
-    letter-spacing: 0.03em;
-}}
-
-/* ─── RESULT CARDS ─── */
 .result-card {{
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 1.6rem;
-    margin-bottom: 1.5rem;
-    position: relative;
-    overflow: hidden;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px;
+    padding: 1.6rem; margin-bottom: 1.5rem; position: relative; overflow: hidden;
 }}
-
 .result-card::after {{
-    content: '';
-    position: absolute;
-    top: -40px; right: -40px;
-    width: 120px; height: 120px;
-    background: radial-gradient(circle, var(--glow-blue) 0%, transparent 70%);
-    pointer-events: none;
+    content: ''; position: absolute; top: -40px; right: -40px; width: 120px; height: 120px;
+    background: radial-gradient(circle, var(--glow-blue) 0%, transparent 70%); pointer-events: none;
 }}
 
-.match-score {{
-    text-align: center;
-    padding: 1rem;
-}}
+.skill-chip {{ display: inline-block; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 20px; padding: 0.22rem 0.65rem; font-size: 0.68rem; color: var(--text-secondary); margin: 0.2rem; font-weight: 500; }}
+.gap-chip {{ border-color: #7f1d1d; color: #fca5a5; background: rgba(127,29,29,0.15); }}
 
-.match-percentage {{
-    font-family: 'Syne', sans-serif !important;
-    font-size: 3rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1;
-    filter: drop-shadow(0 0 20px var(--glow-blue));
-}}
-
-/* ─── SKILL CHIPS ─── */
-.skill-chip {{
-    display: inline-block;
-    background: var(--bg-card2);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 0.22rem 0.65rem;
-    font-size: 0.68rem;
-    color: var(--text-secondary);
-    margin: 0.2rem;
-    font-weight: 500;
-}}
-
-.gap-chip {{
-    border-color: #7f1d1d;
-    color: #fca5a5;
-    background: rgba(127,29,29,0.15);
-}}
-
-/* ─── FORM ELEMENTS ─── */
-.stTextInput > div > div > input,
-.stTextArea > div > div > textarea {{
-    background: var(--input-bg) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 12px !important;
-    color: var(--text-primary) !important;
-    font-family: 'Space Grotesk', sans-serif !important;
+.stTextInput > div > div > input, .stTextArea > div > div > textarea {{
+    background: var(--input-bg) !important; border: 1px solid var(--border) !important; border-radius: 12px !important;
+    color: var(--text-primary) !important; font-family: 'Space Grotesk', sans-serif !important;
     transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }}
-
-.stTextInput > div > div > input:focus,
-.stTextArea > div > div > textarea:focus {{
-    border-color: var(--accent-blue) !important;
-    box-shadow: 0 0 0 3px var(--glow-blue) !important;
+.stTextInput > div > div > input:focus, .stTextArea > div > div > textarea:focus {{
+    border-color: var(--accent-blue) !important; box-shadow: 0 0 0 3px var(--glow-blue) !important;
 }}
 
-/* ─── CONTACT & ABOUT ─── */
-.contact-card, .about-card {{
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 1.6rem;
-}}
-
-.contact-item {{
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.85rem 0;
-    border-bottom: 1px solid var(--border);
-}}
+.contact-card, .about-card {{ background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 1.6rem; }}
+.contact-item {{ display: flex; align-items: center; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }}
 .contact-item:last-child {{ border-bottom: none; }}
-
 .contact-icon {{ font-size: 1.2rem; min-width: 40px; color: var(--accent-blue-bright); }}
 .contact-label {{ font-weight: 600; color: var(--text-primary); min-width: 90px; font-size: 0.84rem; }}
 .contact-value {{ color: var(--text-secondary); font-size: 0.84rem; }}
 .contact-link {{ color: var(--accent-blue-bright); text-decoration: none; }}
 .contact-link:hover {{ color: var(--accent-cyan); text-decoration: underline; }}
-
-.social-grid {{
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-top: 1rem;
-}}
-
-.social-card {{
-    background: var(--bg-card2);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 0.9rem;
-    text-align: center;
-    transition: all 0.3s ease;
-    text-decoration: none;
-}}
-
-.social-card:hover {{
-    background: var(--glow-blue);
-    border-color: var(--accent-blue);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px var(--glow-blue);
-}}
-
+.social-grid {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; }}
+.social-card {{ background: var(--bg-card2); border: 1px solid var(--border); border-radius: 14px; padding: 0.9rem; text-align: center; transition: all 0.3s ease; text-decoration: none; }}
+.social-card:hover {{ background: var(--glow-blue); border-color: var(--accent-blue); transform: translateY(-3px); box-shadow: 0 8px 24px var(--glow-blue); }}
 .social-icon {{ font-size: 1.4rem; margin-bottom: 0.3rem; }}
 .social-name {{ color: var(--text-secondary); font-size: 0.75rem; font-weight: 600; }}
-
-.interest-tag {{
-    display: inline-block;
-    background: var(--glow-blue);
-    border: 1px solid var(--border-glow);
-    border-radius: 20px;
-    padding: 0.25rem 0.85rem;
-    font-size: 0.7rem;
-    color: var(--accent-blue-bright);
-    margin: 0.2rem;
-    font-weight: 600;
-}}
-
+.interest-tag {{ display: inline-block; background: var(--glow-blue); border: 1px solid var(--border-glow); border-radius: 20px; padding: 0.25rem 0.85rem; font-size: 0.7rem; color: var(--accent-blue-bright); margin: 0.2rem; font-weight: 600; }}
 .tech-stack {{ display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.8rem; }}
-
-.tech-pill {{
-    background: var(--bg-card2);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 0.22rem 0.65rem;
-    font-size: 0.65rem;
-    color: var(--text-muted);
-    font-weight: 500;
-}}
-
-.profile-header {{
-    text-align: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border);
-}}
+.tech-pill {{ background: var(--bg-card2); border: 1px solid var(--border); border-radius: 20px; padding: 0.22rem 0.65rem; font-size: 0.65rem; color: var(--text-muted); font-weight: 500; }}
+.profile-header {{ text-align: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }}
 .profile-icon {{ font-size: 3.2rem; margin-bottom: 0.4rem; }}
-.profile-name {{
-    font-family: 'Syne', sans-serif !important;
-    font-size: 1.35rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.2rem;
-}}
+.profile-name {{ font-family: 'Syne', sans-serif !important; font-size: 1.35rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.2rem; }}
 .profile-title {{ color: var(--accent-blue-bright); font-size: 0.8rem; font-weight: 600; }}
+.section-header {{ font-family: 'Syne', sans-serif !important; font-size: 0.88rem; font-weight: 700; color: var(--text-primary); margin: 1rem 0 0.5rem 0; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); letter-spacing: 0.02em; }}
 
-.section-header {{
-    font-family: 'Syne', sans-serif !important;
-    font-size: 0.88rem; font-weight: 700; color: var(--text-primary);
-    margin: 1rem 0 0.5rem 0; padding-bottom: 0.4rem;
-    border-bottom: 1px solid var(--border);
-    letter-spacing: 0.02em;
-}}
+.welcome-container {{ max-width: 400px; margin: 50px auto; text-align: center; }}
+.welcome-badge {{ display: inline-block; background: var(--glow-blue); border: 1px solid var(--border-glow); border-radius: 30px; padding: 0.3rem 1rem; font-size: 0.65rem; color: var(--accent-blue-bright); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.8rem; }}
+.welcome-title {{ font-family: 'Syne', sans-serif !important; font-size: 2rem; font-weight: 800; margin-bottom: 0.4rem; color: var(--text-primary); line-height: 1.1; letter-spacing: -0.03em; }}
+.welcome-gradient {{ background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }}
+.welcome-subtitle {{ color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.82rem; line-height: 1.5; }}
+.welcome-card {{ background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 1.4rem; box-shadow: 0 20px 60px var(--glow-blue); position: relative; overflow: hidden; }}
+.welcome-card::before {{ content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); }}
 
-/* ─── WELCOME SCREEN ─── */
-.welcome-container {{
-    max-width: 400px;
-    margin: 50px auto;
-    text-align: center;
-}}
-
-.welcome-badge {{
-    display: inline-block;
-    background: var(--glow-blue);
-    border: 1px solid var(--border-glow);
-    border-radius: 30px;
-    padding: 0.3rem 1rem;
-    font-size: 0.65rem;
-    color: var(--accent-blue-bright);
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 0.8rem;
-}}
-
-.welcome-title {{
-    font-family: 'Syne', sans-serif !important;
-    font-size: 2rem;
-    font-weight: 800;
-    margin-bottom: 0.4rem;
-    color: var(--text-primary);
-    line-height: 1.1;
-    letter-spacing: -0.03em;
-}}
-
-.welcome-gradient {{
-    background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}}
-
-.welcome-subtitle {{
-    color: var(--text-secondary);
-    margin-bottom: 1.5rem;
-    font-size: 0.82rem;
-    line-height: 1.5;
-}}
-
-.welcome-card {{
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 1.4rem;
-    box-shadow: 0 20px 60px var(--glow-blue);
-    position: relative;
-    overflow: hidden;
-}}
-
-.welcome-card::before {{
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
-}}
-
-/* ─── QUIZ ─── */
-.quiz-start-container {{
-    max-width: 400px; margin: 30px auto; text-align: center;
-}}
-
-.quiz-start-card {{
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 1.4rem;
-    box-shadow: 0 8px 32px var(--glow-blue);
-}}
-
+.quiz-start-container {{ max-width: 400px; margin: 30px auto; text-align: center; }}
+.quiz-start-card {{ background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 1.4rem; box-shadow: 0 8px 32px var(--glow-blue); }}
 .quiz-start-icon {{ font-size: 2rem; margin-bottom: 0.5rem; }}
 .quiz-start-title {{ font-family: 'Syne', sans-serif !important; font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }}
 .quiz-start-desc {{ color: var(--text-secondary); font-size: 0.72rem; margin-bottom: 0.8rem; }}
-
-.quiz-question {{
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--accent-blue);
-    border-radius: 14px;
-    padding: 1.1rem 1.2rem;
-    margin-bottom: 0.9rem;
-    transition: border-color 0.2s ease;
-}}
-
+.quiz-question {{ background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--accent-blue); border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.9rem; transition: border-color 0.2s ease; }}
 .quiz-question:hover {{ border-color: var(--accent-blue-bright); border-left-color: var(--accent-cyan); }}
-
 .quiz-question-text {{ font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; font-size: 0.88rem; line-height: 1.4; }}
 
-/* ─── GLOBAL BUTTON THEME ─── */
-.stButton > button {{
-    font-family: 'Space Grotesk', sans-serif !important;
-    font-weight: 600 !important;
-    border-radius: 10px !important;
-    transition: all 0.25s ease !important;
-}}
+.stButton > button {{ font-family: 'Space Grotesk', sans-serif !important; font-weight: 600 !important; border-radius: 10px !important; transition: all 0.25s ease !important; }}
+.stButton > button[kind="primary"] {{ background: linear-gradient(135deg, var(--accent-blue-dark), var(--accent-blue)) !important; border: none !important; color: #ffffff !important; box-shadow: 0 4px 20px var(--glow-blue) !important; }}
+.stButton > button[kind="primary"]:hover {{ background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)) !important; box-shadow: 0 8px 32px var(--glow-blue) !important; transform: translateY(-2px) !important; }}
 
-.stButton > button[kind="primary"] {{
-    background: linear-gradient(135deg, var(--accent-blue-dark), var(--accent-blue)) !important;
-    border: none !important;
-    color: #ffffff !important;
-    box-shadow: 0 4px 20px var(--glow-blue) !important;
-}}
-
-.stButton > button[kind="primary"]:hover {{
-    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)) !important;
-    box-shadow: 0 8px 32px var(--glow-blue) !important;
-    transform: translateY(-2px) !important;
-}}
-
-/* ─── STREAMLIT NATIVE OVERRIDES ─── */
-.stMarkdown, .stMarkdown p, .element-container .stMarkdown p {{
-    color: var(--text-secondary) !important;
-}}
+.stMarkdown, .stMarkdown p, .element-container .stMarkdown p {{ color: var(--text-secondary) !important; }}
 .stMarkdown strong, .stMarkdown b {{ color: var(--text-primary) !important; }}
-.stMarkdown h1, .stMarkdown h2, .stMarkdown h3,
-.stMarkdown h4, .stMarkdown h5 {{
-    color: var(--text-primary) !important;
-    font-family: 'Syne', sans-serif !important;
-}}
+.stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown h4, .stMarkdown h5 {{ color: var(--text-primary) !important; font-family: 'Syne', sans-serif !important; }}
 .stMarkdown li {{ color: var(--text-secondary) !important; }}
-.stMarkdown code {{
-    background: var(--bg-card2) !important;
-    color: var(--accent-blue) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 4px !important;
-    padding: 0.1rem 0.3rem !important;
-}}
+.stMarkdown code {{ background: var(--bg-card2) !important; color: var(--accent-blue) !important; border: 1px solid var(--border) !important; border-radius: 4px !important; padding: 0.1rem 0.3rem !important; }}
 label {{ color: var(--text-secondary) !important; font-family: 'Space Grotesk', sans-serif !important; }}
 .stRadio label {{ color: var(--text-primary) !important; }}
-
-/* Divider */
 hr {{ border-color: var(--border) !important; }}
-
-/* Caption */
 .stCaption {{ color: var(--text-muted) !important; font-size: 0.68rem !important; }}
 
-/* File uploader — override Streamlit dark theme completely */
-[data-testid="stFileUploader"] {{
-    background: var(--bg-card) !important;
-    border: 2px dashed var(--border-glow) !important;
-    border-radius: 14px !important;
-    transition: border-color 0.2s ease !important;
-}}
+[data-testid="stFileUploader"] {{ background: var(--bg-card) !important; border: 2px dashed var(--border-glow) !important; border-radius: 14px !important; transition: border-color 0.2s ease !important; }}
 [data-testid="stFileUploader"]:hover {{ border-color: var(--accent-blue) !important; }}
+[data-testid="stFileUploader"] > div {{ background: var(--bg-card) !important; color: var(--text-primary) !important; }}
+[data-testid="stFileUploaderDropzone"] {{ background: var(--bg-card2) !important; border: none !important; border-radius: 12px !important; }}
+[data-testid="stFileUploaderDropzoneInstructions"] {{ color: var(--text-secondary) !important; }}
+[data-testid="stFileUploaderDropzoneInstructions"] svg {{ fill: var(--accent-blue) !important; stroke: var(--accent-blue) !important; }}
+[data-testid="stFileUploaderDropzoneInstructions"] span, [data-testid="stFileUploaderDropzoneInstructions"] p, [data-testid="stFileUploaderDropzoneInstructions"] small {{ color: var(--text-secondary) !important; }}
+[data-testid="stFileUploaderDropzone"] button {{ background: var(--accent-blue) !important; color: #ffffff !important; border: none !important; border-radius: 8px !important; }}
 
-[data-testid="stFileUploader"] > div {{
-    background: var(--bg-card) !important;
-    color: var(--text-primary) !important;
-}}
-
-[data-testid="stFileUploaderDropzone"] {{
-    background: var(--bg-card2) !important;
-    border: none !important;
-    border-radius: 12px !important;
-}}
-
-[data-testid="stFileUploaderDropzoneInstructions"] {{
-    color: var(--text-secondary) !important;
-}}
-
-[data-testid="stFileUploaderDropzoneInstructions"] svg {{
-    fill: var(--accent-blue) !important;
-    stroke: var(--accent-blue) !important;
-}}
-
-[data-testid="stFileUploaderDropzoneInstructions"] span,
-[data-testid="stFileUploaderDropzoneInstructions"] p,
-[data-testid="stFileUploaderDropzoneInstructions"] small {{
-    color: var(--text-secondary) !important;
-}}
-
-/* Upload button inside dropzone */
-[data-testid="stFileUploaderDropzone"] button {{
-    background: var(--accent-blue) !important;
-    color: #ffffff !important;
-    border: none !important;
-    border-radius: 8px !important;
-}}
-
-/* Spinner */
 .stSpinner > div {{ border-top-color: var(--accent-blue) !important; }}
-
-/* Success/Warning/Error */
 .stSuccess {{ background: rgba(16,185,129,0.1) !important; border-color: var(--accent-green) !important; color: #34d399 !important; }}
 .stWarning {{ background: rgba(245,158,11,0.1) !important; border-color: var(--accent-amber) !important; }}
 .stError {{ background: rgba(239,68,68,0.1) !important; border-color: #ef4444 !important; }}
 
-/* Welcome form submit button */
-.welcome-card .stButton > button,
-.welcome-card button[kind="primaryFormSubmit"],
-[data-testid="stForm"] button[kind="primaryFormSubmit"],
-[data-testid="stForm"] .stButton > button {{
+.welcome-card .stButton > button, .welcome-card button[kind="primaryFormSubmit"],
+[data-testid="stForm"] button[kind="primaryFormSubmit"], [data-testid="stForm"] .stButton > button {{
     background: linear-gradient(135deg, var(--accent-blue-dark), var(--accent-blue)) !important;
-    border: none !important;
-    color: #ffffff !important;
-    box-shadow: 0 4px 20px var(--glow-blue) !important;
-    border-radius: 10px !important;
-    font-weight: 700 !important;
-    font-family: 'Space Grotesk', sans-serif !important;
+    border: none !important; color: #ffffff !important; box-shadow: 0 4px 20px var(--glow-blue) !important;
+    border-radius: 10px !important; font-weight: 700 !important; font-family: 'Space Grotesk', sans-serif !important;
 }}
-[data-testid="stForm"] button[kind="primaryFormSubmit"]:hover,
-[data-testid="stForm"] .stButton > button:hover {{
+[data-testid="stForm"] button[kind="primaryFormSubmit"]:hover, [data-testid="stForm"] .stButton > button:hover {{
     background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)) !important;
-    box-shadow: 0 8px 32px var(--glow-blue) !important;
-    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 32px var(--glow-blue) !important; transform: translateY(-2px) !important;
 }}
 
-/* Back to Home & secondary buttons */
-.stButton > button[kind="secondary"] {{
-    background: var(--bg-card2) !important;
-    border: 2px solid var(--accent-blue) !important;
-    color: var(--accent-blue) !important;
-    font-weight: 600 !important;
-}}
-.stButton > button[kind="secondary"]:hover {{
-    background: var(--accent-blue) !important;
-    color: #ffffff !important;
-    border-color: var(--accent-blue) !important;
-    box-shadow: 0 4px 16px var(--glow-blue) !important;
-    transform: translateY(-2px) !important;
-}}
+.stButton > button[kind="secondary"] {{ background: var(--bg-card2) !important; border: 2px solid var(--accent-blue) !important; color: var(--accent-blue) !important; font-weight: 600 !important; }}
+.stButton > button[kind="secondary"]:hover {{ background: var(--accent-blue) !important; color: #ffffff !important; border-color: var(--accent-blue) !important; box-shadow: 0 4px 16px var(--glow-blue) !important; transform: translateY(-2px) !important; }}
 
 @keyframes glowPulse {{
     0%, 100% {{ box-shadow: 0 0 10px var(--glow-blue); }}
     50% {{ box-shadow: 0 0 24px var(--glow-blue), 0 0 40px var(--glow-cyan); }}
 }}
-
 .hero-badge {{ animation: glowPulse 3s ease-in-out infinite; }}
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -808,7 +356,6 @@ def render_sidebar():
     first = name.split()[0] if name else "Guest"
     current_page = st.session_state.page
 
-    # Inline sidebar background color via JS-injected style (more reliable than CSS variable in sidebar)
     sidebar_bg = T['sidebar_bg']
     sidebar_border = T['border']
     sb_extra = f"""
@@ -817,44 +364,28 @@ def render_sidebar():
         background: {sidebar_bg} !important;
         border-right: 1px solid {sidebar_border} !important;
     }}
-    /* Mode toggle: smaller, grey */
     .mode-toggle-wrap .stButton > button {{
-        background: {T['bg_card']} !important;
-        border: 1.5px solid {T['border']} !important;
-        color: {T['text_secondary']} !important;
-        min-height: 36px !important;
-        font-size: 0.68rem !important;
-        text-align: center !important;
-        justify-content: center !important;
-        margin-bottom: 0.5rem !important;
+        background: {T['bg_card']} !important; border: 1.5px solid {T['border']} !important;
+        color: {T['text_secondary']} !important; min-height: 36px !important; font-size: 0.68rem !important;
+        text-align: center !important; justify-content: center !important; margin-bottom: 0.5rem !important;
     }}
     .mode-toggle-wrap .stButton > button:hover {{
-        background: {T['glow_blue']} !important;
-        border-color: {T['accent_blue']} !important;
-        color: {T['accent_blue']} !important;
-        transform: none !important;
-        box-shadow: none !important;
+        background: {T['glow_blue']} !important; border-color: {T['accent_blue']} !important;
+        color: {T['accent_blue']} !important; transform: none !important; box-shadow: none !important;
     }}
-    /* Signout: red-tinted */
     .signout-wrap .stButton > button {{
-        background: transparent !important;
-        border: 1.5px solid {T['text_muted']} !important;
-        color: {T['text_muted']} !important;
-        margin-top: 0.3rem !important;
+        background: transparent !important; border: 1.5px solid {T['text_muted']} !important;
+        color: {T['text_muted']} !important; margin-top: 0.3rem !important;
     }}
     .signout-wrap .stButton > button:hover {{
-        background: #ef4444 !important;
-        border-color: #ef4444 !important;
-        color: #ffffff !important;
-        transform: none !important;
-        box-shadow: 0 4px 14px rgba(239,68,68,0.3) !important;
+        background: #ef4444 !important; border-color: #ef4444 !important; color: #ffffff !important;
+        transform: none !important; box-shadow: 0 4px 14px rgba(239,68,68,0.3) !important;
     }}
     </style>
     """
     st.markdown(sb_extra, unsafe_allow_html=True)
 
     with st.sidebar:
-        # Brand
         st.markdown(f"""
         <div class="sidebar-brand">
             <span class="sidebar-brand-logo">🎯</span>
@@ -862,12 +393,8 @@ def render_sidebar():
         </div>
         """, unsafe_allow_html=True)
 
-        # User chip
-        st.markdown(f"""
-        <div class="user-chip">👤 &nbsp;{first}</div>
-        """, unsafe_allow_html=True)
+        st.markdown(f'<div class="user-chip">👤 &nbsp;{first}</div>', unsafe_allow_html=True)
 
-        # Dark/Light toggle — wrapped for targeted CSS
         st.markdown('<div class="mode-toggle-wrap">', unsafe_allow_html=True)
         mode_label = f"{T['mode_icon']}  {T['mode_label']}"
         if st.button(mode_label, key="dark_toggle", use_container_width=True):
@@ -877,7 +404,6 @@ def render_sidebar():
 
         st.markdown("<div style='margin-bottom:0.25rem'></div>", unsafe_allow_html=True)
 
-        # Navigation buttons
         nav_items = [
             ("🏠  Home", "home"),
             ("📄  Analyze CV", "analyze"),
@@ -894,7 +420,6 @@ def render_sidebar():
                 if st.button(label, key=f"nav_{page_key}", use_container_width=True):
                     nav_goto(page_key)
 
-        # Sign out — wrapped for targeted CSS
         st.markdown('<div class="signout-wrap">', unsafe_allow_html=True)
         if st.button("⏻  Sign Out", key="signout_btn", use_container_width=True):
             sign_out()
@@ -916,12 +441,10 @@ def render_welcome():
         st.markdown("""
         <div class="welcome-container">
             <div class="welcome-badge hero-badge">✦ Powered by AI &amp; FAISS</div>
-            <div class="welcome-title">
-                AI <span class="welcome-gradient">Career</span><br>Platform
-            </div>
+            <div class="welcome-title">AI <span class="welcome-gradient">Career</span><br>Platform</div>
             <p class="welcome-subtitle">Your AI-powered career companion.<br>Match your CV to the best AI/ML roles in seconds.</p>
             <div class="welcome-card">
-                <div style="font-size: 0.82rem; font-weight: 600; margin-bottom: 0.9rem; color: var(--text-primary);">
+                <div style="font-size:0.82rem; font-weight:600; margin-bottom:0.9rem; color:var(--text-primary);">
                     👋 Welcome! What's your name?
                 </div>
         """, unsafe_allow_html=True)
@@ -956,7 +479,6 @@ def render_home():
     """, unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3)
-
     with col1:
         st.markdown("""
         <div class="feature-card">
@@ -1026,12 +548,10 @@ def render_analyze():
         if uploaded and st.button("🚀 Start Analysis", use_container_width=True, type="primary"):
             with st.spinner("Analyzing your CV..."):
                 try:
-                    # Write to tmp, close it first, THEN read — fixes EmptyFileError on Streamlit Cloud
                     tmp_path = None
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
                         tmp.write(uploaded.read())
                         tmp_path = tmp.name
-                    # File is now closed — safe to read with pypdf
                     cv_text = extract_cv_text(tmp_path)
                     os.unlink(tmp_path)
 
@@ -1041,7 +561,7 @@ def render_analyze():
                         st.session_state.cv_text = cv_text
                         st.session_state.retrieved = retrieve_context(cv_text, "", k=5)
                         st.session_state.agent = build_agent(cv_text, "", st.session_state.candidate_name)
-                        st.session_state.chat_history = []  # reset chat on new CV
+                        st.session_state.chat_history = []
                         st.session_state.analysis_raw = run_agent(
                             st.session_state.agent,
                             "Analyse this CV. Follow tags: TOP_ROLE, MATCH_PCT, WHY_RIGHT, SKILL_GAPS, RESUME_ADD, CAREER_PATH"
@@ -1070,10 +590,8 @@ def render_analysis_results():
     has_ai_exp = retrieved.get("has_ai_experience", False)
     T = get_theme()
 
-    # ── Unified Score: blend FAISS match_pct + readiness score ──
     faiss_pct   = top_match.get("match_pct", 0)
     ready_score = readiness.get("total_score", 0)
-    # Weighted blend: 55% role match + 45% readiness
     unified_score = round(faiss_pct * 0.55 + ready_score * 0.45)
     unified_score = max(5, min(97, unified_score))
     level         = readiness.get("level", "Developing")
@@ -1082,7 +600,6 @@ def render_analysis_results():
     company       = top_match.get("company", "")
     location      = top_match.get("location", "Dhaka")
 
-    # Scoreboard tiers
     if unified_score >= 80:
         tier_color  = "#10b981"
         tier_label  = "Very Strong — AI/ML Field Ready"
@@ -1136,14 +653,10 @@ def render_analysis_results():
         <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:1.2rem;">
             {company}{' · ' + location if company else location}
         </div>
-
-        <!-- Progress bar -->
         <div style="background:var(--bg-card2); border:1px solid var(--border); border-radius:30px; height:10px; overflow:hidden; margin:0 2rem 0.8rem;">
             <div style="width:{bar_pct}%; height:100%; background:{bar_gradient}; border-radius:30px;
                         transition:width 0.8s ease; box-shadow:0 0 8px {tier_color}60;"></div>
         </div>
-
-        <!-- Tier badge -->
         <div style="display:inline-block; padding:0.35rem 1.1rem; background:{tier_bg}; border:1px solid {tier_border};
                     border-radius:30px; font-size:0.72rem; font-weight:700; color:{tier_color}; letter-spacing:0.04em;">
             {tier_label}
@@ -1175,7 +688,7 @@ def render_analysis_results():
                         opacity:{'1' if 40 <= unified_score < 60 else '0.55'};">
                 <div style="font-size:1.1rem; margin-bottom:0.2rem;">🔍</div>
                 <div style="font-size:0.62rem; font-weight:700; color:{'#f59e0b' if 40 <= unified_score < 60 else 'var(--text-muted)'}; margin-bottom:0.2rem;">40–59%</div>
-                <div style="font-size:0.6rem; color:var(--text-muted); line-height:1.3;">Interested — explore & validate</div>
+                <div style="font-size:0.6rem; color:var(--text-muted); line-height:1.3;">Interested — explore &amp; validate</div>
             </div>
             <div style="padding:0.7rem 0.5rem; border-radius:10px; text-align:center;
                         background:{'rgba(59,130,246,0.15)' if 60 <= unified_score < 80 else 'var(--bg-card2)'};
@@ -1194,8 +707,6 @@ def render_analysis_results():
                 <div style="font-size:0.6rem; color:var(--text-muted); line-height:1.3;">Very strong — AI/ML ready</div>
             </div>
         </div>
-
-        <!-- Score breakdown bar -->
         <div style="margin-top:1rem; padding-top:0.8rem; border-top:1px solid var(--border);">
             <div style="display:flex; justify-content:space-between; margin-bottom:0.3rem;">
                 <span style="font-size:0.68rem; color:var(--text-muted); font-weight:600;">Score Breakdown</span>
@@ -1219,7 +730,6 @@ def render_analysis_results():
     </div>
     """, unsafe_allow_html=True)
 
-    # ── Actionable recommendation (fully custom HTML, theme-safe) ──
     if rec:
         st.markdown(f"""
         <div style="padding:0.8rem 1rem; background:{tier_bg}; border:1px solid {tier_border};
@@ -1237,7 +747,7 @@ def render_analysis_results():
         """, unsafe_allow_html=True)
 
     if not has_ai_exp:
-        st.markdown(f"""
+        st.markdown("""
         <div style="padding:0.7rem 1rem; background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.25);
                     border-left:4px solid var(--accent-blue); border-radius:10px; margin-bottom:1rem;">
             <span style="font-size:0.82rem; color:var(--text-primary);">
@@ -1246,7 +756,6 @@ def render_analysis_results():
         </div>
         """, unsafe_allow_html=True)
 
-    # Skill gaps & resume additions
     col1, col2 = st.columns(2)
     with col1:
         gaps = retrieved.get("skill_gaps", [])
@@ -1270,7 +779,6 @@ def render_analysis_results():
             </div>
             """, unsafe_allow_html=True)
 
-    # All matched roles
     roles_html_parts = []
     for r in retrieved.get("all_matches", [])[:4]:
         sal_min = r.get("salary_min", 0)
@@ -1279,18 +787,16 @@ def render_analysis_results():
         rtitle  = r.get("title", r.get("role", "Role"))
         rcomp   = r.get("company", "Various")
         rpct    = r.get("match_pct", 0)
-        roles_html_parts.append(f"""
-        <div style="margin-bottom:0.7rem; padding:0.7rem 1rem; background:var(--bg-card2); border:1px solid var(--border);
-                    border-left:3px solid var(--accent-blue); border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
-            <div>
-                <strong style="color:var(--text-primary);">{rtitle}</strong>
-                <span style="color:var(--text-muted); font-size:0.75rem;"> · {rcomp}</span>
-            </div>
-            <div style="text-align:right;">
-                <span style="color:var(--accent-blue-bright); font-weight:700; font-size:0.85rem;">{rpct}%</span>
-                <div style="color:var(--text-muted); font-size:0.7rem;">{sal_str}</div>
-            </div>
-        </div>""")
+        roles_html_parts.append(
+            f'<div style="margin-bottom:0.7rem; padding:0.7rem 1rem; background:var(--bg-card2); border:1px solid var(--border);'
+            f'border-left:3px solid var(--accent-blue); border-radius:10px; display:flex; justify-content:space-between; align-items:center;">'
+            f'<div><strong style="color:var(--text-primary);">{rtitle}</strong>'
+            f'<span style="color:var(--text-muted); font-size:0.75rem;"> · {rcomp}</span></div>'
+            f'<div style="text-align:right;">'
+            f'<span style="color:var(--accent-blue-bright); font-weight:700; font-size:0.85rem;">{rpct}%</span>'
+            f'<div style="color:var(--text-muted); font-size:0.7rem;">{sal_str}</div>'
+            f'</div></div>'
+        )
     roles_inner = "".join(roles_html_parts)
     st.markdown(f"""
     <div class="result-card">
@@ -1299,7 +805,6 @@ def render_analysis_results():
     </div>
     """, unsafe_allow_html=True)
 
-    # LLM Analysis — parse tags and render as themed cards
     if analysis_raw:
         def parse_tag(text, tag):
             pattern = rf'{tag}:\s*(.*?)(?=\n[A-Z_]+:|$)'
@@ -1316,23 +821,25 @@ def render_analysis_results():
                     for l in raw.split('\n')
                     if l.strip() and re.match(r'^[-•*]', l.strip())]
 
-        top_role   = parse_tag(analysis_raw, "TOP_ROLE")
-        match_pct  = parse_tag(analysis_raw, "MATCH_PCT")
-        why_right  = parse_tag(analysis_raw, "WHY_RIGHT")
-        runner_up  = parse_tag(analysis_raw, "RUNNER_UP")
-        runner_why = parse_tag(analysis_raw, "RUNNER_UP_WHY")
-        next_steps = parse_list_tag(analysis_raw, "NEXT_STEPS")
-        skill_gaps = parse_list_tag(analysis_raw, "SKILL_GAPS")
-        resume_add = parse_list_tag(analysis_raw, "RESUME_ADD")
+        top_role    = parse_tag(analysis_raw, "TOP_ROLE")
+        match_pct   = parse_tag(analysis_raw, "MATCH_PCT")
+        why_right   = parse_tag(analysis_raw, "WHY_RIGHT")
+        runner_up   = parse_tag(analysis_raw, "RUNNER_UP")
+        runner_why  = parse_tag(analysis_raw, "RUNNER_UP_WHY")
+        next_steps  = parse_list_tag(analysis_raw, "NEXT_STEPS")
+        skill_gaps  = parse_list_tag(analysis_raw, "SKILL_GAPS")
+        resume_add  = parse_list_tag(analysis_raw, "RESUME_ADD")
         career_path = parse_list_tag(analysis_raw, "CAREER_PATH")
 
-        # Hero card — why this role fits
         if top_role or why_right:
             hero_title = ""
             if top_role:
-                pct_badge = f"&nbsp;<span style='color:var(--accent-blue);font-size:0.85rem;'>({match_pct}% match)</span>" if match_pct else ""
-                hero_title = f"<div style='font-family:Syne,sans-serif; font-size:1.05rem; font-weight:800; color:var(--text-primary); margin-bottom:0.4rem;'>🏆 {top_role}{pct_badge}</div>"
-            why_html = f"<div style='color:var(--text-secondary); font-size:0.84rem; line-height:1.6;'>{why_right}</div>" if why_right else ""
+                pct_badge = (f"&nbsp;<span style='color:var(--accent-blue);font-size:0.85rem;'>({match_pct}% match)</span>"
+                             if match_pct else "")
+                hero_title = (f"<div style='font-family:Syne,sans-serif; font-size:1.05rem; font-weight:800;"
+                              f"color:var(--text-primary); margin-bottom:0.4rem;'>🏆 {top_role}{pct_badge}</div>")
+            why_html = (f"<div style='color:var(--text-secondary); font-size:0.84rem; line-height:1.6;'>{why_right}</div>"
+                        if why_right else "")
             st.markdown(f"""
             <div class="result-card" style="border-left:4px solid var(--accent-blue);">
                 <div style="font-size:0.68rem; font-weight:700; color:var(--text-muted); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.5rem;">🤖 AI Career Analysis</div>
@@ -1341,115 +848,112 @@ def render_analysis_results():
             </div>
             """, unsafe_allow_html=True)
 
-        # Next Steps
+        # ── FIX 1: Next Steps — build all HTML in one string, render once ──
         if next_steps:
-            st.markdown("""
-            <div class="result-card">
-                <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.7rem; font-size:0.88rem; font-family:'Syne',sans-serif;">🚀 Next Steps</div>
-            """, unsafe_allow_html=True)
-            for i, s in enumerate(next_steps[:4]):
-                st.markdown(f"""
-                <div style="display:flex; gap:0.8rem; align-items:flex-start; margin-bottom:0.6rem;
-                            padding:0.5rem 0.8rem; background:var(--bg-card2); border-radius:8px; border:1px solid var(--border);">
-                    <span style="background:var(--accent-blue); color:#fff; border-radius:50%; width:22px; height:22px;
-                                 min-width:22px; display:flex; align-items:center; justify-content:center;
-                                 font-size:0.65rem; font-weight:700;">{i+1}</span>
-                    <span style="color:var(--text-primary); font-size:0.82rem; line-height:1.5;">{s}</span>
-                </div>
-                """, unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+            _ns_items = "".join(
+                '<div style="display:flex; gap:0.8rem; align-items:flex-start; margin-bottom:0.6rem;'
+                'padding:0.5rem 0.8rem; background:var(--bg-card2); border-radius:8px; border:1px solid var(--border);">'
+                f'<span style="background:var(--accent-blue); color:#fff; border-radius:50%; width:22px; height:22px;'
+                'min-width:22px; display:flex; align-items:center; justify-content:center;'
+                f'font-size:0.65rem; font-weight:700;">{_i + 1}</span>'
+                f'<span style="color:var(--text-primary); font-size:0.82rem; line-height:1.5;">{_s}</span>'
+                '</div>'
+                for _i, _s in enumerate(next_steps[:4])
+            )
+            st.markdown(
+                f'<div class="result-card">'
+                f'<div style="font-weight:700; color:var(--text-primary); margin-bottom:0.7rem; font-size:0.88rem; font-family:\'Syne\',sans-serif;">🚀 Next Steps</div>'
+                f'{_ns_items}</div>',
+                unsafe_allow_html=True
+            )
 
-        # Skill Gaps
+        # ── FIX 2: Skill Gaps — build all HTML in one string, render once ──
         if skill_gaps:
-            st.markdown("""
-            <div class="result-card">
-                <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.7rem; font-size:0.88rem; font-family:'Syne',sans-serif;">🔍 Skill Gaps to Close</div>
-            """, unsafe_allow_html=True)
-            for s in skill_gaps[:5]:
+            def _gap_inner(s):
                 if ':' in s:
-                    glabel, gcontent = s.split(':', 1)
-                    ginner = f"<strong style='color:#ef4444;'>⚡ {glabel.strip()}</strong>: {gcontent.strip()}"
-                else:
-                    ginner = f"<strong style='color:#ef4444;'>⚡ {s}</strong>"
-                st.markdown(f"""
-                <div style="padding:0.5rem 0.8rem; background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.2);
-                            border-left:3px solid #ef4444; border-radius:8px; margin-bottom:0.5rem;
-                            color:var(--text-primary); font-size:0.82rem; line-height:1.5;">
-                    {ginner}
-                </div>
-                """, unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+                    gl, gc = s.split(':', 1)
+                    return f"<strong style='color:#ef4444;'>⚡ {gl.strip()}</strong>: {gc.strip()}"
+                return f"<strong style='color:#ef4444;'>⚡ {s}</strong>"
 
-        # Resume Additions
+            _gap_items = "".join(
+                '<div style="padding:0.5rem 0.8rem; background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.2);'
+                'border-left:3px solid #ef4444; border-radius:8px; margin-bottom:0.5rem;'
+                f'color:var(--text-primary); font-size:0.82rem; line-height:1.5;">{_gap_inner(_s)}</div>'
+                for _s in skill_gaps[:5]
+            )
+            st.markdown(
+                f'<div class="result-card">'
+                f'<div style="font-weight:700; color:var(--text-primary); margin-bottom:0.7rem; font-size:0.88rem; font-family:\'Syne\',sans-serif;">🔍 Skill Gaps to Close</div>'
+                f'{_gap_items}</div>',
+                unsafe_allow_html=True
+            )
+
+        # ── FIX 3: Resume Additions — build all HTML in one string, render once ──
         if resume_add:
-            st.markdown("""
-            <div class="result-card">
-                <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.7rem; font-size:0.88rem; font-family:'Syne',sans-serif;">📝 Resume Additions</div>
-            """, unsafe_allow_html=True)
-            for s in resume_add[:5]:
-                st.markdown(f"""
-                <div style="padding:0.5rem 0.8rem; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2);
-                            border-left:3px solid var(--accent-green); border-radius:8px; margin-bottom:0.5rem;
-                            color:var(--text-primary); font-size:0.82rem; line-height:1.5;">
-                    ✅ {s}
-                </div>
-                """, unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+            _ra_items = "".join(
+                '<div style="padding:0.5rem 0.8rem; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2);'
+                'border-left:3px solid var(--accent-green); border-radius:8px; margin-bottom:0.5rem;'
+                f'color:var(--text-primary); font-size:0.82rem; line-height:1.5;">✅ {_s}</div>'
+                for _s in resume_add[:5]
+            )
+            st.markdown(
+                f'<div class="result-card">'
+                f'<div style="font-weight:700; color:var(--text-primary); margin-bottom:0.7rem; font-size:0.88rem; font-family:\'Syne\',sans-serif;">📝 Resume Additions</div>'
+                f'{_ra_items}</div>',
+                unsafe_allow_html=True
+            )
 
-        # Career Path — each item rendered individually to avoid f-string HTML escaping
+        # ── FIX 4: Career Path — build all HTML in one string, render once ──
         if career_path:
             n = min(len(career_path), 3)
-            # Icon & accent per step
             step_meta = [
                 ("#3b82f6", "🎯", "Short-term"),
                 ("#8b5cf6", "📈", "Mid-term"),
                 ("#10b981", "🏆", "Long-term"),
             ]
-            st.markdown("""
-            <div class="result-card">
-                <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.9rem;
-                            font-size:0.88rem; font-family:'Syne',sans-serif;">🗺️ Career Path</div>
-            """, unsafe_allow_html=True)
-
-            for i, s in enumerate(career_path[:3]):
-                dot_color, step_icon, _ = step_meta[i] if i < len(step_meta) else ("#3b82f6", "•", "Step")
-                connector_html = (
-                    f"<div style='width:2px; height:24px; background:var(--border); margin:2px auto;'></div>"
-                    if i < n - 1 else ""
+            _cp_steps = []
+            for _i, _s in enumerate(career_path[:3]):
+                _dot_color, _step_icon, _ = step_meta[_i] if _i < len(step_meta) else ("#3b82f6", "•", "Step")
+                _connector = (
+                    f'<div style="width:2px; height:24px; background:var(--border); margin:2px auto;"></div>'
+                    if _i < n - 1 else ""
                 )
-                # Split on first colon only
-                if ':' in s:
-                    raw_label, raw_content = s.split(':', 1)
-                    label   = raw_label.strip()
-                    content = raw_content.strip()
+                if ':' in _s:
+                    _raw_label, _raw_content = _s.split(':', 1)
+                    _label   = _raw_label.strip()
+                    _content = _raw_content.strip()
                 else:
-                    label   = f"Step {i+1}"
-                    content = s.strip()
+                    _label   = f"Step {_i + 1}"
+                    _content = _s.strip()
 
-                st.markdown(f"""
-                <div style="display:flex; gap:0.8rem; align-items:flex-start; margin-bottom:0.2rem;">
-                    <div style="min-width:14px; display:flex; flex-direction:column; align-items:center; padding-top:4px;">
-                        <div style="width:14px; height:14px; background:{dot_color}; border-radius:50%;
-                                    box-shadow:0 0 6px {dot_color}60; flex-shrink:0;"></div>
-                        {connector_html}
-                    </div>
-                    <div style="flex:1; padding:0.6rem 0.9rem; background:var(--bg-card2);
-                                border:1px solid var(--border); border-left:3px solid {dot_color};
-                                border-radius:8px; margin-bottom:0.5rem;">
-                        <div style="font-size:0.7rem; font-weight:700; color:{dot_color};
-                                    letter-spacing:0.05em; text-transform:uppercase; margin-bottom:0.25rem;">
-                            {step_icon} {label}
-                        </div>
-                        <div style="color:var(--text-primary); font-size:0.82rem; line-height:1.55;">{content}</div>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
+                _cp_steps.append(
+                    f'<div style="display:flex; gap:0.8rem; align-items:flex-start; margin-bottom:0.2rem;">'
+                    f'<div style="min-width:14px; display:flex; flex-direction:column; align-items:center; padding-top:4px;">'
+                    f'<div style="width:14px; height:14px; background:{_dot_color}; border-radius:50%;'
+                    f'box-shadow:0 0 6px {_dot_color}60; flex-shrink:0;"></div>'
+                    f'{_connector}'
+                    f'</div>'
+                    f'<div style="flex:1; padding:0.6rem 0.9rem; background:var(--bg-card2);'
+                    f'border:1px solid var(--border); border-left:3px solid {_dot_color};'
+                    f'border-radius:8px; margin-bottom:0.5rem;">'
+                    f'<div style="font-size:0.7rem; font-weight:700; color:{_dot_color};'
+                    f'letter-spacing:0.05em; text-transform:uppercase; margin-bottom:0.25rem;">'
+                    f'{_step_icon} {_label}</div>'
+                    f'<div style="color:var(--text-primary); font-size:0.82rem; line-height:1.55;">{_content}</div>'
+                    f'</div></div>'
+                )
+            _cp_html = "".join(_cp_steps)
+            st.markdown(
+                f'<div class="result-card">'
+                f'<div style="font-weight:700; color:var(--text-primary); margin-bottom:0.9rem;'
+                f'font-size:0.88rem; font-family:\'Syne\',sans-serif;">🗺️ Career Path</div>'
+                f'{_cp_html}</div>',
+                unsafe_allow_html=True
+            )
 
-            st.markdown("</div>", unsafe_allow_html=True)
-
-        # Runner Up
         if runner_up:
-            ru_why_html = f"<div style='color:var(--text-secondary); font-size:0.82rem; line-height:1.5;'>{runner_why}</div>" if runner_why else ""
+            ru_why_html = (f"<div style='color:var(--text-secondary); font-size:0.82rem; line-height:1.5;'>{runner_why}</div>"
+                           if runner_why else "")
             st.markdown(f"""
             <div class="result-card" style="border-left:4px solid var(--accent-purple);">
                 <div style="font-size:0.68rem; font-weight:700; color:var(--text-muted); letter-spacing:0.1em;
@@ -1461,7 +965,7 @@ def render_analysis_results():
             """, unsafe_allow_html=True)
 
     # AI Chat
-    st.markdown(f"""
+    st.markdown("""
     <div class="result-card">
         <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.6rem; font-size:0.9rem; font-family:'Syne',sans-serif;">💬 Ask Your Career Advisor</div>
         <div style="color:var(--text-secondary); font-size:0.78rem; margin-bottom:0.8rem;">Ask anything about your CV, career path, skill gaps, or job search strategy.</div>
@@ -1516,7 +1020,6 @@ def render_jd_match():
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
                     tmp.write(uploaded.read())
                     tmp_path = tmp.name
-                # File closed — safe to read
                 cv_text = extract_cv_text(tmp_path)
                 os.unlink(tmp_path)
 
@@ -1557,9 +1060,9 @@ def render_jd_match_results():
     st.markdown(f"""
     <div class="result-card">
         <div style="text-align:center;">
-            <div style="font-size: 0.72rem; color: var(--text-muted); font-weight:600; letter-spacing:0.1em; text-transform:uppercase;">Match Score</div>
-            <div style="font-family:'Syne',sans-serif; font-size: 3rem; font-weight: 800; color: {color}; line-height:1.1;">{pct}%</div>
-            <div style="font-size: 0.9rem; font-weight: 600; color: {color}; margin-top:0.3rem;">{status}</div>
+            <div style="font-size:0.72rem; color:var(--text-muted); font-weight:600; letter-spacing:0.1em; text-transform:uppercase;">Match Score</div>
+            <div style="font-family:'Syne',sans-serif; font-size:3rem; font-weight:800; color:{color}; line-height:1.1;">{pct}%</div>
+            <div style="font-size:0.9rem; font-weight:600; color:{color}; margin-top:0.3rem;">{status}</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -1568,7 +1071,7 @@ def render_jd_match_results():
         st.markdown("### 📊 Similar Roles from Database")
         for role in result["similar_roles"][:3]:
             st.markdown(f"""
-            <div style="padding: 0.7rem 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius:10px; margin-bottom:0.5rem; color:var(--text-primary);">
+            <div style="padding:0.7rem 1rem; background:var(--bg-card); border:1px solid var(--border); border-radius:10px; margin-bottom:0.5rem; color:var(--text-primary);">
                 <strong>{role.get('title', role.get('role', 'Role'))}</strong>
                 <span style="color:var(--text-muted);"> at {role.get('company', 'Various')}</span>
             </div>
@@ -1651,9 +1154,9 @@ def render_quiz_results():
     st.markdown(f"""
     <div class="result-card">
         <div style="text-align:center;">
-            <div style="font-family:'Syne',sans-serif; font-size: 3rem; font-weight: 800; color: {color}; line-height:1.1;">{pct}%</div>
-            <div style="font-size: 1rem; font-weight: 700; margin: 0.4rem 0; color: var(--text-primary); font-family:'Syne',sans-serif;">Interest Level: {level}</div>
-            <div style="color: var(--text-secondary); font-size: 0.85rem;">{result["message"]}</div>
+            <div style="font-family:'Syne',sans-serif; font-size:3rem; font-weight:800; color:{color}; line-height:1.1;">{pct}%</div>
+            <div style="font-size:1rem; font-weight:700; margin:0.4rem 0; color:var(--text-primary); font-family:'Syne',sans-serif;">Interest Level: {level}</div>
+            <div style="color:var(--text-secondary); font-size:0.85rem;">{result["message"]}</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -1704,7 +1207,7 @@ def render_about():
 
     st.markdown('<div class="section-header">🔬 Research Interests</div>', unsafe_allow_html=True)
     st.markdown("""
-    <div style="margin-bottom: 1rem;">
+    <div style="margin-bottom:1rem;">
         <span class="interest-tag">Natural Language Processing (NLP)</span>
         <span class="interest-tag">Computer Vision</span>
         <span class="interest-tag">Cyber Security</span>
@@ -1713,7 +1216,7 @@ def render_about():
 
     st.markdown('<div class="section-header">🎓 Academic Affiliation</div>', unsafe_allow_html=True)
     st.markdown("""
-    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.85rem; line-height:1.6;">
+    <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.85rem; line-height:1.6;">
         Department of Computer Science &amp; Engineering<br>
         Rajshahi University of Engineering &amp; Technology (RUET)
     </p>
@@ -1721,7 +1224,7 @@ def render_about():
 
     st.markdown('<div class="section-header">🚀 About This Platform</div>', unsafe_allow_html=True)
     st.markdown("""
-    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem; font-size: 0.85rem;">
+    <p style="color:var(--text-secondary); line-height:1.6; margin-bottom:1rem; font-size:0.85rem;">
         AI Career Platform is an intelligent career matching system designed to help job seekers in Bangladesh
         find the best AI/ML roles based on their CV content, skills, and career preferences.
     </p>
@@ -1729,7 +1232,7 @@ def render_about():
 
     st.markdown('<div class="section-header">✨ Features</div>', unsafe_allow_html=True)
     st.markdown("""
-    <ul style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 1rem; font-size: 0.82rem; padding-left: 1rem;">
+    <ul style="color:var(--text-secondary); line-height:1.8; margin-bottom:1rem; font-size:0.82rem; padding-left:1rem;">
         <li>📄 AI-powered CV analysis and role matching</li>
         <li>🎯 Job Description matching with real-time skill gap analysis</li>
         <li>🧠 Career interest quiz to discover your ideal role</li>
@@ -1803,7 +1306,7 @@ def render_contact():
         </div>
     </div>
 
-    <div class="section-header" style="margin-top: 1.5rem; text-align: center;">Connect With Me</div>
+    <div class="section-header" style="margin-top:1.5rem; text-align:center;">Connect With Me</div>
     <div class="social-grid">
         <a href="https://github.com/jobayertalha" target="_blank" class="social-card">
             <div class="social-icon">💻</div>
