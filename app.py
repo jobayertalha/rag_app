@@ -1317,9 +1317,7 @@ def _generate_jd_recommendation(pct: int, result: dict) -> str:
 
 
 
-# ============================================================
-quiz
-
+# ============================================================quiz
 def render_quiz():
     st.markdown("""
     <div class="main-content">
