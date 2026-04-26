@@ -1,4 +1,4 @@
-fix me this """
+"""
 quiz.py — Career Interest & Aptitude Quiz
 Focus on AI/ML interest alignment, problem-solving, and career preferences.
 Questions shuffle each time to prevent bias.
@@ -124,25 +124,20 @@ ALTERNATE_QUESTIONS = [
     }
 ]
 
-# Maximum possible score
-MAX_SCORE = sum(max(q["scores"]) for q in BASE_QUESTIONS[:10])  # 30 points max
+MAX_SCORE = 30
 
 
 def get_shuffled_questions():
     """Return shuffled questions, randomly selecting from base and alternate pool."""
-    # Take all base questions (10) and add some alternates
     all_questions = BASE_QUESTIONS.copy()
     
-    # Add alternate questions if they're not already included
     existing_ids = {q["id"] for q in all_questions}
     for alt_q in ALTERNATE_QUESTIONS:
         if alt_q["id"] not in existing_ids:
             all_questions.append(alt_q)
     
-    # Shuffle the questions
     shuffled = random.sample(all_questions, min(10, len(all_questions)))
     
-    # Renumber for display
     for i, q in enumerate(shuffled):
         q["display_id"] = i + 1
     
@@ -150,16 +145,10 @@ def get_shuffled_questions():
 
 
 def calculate_interest_score(responses: dict, questions_list: list = None) -> dict:
-    """
-    responses: {question_display_id: selected_option_index}
-    questions_list: the list of questions used for this quiz session
-    Returns score, level, and recommendations.
-    Score range: 0-30 (10 questions × max 3 points each)
-    """
+    """Calculate interest score based on user responses."""
     total_score = 0
     category_scores = {}
     
-    # Use provided questions list, otherwise fallback to base questions
     if questions_list is None:
         questions_list = BASE_QUESTIONS[:10]
     
@@ -170,151 +159,92 @@ def calculate_interest_score(responses: dict, questions_list: list = None) -> di
             score = q["scores"][selected]
             total_score += score
             
-            # Track category scores
             cat = q["category"]
             if cat not in category_scores:
                 category_scores[cat] = {"score": 0, "max_possible": 0}
             category_scores[cat]["score"] += score
             category_scores[cat]["max_possible"] += max(q["scores"])
     
-    # Calculate percentage (0-100)
-    max_possible = 30  # MAX_SCORE
+    max_possible = MAX_SCORE
     pct = int((total_score / max_possible) * 100) if max_possible > 0 else 0
     pct = max(0, min(100, pct))
     
-    # ============================================================
-    # DETAILED SCORE ANALYSIS BASED ON YOUR REQUIREMENTS
-    # Score ranges out of 30:
-    # 21-30 points (70-100%): STRONG ALIGNMENT - Focus on AI/ML
-    # 10-20 points (33-69%): MODERATE ALIGNMENT - Explore mixed fields
-    # 0-9 points (0-33%): LOW ALIGNMENT - Not aligned with AI/ML
-    # ============================================================
-    
-    # Detailed breakdown by score
-    if total_score >= 21:  # 70%+ of 30
+    # Score ranges
+    if total_score >= 21:
         level = "STRONG ALIGNMENT"
         alignment = "high"
         color = "#10b981"
         icon = "🚀"
         
-        # Detailed analysis for high scorers
-        strength_areas = []
-        if category_scores.get("ML Interest", {}).get("score", 0) >= 5:
-            strength_areas.append("Strong interest in ML systems")
-        if category_scores.get("AI Curiosity", {}).get("score", 0) >= 4:
-            strength_areas.append("High curiosity about AI breakthroughs")
-        if category_scores.get("Hands-on Interest", {}).get("score", 0) >= 3:
-            strength_areas.append("Hands-on project building interest")
-        
         recommendation = {
-            "verdict": "✅ STRONG ALIGNMENT - Focus on AI/ML Career Path!",
-            "message": f"Your score of {total_score}/30 ({pct}%) indicates strong interest and aptitude for AI/ML. You should definitely pursue this field!",
-            "detailed_analysis": f"""
-            **Your Score Analysis:** {total_score}/30 points
-            
-            **What this means:** You have genuine passion for AI/ML concepts, mathematical thinking, and hands-on coding. 
-            Your responses show {', '.join(strength_areas) if strength_areas else 'consistent interest across all areas'}.
-            
-            **Career Recommendation:** Focus 100% on AI/ML career path. You have the right mindset and curiosity.
-            """,
+            "verdict": "STRONG ALIGNMENT - Focus on AI/ML Career Path!",
+            "message": f"Your score of {total_score}/30 ({pct}%) indicates strong interest and aptitude for AI/ML.",
+            "detailed_analysis": f"Your Score: {total_score}/30 points ({pct}%)\n\nWhat This Means: You have genuine passion for AI/ML concepts, mathematical thinking, and hands-on coding.\n\nCareer Path: Focus 100% on AI/ML career path. You have the right mindset and curiosity to succeed.",
             "roles": [
-                "🤖 AI/ML Engineer",
-                "🔬 Research Scientist", 
-                "🧠 NLP Engineer",
-                "👁️ Computer Vision Engineer",
-                "📊 Data Scientist"
+                "AI/ML Engineer",
+                "Research Scientist", 
+                "NLP Engineer",
+                "Computer Vision Engineer",
+                "Data Scientist"
             ],
             "next_steps": [
-                "🚀 Start with Python and ML fundamentals immediately",
-                "💡 Build 2-3 portfolio projects in your area of interest",
-                "📜 Earn certifications from DeepLearning.ai or Coursera",
-                "🎯 Apply for AI/ML internships within 3-6 months",
-                "🔗 Join AI/ML communities (Kaggle, Hugging Face, GitHub)"
+                "Start with Python and ML fundamentals immediately",
+                "Build 2-3 portfolio projects",
+                "Earn certifications from DeepLearning.ai or Coursera",
+                "Apply for AI/ML internships",
+                "Join AI/ML communities on Kaggle and GitHub"
             ]
         }
         
-    elif total_score >= 10:  # 33-69% - Moderate alignment
+    elif total_score >= 10:
         level = "MODERATE ALIGNMENT"
         alignment = "medium"
         color = "#f59e0b"
         icon = "🔍"
         
-        # Determine which areas are stronger
-        stronger_areas = []
-        weaker_areas = []
-        for cat, data in category_scores.items():
-            if data["max_possible"] > 0:
-                cat_pct = (data["score"] / data["max_possible"]) * 100
-                if cat_pct >= 60:
-                    stronger_areas.append(cat)
-                elif cat_pct < 40:
-                    weaker_areas.append(cat)
-        
         recommendation = {
-            "verdict": "🔍 MODERATE ALIGNMENT - Explore AI/ML Alongside Other Fields",
-            "message": f"Your score of {total_score}/30 ({pct}%) shows some interest in AI/ML, but you might also enjoy other tech fields.",
-            "detailed_analysis": f"""
-            **Your Score Analysis:** {total_score}/30 points
-            
-            **What this means:** You have curiosity about AI/ML but may need more exposure to decide.
-            
-            **Your Stronger Areas:** {', '.join(stronger_areas) if stronger_areas else 'General interest across topics'}
-            **Areas to Explore More:** {', '.join(weaker_areas) if weaker_areas else 'Consider taking an introductory course'}
-            
-            **Career Recommendation:** Explore both AI/ML and traditional software development. Consider a minor in AI/ML while pursuing CS degree.
-            """,
+            "verdict": "MODERATE ALIGNMENT - Explore AI/ML Alongside Other Fields",
+            "message": f"Your score of {total_score}/30 ({pct}%) shows some interest in AI/ML.",
+            "detailed_analysis": f"Your Score: {total_score}/30 points ({pct}%)\n\nWhat This Means: You have curiosity about AI/ML but may need more exposure to decide.\n\nCareer Path: Explore both AI/ML and traditional software development.",
             "roles": [
-                "📈 Data Analyst (bridge to AI/ML)",
-                "🛠️ ML Engineer (entry-level)",
-                "💻 Software Developer with ML focus",
-                "📊 Business Intelligence Analyst",
-                "🔧 Data Engineer"
+                "Data Analyst",
+                "ML Engineer (entry-level)",
+                "Software Developer with ML focus",
+                "Business Intelligence Analyst",
+                "Data Engineer"
             ],
             "next_steps": [
-                "📚 Take Andrew Ng's Machine Learning course first",
-                "💻 Build one small AI project to test your interest",
-                "🔀 Explore data analysis as an alternative path",
-                "💬 Talk to professionals in both AI and traditional software roles",
-                "📖 Consider a dual-track learning path (AI + traditional dev)"
+                "Take Andrew Ng's Machine Learning course",
+                "Build one small AI project",
+                "Explore data analysis as an alternative",
+                "Talk to professionals in both fields",
+                "Consider a dual-track learning path"
             ]
         }
         
-    else:  # <33% - Low alignment
+    else:
         level = "LOW ALIGNMENT"
         alignment = "low"
         color = "#ef4444"
         icon = "⚡"
         
-        # Find what interests them instead
-        other_interests = []
-        if category_scores.get("Coding Skill", {}).get("score", 0) >= 2:
-            other_interests.append("Coding/Programming")
-        
         recommendation = {
-            "verdict": "⚡ LOW ALIGNMENT - AI/ML May Not Be Your Best Fit",
+            "verdict": "LOW ALIGNMENT - AI/ML May Not Be Your Best Fit",
             "message": f"Your score of {total_score}/30 ({pct}%) suggests other technology fields might suit you better.",
-            "detailed_analysis": f"""
-            **Your Score Analysis:** {total_score}/30 points
-            
-            **What this means:** Your interests and strengths align more with other tech fields than pure AI/ML.
-            
-            **Consider These Alternatives:** {', '.join(other_interests) if other_interests else 'Traditional software development, web/mobile development, or IT operations'}
-            
-            **Career Recommendation:** Focus on building strong programming fundamentals first. AI/ML can be an elective later.
-            """,
+            "detailed_analysis": f"Your Score: {total_score}/30 points ({pct}%)\n\nWhat This Means: Your interests and strengths align more with other technology fields.\n\nCareer Path: Focus on building strong programming fundamentals first.",
             "roles": [
-                "💻 Software Developer",
-                "📱 Mobile App Developer",
-                "🌐 Web Developer",
-                "🔧 IT Support / System Administrator",
-                "📋 Project Manager (Tech)"
+                "Software Developer",
+                "Mobile App Developer",
+                "Web Developer",
+                "IT Support",
+                "Project Manager"
             ],
             "next_steps": [
-                "💻 Master core programming first (Python, JavaScript)",
-                "🏗️ Build web or mobile apps to find your passion",
-                "🎓 Consider CS degree with AI/ML as elective, not major",
-                "🗣️ Speak with career counselors about alternative paths",
-                "📊 Data analysis could be a lighter entry point if interested"
+                "Master core programming first",
+                "Build web or mobile apps",
+                "Consider CS degree with AI/ML as elective",
+                "Speak with career counselors",
+                "Explore data analysis as a lighter entry point"
             ]
         }
     
@@ -332,14 +262,6 @@ def calculate_interest_score(responses: dict, questions_list: list = None) -> di
     }
 
 
-
 def reset_quiz():
     """Reset quiz state (to be called from app.py)"""
-    pass  # This will be handled by app.py session state also in etailsed score analysis coming tag Your Score Analysis: 23/30 points
-
-    <strong>What this means:<strong> You have genuine passion for AI/ML concepts, mathematical thinking, and hands-on coding. 
-    Your responses show Hands-on project building interest.
-
-    <strong>Career Recommendation:<strong> Focus 100% on AI/ML career path. You have the right mindset and curiosity.
-    </p>
-</div>
+    pass
