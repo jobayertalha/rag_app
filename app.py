@@ -33,7 +33,8 @@ _defaults = {
     "jd_match_result": None,
     "quiz_responses": {},
     "quiz_result": None,
-    "current_quiz_questions": None,  # ADD THIS
+    "current_quiz_questions": None,
+    "quiz_started": False,  # ADD THIS LINE
     "dark_mode": True,
 }
 for k, v in _defaults.items():
@@ -1328,97 +1329,106 @@ def render_quiz():
         </div>
     """, unsafe_allow_html=True)
 
-    # If quiz results exist, show results page
-    if st.session_state.quiz_result:
+    # Check if quiz has results (completed)
+    if st.session_state.quiz_result is not None:
         render_quiz_results()
         st.markdown("---")
         col1, col2 = st.columns(2)
         with col1:
             if st.button("🔄 Take Quiz Again", use_container_width=True):
-                # Reset everything
-                st.session_state.quiz_responses = {}
+                # Reset everything to show start screen
                 st.session_state.quiz_result = None
-                if "current_quiz_questions" in st.session_state:
-                    del st.session_state.current_quiz_questions
+                st.session_state.quiz_responses = {}
+                st.session_state.current_quiz_questions = None
+                if "quiz_started" in st.session_state:
+                    st.session_state.quiz_started = False
                 st.rerun()
         with col2:
             if st.button("← Back to Home", use_container_width=True):
-                st.session_state.quiz_responses = {}
                 st.session_state.quiz_result = None
+                st.session_state.quiz_responses = {}
+                st.session_state.current_quiz_questions = None
                 nav_goto("home")
         st.markdown("</div>", unsafe_allow_html=True)
         return
 
-    # If quiz not started (no responses dict or empty), show start screen
-    if not st.session_state.quiz_responses or len(st.session_state.quiz_responses) == 0:
-        col1, col2, col3 = st.columns([1, 1.2, 1])
-        with col2:
-            st.markdown("""
-            <div class="quiz-start-container">
-                <div class="quiz-start-card">
-                    <div class="quiz-start-icon">📋</div>
-                    <div class="quiz-start-title">Ready to discover your career fit?</div>
-                    <div class="quiz-start-desc">Answer 10 questions about your preferences and thinking style.</div>
+    # Check if quiz has been started (has questions generated)
+    quiz_started = st.session_state.get("quiz_started", False)
+    
+    # If quiz is started but not completed - show questions
+    if quiz_started and st.session_state.current_quiz_questions is not None:
+        with st.form("quiz_form"):
+            questions = st.session_state.current_quiz_questions
+            
+            for q in questions:
+                qid = q["display_id"]
+                st.markdown(f"""
+                <div class="quiz-question">
+                    <div class="quiz-question-text">{qid}. {q["question"]}</div>
                 </div>
-            </div>
-            """, unsafe_allow_html=True)
-            if st.button("🚀 Start Quiz", use_container_width=True, type="primary"):
-                # Generate shuffled questions
-                from quiz import get_shuffled_questions
-                st.session_state.current_quiz_questions = get_shuffled_questions()
-                # Initialize responses with None for each question
-                st.session_state.quiz_responses = {q["display_id"]: None for q in st.session_state.current_quiz_questions}
+                """, unsafe_allow_html=True)
+                
+                # Get current value (None if not answered)
+                current_val = st.session_state.quiz_responses.get(qid)
+                
+                # Radio button with NO pre-selected answer
+                response = st.radio(
+                    f"q{qid}",
+                    options=q["options"],
+                    key=f"quiz_{qid}",
+                    label_visibility="collapsed",
+                    index=None  # No pre-selected answer
+                )
+                
+                # Store response when selected
+                if response is not None:
+                    st.session_state.quiz_responses[qid] = q["options"].index(response)
+            
+            # Check if all questions answered
+            all_answered = all(st.session_state.quiz_responses.get(q["display_id"]) is not None for q in questions)
+            
+            if not all_answered:
+                answered = sum(1 for q in questions if st.session_state.quiz_responses.get(q["display_id"]) is not None)
+                st.warning(f"⚠️ Please answer all {len(questions)} questions ({answered}/{len(questions)} completed)")
+            
+            # Submit button - disabled until all answered
+            submit_btn = st.form_submit_button("📊 Get Results", use_container_width=True, type="primary", disabled=not all_answered)
+            
+            if submit_btn and all_answered:
+                from quiz import calculate_interest_score
+                result = calculate_interest_score(st.session_state.quiz_responses, st.session_state.current_quiz_questions)
+                st.session_state.quiz_result = result
                 st.rerun()
-
-        st.markdown("---")
-        if st.button("← Back to Home", key="back_home_quiz_start"):
-            nav_goto("home")
+        
         st.markdown("</div>", unsafe_allow_html=True)
         return
 
-    # Quiz is active - show questions
-    with st.form("quiz_form"):
-        questions = st.session_state.current_quiz_questions
-        
-        for q in questions:
-            qid = q["display_id"]
-            st.markdown(f"""
-            <div class="quiz-question">
-                <div class="quiz-question-text">{qid}. {q["question"]}</div>
+    # Show Start Quiz screen (default state)
+    col1, col2, col3 = st.columns([1, 1.2, 1])
+    with col2:
+        st.markdown("""
+        <div class="quiz-start-container">
+            <div class="quiz-start-card">
+                <div class="quiz-start-icon">📋</div>
+                <div class="quiz-start-title">Ready to discover your career fit?</div>
+                <div class="quiz-start-desc">Answer 10 questions about your preferences and thinking style.</div>
             </div>
-            """, unsafe_allow_html=True)
-            
-            # Get current value (None if not answered)
-            current_val = st.session_state.quiz_responses.get(qid)
-            
-            # Radio button with NO pre-selected answer (index=None)
-            response = st.radio(
-                f"q{qid}",
-                options=q["options"],
-                key=f"quiz_{qid}",
-                label_visibility="collapsed",
-                index=None  # NO pre-selected answer!
-            )
-            
-            # Store response when selected
-            if response is not None:
-                st.session_state.quiz_responses[qid] = q["options"].index(response)
-
-        # Check if all questions are answered
-        all_answered = all(st.session_state.quiz_responses.get(q["display_id"]) is not None for q in questions)
+        </div>
+        """, unsafe_allow_html=True)
         
-        if not all_answered:
-            answered = sum(1 for q in questions if st.session_state.quiz_responses.get(q["display_id"]) is not None)
-            st.warning(f"⚠️ Please answer all {len(questions)} questions ({answered}/{len(questions)} completed)")
-        
-        # Submit button
-        submit_btn = st.form_submit_button("📊 Get Results", use_container_width=True, type="primary", disabled=not all_answered)
-        
-        if submit_btn and all_answered:
-            from quiz import calculate_interest_score
-            result = calculate_interest_score(st.session_state.quiz_responses, st.session_state.current_quiz_questions)
-            st.session_state.quiz_result = result
+        if st.button("🚀 Start Quiz", use_container_width=True, type="primary"):
+            from quiz import get_shuffled_questions
+            # Generate shuffled questions
+            st.session_state.current_quiz_questions = get_shuffled_questions()
+            # Initialize empty responses
+            st.session_state.quiz_responses = {}
+            st.session_state.quiz_result = None
+            st.session_state.quiz_started = True
             st.rerun()
+
+    st.markdown("---")
+    if st.button("← Back to Home", key="back_home_quiz_start"):
+        nav_goto("home")
 
     st.markdown("</div>", unsafe_allow_html=True)
 
