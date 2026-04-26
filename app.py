@@ -1068,98 +1068,253 @@ def render_analysis_results():
     readiness = retrieved.get("readiness", {})
     analysis_raw = st.session_state.get("analysis_raw", "")
     has_ai_exp = retrieved.get("has_ai_experience", False)
+    T = get_theme()
 
-    st.markdown('<div class="result-card">', unsafe_allow_html=True)
+    # ── Unified Score: blend FAISS match_pct + readiness score ──
+    faiss_pct   = top_match.get("match_pct", 0)
+    ready_score = readiness.get("total_score", 0)
+    # Weighted blend: 55% role match + 45% readiness
+    unified_score = round(faiss_pct * 0.55 + ready_score * 0.45)
+    unified_score = max(5, min(97, unified_score))
+    level         = readiness.get("level", "Developing")
+    rec           = readiness.get("recommendation", "")
+    role_title    = top_match.get("title", top_match.get("role", "AI Professional"))
+    company       = top_match.get("company", "")
+    location      = top_match.get("location", "Dhaka")
 
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
+    # Scoreboard tiers
+    if unified_score >= 80:
+        tier_color  = "#10b981"
+        tier_label  = "Very Strong — AI/ML Field Ready"
+        tier_icon   = "🚀"
+        tier_bg     = "rgba(16,185,129,0.10)"
+        tier_border = "rgba(16,185,129,0.35)"
+        bar_gradient= "linear-gradient(90deg,#059669,#10b981,#34d399)"
+        verdict     = "Your profile is highly competitive for AI/ML roles in Bangladesh's market."
+    elif unified_score >= 60:
+        tier_color  = "#3b82f6"
+        tier_label  = "Strong — Needs More Polishing"
+        tier_icon   = "💪"
+        tier_bg     = "rgba(59,130,246,0.10)"
+        tier_border = "rgba(59,130,246,0.30)"
+        bar_gradient= "linear-gradient(90deg,#1d4ed8,#3b82f6,#60a5fa)"
+        verdict     = "Solid foundation with targeted gaps. Closing 2–3 skill areas will unlock mid-level roles."
+    elif unified_score >= 40:
+        tier_color  = "#f59e0b"
+        tier_label  = "Developing — Explore & Validate Interest"
+        tier_icon   = "🔍"
+        tier_bg     = "rgba(245,158,11,0.10)"
+        tier_border = "rgba(245,158,11,0.30)"
+        bar_gradient= "linear-gradient(90deg,#d97706,#f59e0b,#fbbf24)"
+        verdict     = "You have foundational interest. Build 2–3 focused projects and earn a recognized certificate to progress."
+    else:
+        tier_color  = "#ef4444"
+        tier_label  = "Beginner — Consider Broader Exploration"
+        tier_icon   = "⚡"
+        tier_bg     = "rgba(239,68,68,0.10)"
+        tier_border = "rgba(239,68,68,0.25)"
+        bar_gradient= "linear-gradient(90deg,#b91c1c,#ef4444,#f87171)"
+        verdict     = "Limited AI/ML signal detected in your CV. Consider whether this field aligns with your core interests before investing heavily."
+
+    bar_pct = unified_score
+
+    # ── HERO: Unified Score Card ──
+    st.markdown(f"""
+    <div class="result-card" style="text-align:center; padding:2rem 1.5rem 1.5rem;">
+        <div style="font-size:0.68rem; font-weight:700; color:{tier_color}; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.5rem;">
+            {tier_icon} AI/ML Profile Score
+        </div>
+        <div style="font-family:'Syne',sans-serif; font-size:4rem; font-weight:900; line-height:1;
+                    background:linear-gradient(135deg,{tier_color},{tier_color}99);
+                    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+                    filter:drop-shadow(0 0 20px {tier_color}40); margin-bottom:0.5rem;">
+            {unified_score}%
+        </div>
+        <div style="font-family:'Syne',sans-serif; font-size:1.05rem; font-weight:700; color:var(--text-primary); margin-bottom:0.2rem;">
+            {role_title}
+        </div>
+        <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:1.2rem;">
+            {company}{' · ' + location if company else location}
+        </div>
+
+        <!-- Progress bar -->
+        <div style="background:var(--bg-card2); border:1px solid var(--border); border-radius:30px; height:10px; overflow:hidden; margin:0 2rem 0.8rem;">
+            <div style="width:{bar_pct}%; height:100%; background:{bar_gradient}; border-radius:30px;
+                        transition:width 0.8s ease; box-shadow:0 0 8px {tier_color}60;"></div>
+        </div>
+
+        <!-- Tier badge -->
+        <div style="display:inline-block; padding:0.35rem 1.1rem; background:{tier_bg}; border:1px solid {tier_border};
+                    border-radius:30px; font-size:0.72rem; font-weight:700; color:{tier_color}; letter-spacing:0.04em;">
+            {tier_label}
+        </div>
+        <div style="margin-top:0.7rem; font-size:0.78rem; color:var(--text-secondary); max-width:480px; margin-left:auto; margin-right:auto; line-height:1.5;">
+            {verdict}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ── Scoreboard / Field Fit Scale ──
+    st.markdown(f"""
+    <div class="result-card">
+        <div style="font-weight:700; color:var(--text-primary); margin-bottom:1rem; font-size:0.88rem; font-family:'Syne',sans-serif;">
+            📊 AI/ML Field Readiness Scale
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:0.5rem;">
+            <div style="padding:0.7rem 0.5rem; border-radius:10px; text-align:center;
+                        background:{'rgba(239,68,68,0.15)' if unified_score < 40 else 'var(--bg-card2)'};
+                        border:1.5px solid {'#ef4444' if unified_score < 40 else 'var(--border)'};
+                        opacity:{'1' if unified_score < 40 else '0.55'};">
+                <div style="font-size:1.1rem; margin-bottom:0.2rem;">⚡</div>
+                <div style="font-size:0.62rem; font-weight:700; color:{'#ef4444' if unified_score < 40 else 'var(--text-muted)'}; margin-bottom:0.2rem;">0–39%</div>
+                <div style="font-size:0.6rem; color:var(--text-muted); line-height:1.3;">Consider other fields first</div>
+            </div>
+            <div style="padding:0.7rem 0.5rem; border-radius:10px; text-align:center;
+                        background:{'rgba(245,158,11,0.15)' if 40 <= unified_score < 60 else 'var(--bg-card2)'};
+                        border:1.5px solid {'#f59e0b' if 40 <= unified_score < 60 else 'var(--border)'};
+                        opacity:{'1' if 40 <= unified_score < 60 else '0.55'};">
+                <div style="font-size:1.1rem; margin-bottom:0.2rem;">🔍</div>
+                <div style="font-size:0.62rem; font-weight:700; color:{'#f59e0b' if 40 <= unified_score < 60 else 'var(--text-muted)'}; margin-bottom:0.2rem;">40–59%</div>
+                <div style="font-size:0.6rem; color:var(--text-muted); line-height:1.3;">Interested — explore & validate</div>
+            </div>
+            <div style="padding:0.7rem 0.5rem; border-radius:10px; text-align:center;
+                        background:{'rgba(59,130,246,0.15)' if 60 <= unified_score < 80 else 'var(--bg-card2)'};
+                        border:1.5px solid {'#3b82f6' if 60 <= unified_score < 80 else 'var(--border)'};
+                        opacity:{'1' if 60 <= unified_score < 80 else '0.55'};">
+                <div style="font-size:1.1rem; margin-bottom:0.2rem;">💪</div>
+                <div style="font-size:0.62rem; font-weight:700; color:{'#3b82f6' if 60 <= unified_score < 80 else 'var(--text-muted)'}; margin-bottom:0.2rem;">60–79%</div>
+                <div style="font-size:0.6rem; color:var(--text-muted); line-height:1.3;">Strong — needs polishing</div>
+            </div>
+            <div style="padding:0.7rem 0.5rem; border-radius:10px; text-align:center;
+                        background:{'rgba(16,185,129,0.15)' if unified_score >= 80 else 'var(--bg-card2)'};
+                        border:1.5px solid {'#10b981' if unified_score >= 80 else 'var(--border)'};
+                        opacity:{'1' if unified_score >= 80 else '0.55'};">
+                <div style="font-size:1.1rem; margin-bottom:0.2rem;">🚀</div>
+                <div style="font-size:0.62rem; font-weight:700; color:{'#10b981' if unified_score >= 80 else 'var(--text-muted)'}; margin-bottom:0.2rem;">80–100%</div>
+                <div style="font-size:0.6rem; color:var(--text-muted); line-height:1.3;">Very strong — AI/ML ready</div>
+            </div>
+        </div>
+
+        <!-- Score breakdown bar -->
+        <div style="margin-top:1rem; padding-top:0.8rem; border-top:1px solid var(--border);">
+            <div style="display:flex; justify-content:space-between; margin-bottom:0.3rem;">
+                <span style="font-size:0.68rem; color:var(--text-muted); font-weight:600;">Score Breakdown</span>
+                <span style="font-size:0.68rem; color:var(--text-muted);">Role Match {faiss_pct}% · Readiness {round(ready_score)}%</span>
+            </div>
+            <div style="display:flex; gap:0.3rem; height:6px; border-radius:4px; overflow:hidden;">
+                <div style="width:{faiss_pct*0.55}%; background:var(--accent-blue); border-radius:4px;"></div>
+                <div style="width:{ready_score*0.45}%; background:var(--accent-cyan); border-radius:4px;"></div>
+            </div>
+            <div style="display:flex; gap:1rem; margin-top:0.35rem;">
+                <div style="display:flex; align-items:center; gap:0.3rem;">
+                    <div style="width:8px; height:8px; background:var(--accent-blue); border-radius:2px;"></div>
+                    <span style="font-size:0.62rem; color:var(--text-muted);">Role Match (55%)</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:0.3rem;">
+                    <div style="width:8px; height:8px; background:var(--accent-cyan); border-radius:2px;"></div>
+                    <span style="font-size:0.62rem; color:var(--text-muted);">CV Readiness (45%)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ── Actionable recommendation (fully custom HTML, theme-safe) ──
+    if rec:
         st.markdown(f"""
-        <div class="match-score">
-            <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.3rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase;">Top Role Match</div>
-            <div class="match-percentage">{top_match.get('match_pct', 0)}%</div>
-            <h3 style="color: var(--text-primary); margin-top: 0.4rem; font-size: 1rem; font-family:'Syne',sans-serif; font-weight:700;">{top_match.get('title', top_match.get('role', 'AI Professional'))}</h3>
-            <div style="color: var(--text-muted); font-size: 0.75rem;">{top_match.get('company', '')} · {top_match.get('location', 'Dhaka')}</div>
+        <div style="padding:0.8rem 1rem; background:{tier_bg}; border:1px solid {tier_border};
+                    border-left:4px solid {tier_color}; border-radius:10px; margin-bottom:1rem;">
+            <div style="display:flex; align-items:flex-start; gap:0.6rem;">
+                <span style="font-size:1rem; line-height:1;">{tier_icon}</span>
+                <div>
+                    <div style="font-size:0.72rem; font-weight:700; color:{tier_color}; margin-bottom:0.2rem; letter-spacing:0.04em; text-transform:uppercase;">
+                        {level} · Recommendation
+                    </div>
+                    <div style="font-size:0.82rem; color:var(--text-primary); line-height:1.5;">{rec}</div>
+                </div>
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
-    # Readiness score
-    score = readiness.get("total_score", 0)
-    level = readiness.get("level", "")
-    rec = readiness.get("recommendation", "")
-    if score < 30:
-        st.error(f"🔴 **AI/ML Readiness: {score}%** ({level}) — {rec}")
-    elif score < 60:
-        st.warning(f"🟡 **AI/ML Readiness: {score}%** ({level}) — {rec}")
-    else:
-        st.success(f"🟢 **AI/ML Readiness: {score}%** ({level}) — {rec}")
-
     if not has_ai_exp:
-        st.info("💡 **Tip:** No AI/ML work experience detected in your CV. Adding relevant projects or internships will significantly boost your match score.")
-
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown(f"""
+        <div style="padding:0.7rem 1rem; background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.25);
+                    border-left:4px solid var(--accent-blue); border-radius:10px; margin-bottom:1rem;">
+            <span style="font-size:0.82rem; color:var(--text-primary);">
+                💡 <strong>Tip:</strong> No AI/ML work experience detected. Adding internships or research projects will significantly boost your profile score.
+            </span>
+        </div>
+        """, unsafe_allow_html=True)
 
     # Skill gaps & resume additions
     col1, col2 = st.columns(2)
     with col1:
         gaps = retrieved.get("skill_gaps", [])
         if gaps:
+            chips = "".join(f"<span class='skill-chip gap-chip'>{g}</span>" for g in gaps[:6])
             st.markdown(f"""
             <div class="result-card">
                 <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.6rem; font-size:0.85rem;">❌ Skill Gaps</div>
-                {"".join(f"<span class='skill-chip gap-chip'>{g}</span>" for g in gaps[:6])}
+                {chips}
             </div>
             """, unsafe_allow_html=True)
 
     with col2:
         recs = retrieved.get("resume_skills", [])
         if recs:
+            chips = "".join(f"<span class='skill-chip'>+ {sk}</span>" for sk in recs[:6])
             st.markdown(f"""
             <div class="result-card">
                 <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.6rem; font-size:0.85rem;">➕ Add to Resume</div>
-                {"".join(f"<span class='skill-chip'>+ {sk}</span>" for sk in recs[:6])}
+                {chips}
             </div>
             """, unsafe_allow_html=True)
 
     # All matched roles
+    roles_html_parts = []
+    for r in retrieved.get("all_matches", [])[:4]:
+        sal_min = r.get("salary_min", 0)
+        sal_max = r.get("salary_max", 0)
+        sal_str = f"৳{sal_min:,}–৳{sal_max:,}/mo" if sal_min else ""
+        rtitle  = r.get("title", r.get("role", "Role"))
+        rcomp   = r.get("company", "Various")
+        rpct    = r.get("match_pct", 0)
+        roles_html_parts.append(f"""
+        <div style="margin-bottom:0.7rem; padding:0.7rem 1rem; background:var(--bg-card2); border:1px solid var(--border);
+                    border-left:3px solid var(--accent-blue); border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <strong style="color:var(--text-primary);">{rtitle}</strong>
+                <span style="color:var(--text-muted); font-size:0.75rem;"> · {rcomp}</span>
+            </div>
+            <div style="text-align:right;">
+                <span style="color:var(--accent-blue-bright); font-weight:700; font-size:0.85rem;">{rpct}%</span>
+                <div style="color:var(--text-muted); font-size:0.7rem;">{sal_str}</div>
+            </div>
+        </div>""")
+    roles_inner = "".join(roles_html_parts)
     st.markdown(f"""
     <div class="result-card">
         <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.8rem; font-size:0.9rem; font-family:'Syne',sans-serif;">🗺️ Matched Roles</div>
+        {roles_inner}
+    </div>
     """, unsafe_allow_html=True)
-    for r in retrieved.get("all_matches", [])[:4]:
-        sal_min = r.get('salary_min', 0)
-        sal_max = r.get('salary_max', 0)
-        sal_str = f"৳{sal_min:,}–৳{sal_max:,}/mo" if sal_min else ""
-        st.markdown(f"""
-        <div style="margin-bottom: 0.7rem; padding: 0.7rem 1rem; background: var(--bg-card2); border: 1px solid var(--border); border-left: 3px solid var(--accent-blue); border-radius: 10px; display:flex; justify-content:space-between; align-items:center;">
-            <div>
-                <strong style="color:var(--text-primary);">{r.get('title', r.get('role', 'Role'))}</strong>
-                <span style="color:var(--text-muted); font-size:0.75rem;"> · {r.get('company', 'Various')}</span>
-            </div>
-            <div style="text-align:right;">
-                <span style="color: var(--accent-blue-bright); font-weight:700; font-size:0.85rem;">{r.get('match_pct', 0)}%</span>
-                <div style="color:var(--text-muted); font-size:0.7rem;">{sal_str}</div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
 
     # LLM Analysis — parse tags and render as themed cards
     if analysis_raw:
         def parse_tag(text, tag):
-            """Extract content after TAG: until next TAG: or end."""
             pattern = rf'{tag}:\s*(.*?)(?=\n[A-Z_]+:|$)'
             m = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
             return m.group(1).strip() if m else ""
 
         def parse_list_tag(text, tag):
-            """Extract bullet list after TAG:"""
             pattern = rf'{tag}:\s*\n(.*?)(?=\n[A-Z_]+:|$)'
             m = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
             if not m:
                 return []
             raw = m.group(1).strip()
-            items = [re.sub(r'^[-•*]\s*', '', l.strip()) for l in raw.split('\n') if l.strip() and re.match(r'^[-•*]', l.strip())]
-            return items
+            return [re.sub(r'^[-•*]\s*', '', l.strip())
+                    for l in raw.split('\n')
+                    if l.strip() and re.match(r'^[-•*]', l.strip())]
 
         top_role   = parse_tag(analysis_raw, "TOP_ROLE")
         match_pct  = parse_tag(analysis_raw, "MATCH_PCT")
@@ -1169,100 +1324,141 @@ def render_analysis_results():
         next_steps = parse_list_tag(analysis_raw, "NEXT_STEPS")
         skill_gaps = parse_list_tag(analysis_raw, "SKILL_GAPS")
         resume_add = parse_list_tag(analysis_raw, "RESUME_ADD")
-        career_path= parse_list_tag(analysis_raw, "CAREER_PATH")
+        career_path = parse_list_tag(analysis_raw, "CAREER_PATH")
 
-        # Hero card
+        # Hero card — why this role fits
         if top_role or why_right:
+            hero_title = ""
+            if top_role:
+                pct_badge = f"&nbsp;<span style='color:var(--accent-blue);font-size:0.85rem;'>({match_pct}% match)</span>" if match_pct else ""
+                hero_title = f"<div style='font-family:Syne,sans-serif; font-size:1.05rem; font-weight:800; color:var(--text-primary); margin-bottom:0.4rem;'>🏆 {top_role}{pct_badge}</div>"
+            why_html = f"<div style='color:var(--text-secondary); font-size:0.84rem; line-height:1.6;'>{why_right}</div>" if why_right else ""
             st.markdown(f"""
-            <div class="result-card" style="border-left: 4px solid var(--accent-blue);">
-                <div style="font-size:0.7rem; font-weight:700; color:var(--text-muted); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.4rem;">🤖 AI Career Analysis</div>
-                {"<div style='font-family:Syne,sans-serif; font-size:1.1rem; font-weight:800; color:var(--text-primary); margin-bottom:0.3rem;'>🏆 " + top_role + ("  <span style='color:var(--accent-blue);font-size:0.9rem;'>(" + match_pct + "% match)</span>" if match_pct else "") + "</div>" if top_role else ""}
-                {"<div style='color:var(--text-secondary); font-size:0.85rem; line-height:1.6;'>" + why_right + "</div>" if why_right else ""}
+            <div class="result-card" style="border-left:4px solid var(--accent-blue);">
+                <div style="font-size:0.68rem; font-weight:700; color:var(--text-muted); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.5rem;">🤖 AI Career Analysis</div>
+                {hero_title}
+                {why_html}
             </div>
             """, unsafe_allow_html=True)
 
         # Next Steps
         if next_steps:
-            steps_html = "".join(f"""
-            <div style="display:flex; gap:0.8rem; align-items:flex-start; margin-bottom:0.6rem; padding:0.5rem 0.8rem; background:var(--bg-card2); border-radius:8px; border:1px solid var(--border);">
-                <span style="background:var(--accent-blue); color:#fff; border-radius:50%; width:22px; height:22px; min-width:22px; display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:700;">{i+1}</span>
-                <span style="color:var(--text-primary); font-size:0.82rem; line-height:1.5;">{s}</span>
-            </div>""" for i, s in enumerate(next_steps[:4]))
-            st.markdown(f"""
+            st.markdown("""
             <div class="result-card">
                 <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.7rem; font-size:0.88rem; font-family:'Syne',sans-serif;">🚀 Next Steps</div>
-                {steps_html}
-            </div>""", unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
+            for i, s in enumerate(next_steps[:4]):
+                st.markdown(f"""
+                <div style="display:flex; gap:0.8rem; align-items:flex-start; margin-bottom:0.6rem;
+                            padding:0.5rem 0.8rem; background:var(--bg-card2); border-radius:8px; border:1px solid var(--border);">
+                    <span style="background:var(--accent-blue); color:#fff; border-radius:50%; width:22px; height:22px;
+                                 min-width:22px; display:flex; align-items:center; justify-content:center;
+                                 font-size:0.65rem; font-weight:700;">{i+1}</span>
+                    <span style="color:var(--text-primary); font-size:0.82rem; line-height:1.5;">{s}</span>
+                </div>
+                """, unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
         # Skill Gaps
         if skill_gaps:
-            gap_items = []
-            for s in skill_gaps[:5]:
-                if ':' in s:
-                    glabel = s.split(':', 1)[0].strip()
-                    gcontent = s.split(':', 1)[1].strip()
-                    ginner = f"<strong style=\"color:#ef4444;\">⚡ {glabel}</strong>: {gcontent}"
-                else:
-                    ginner = f"<strong style=\"color:#ef4444;\">⚡ {s}</strong>"
-                gap_items.append(f"""
-            <div style="padding:0.5rem 0.8rem; background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.2); border-left:3px solid #ef4444; border-radius:8px; margin-bottom:0.5rem; color:var(--text-primary); font-size:0.82rem; line-height:1.5;">
-                {ginner}
-            </div>""")
-            gaps_html = "".join(gap_items)
-            st.markdown(f"""
+            st.markdown("""
             <div class="result-card">
                 <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.7rem; font-size:0.88rem; font-family:'Syne',sans-serif;">🔍 Skill Gaps to Close</div>
-                {gaps_html}
-            </div>""", unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
+            for s in skill_gaps[:5]:
+                if ':' in s:
+                    glabel, gcontent = s.split(':', 1)
+                    ginner = f"<strong style='color:#ef4444;'>⚡ {glabel.strip()}</strong>: {gcontent.strip()}"
+                else:
+                    ginner = f"<strong style='color:#ef4444;'>⚡ {s}</strong>"
+                st.markdown(f"""
+                <div style="padding:0.5rem 0.8rem; background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.2);
+                            border-left:3px solid #ef4444; border-radius:8px; margin-bottom:0.5rem;
+                            color:var(--text-primary); font-size:0.82rem; line-height:1.5;">
+                    {ginner}
+                </div>
+                """, unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
         # Resume Additions
         if resume_add:
-            adds_html = "".join(f"""
-            <div style="padding:0.5rem 0.8rem; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2); border-left:3px solid var(--accent-green); border-radius:8px; margin-bottom:0.5rem; color:var(--text-primary); font-size:0.82rem; line-height:1.5;">
-                ✅ {s}
-            </div>""" for s in resume_add[:5])
-            st.markdown(f"""
+            st.markdown("""
             <div class="result-card">
                 <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.7rem; font-size:0.88rem; font-family:'Syne',sans-serif;">📝 Resume Additions</div>
-                {adds_html}
-            </div>""", unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
+            for s in resume_add[:5]:
+                st.markdown(f"""
+                <div style="padding:0.5rem 0.8rem; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2);
+                            border-left:3px solid var(--accent-green); border-radius:8px; margin-bottom:0.5rem;
+                            color:var(--text-primary); font-size:0.82rem; line-height:1.5;">
+                    ✅ {s}
+                </div>
+                """, unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
-        # Career Path
+        # Career Path — each item rendered individually to avoid f-string HTML escaping
         if career_path:
-            path_items = []
-            for i, s in enumerate(career_path[:4]):
-                connector = "<div style='width:2px; flex:1; background:var(--border); margin:3px auto;'></div>" if i < len(career_path) - 1 else ""
-                if ':' in s:
-                    label = s.split(':', 1)[0].strip()
-                    content = s.split(':', 1)[1].strip()
-                    inner = f"<strong style=\"color:var(--accent-blue);\">{label}</strong>: {content}"
-                else:
-                    inner = s
-                path_items.append(f"""
-            <div style="display:flex; gap:0.8rem; align-items:flex-start; margin-bottom:0.6rem;">
-                <div style="min-width:10px; display:flex; flex-direction:column; align-items:center;">
-                    <div style="width:10px; height:10px; background:var(--accent-blue); border-radius:50%; margin-top:5px;"></div>
-                    {connector}
-                </div>
-                <div style="padding:0.5rem 0.8rem; background:var(--bg-card2); border:1px solid var(--border); border-radius:8px; flex:1; color:var(--text-primary); font-size:0.82rem; line-height:1.5; margin-bottom:0.2rem;">
-                    {inner}
-                </div>
-            </div>""")
-            path_html = "".join(path_items)
-            st.markdown(f"""
+            n = min(len(career_path), 3)
+            # Icon & accent per step
+            step_meta = [
+                ("#3b82f6", "🎯", "Short-term"),
+                ("#8b5cf6", "📈", "Mid-term"),
+                ("#10b981", "🏆", "Long-term"),
+            ]
+            st.markdown("""
             <div class="result-card">
-                <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.7rem; font-size:0.88rem; font-family:'Syne',sans-serif;">🗺️ Career Path</div>
-                {path_html}
-            </div>""", unsafe_allow_html=True)
+                <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.9rem;
+                            font-size:0.88rem; font-family:'Syne',sans-serif;">🗺️ Career Path</div>
+            """, unsafe_allow_html=True)
+
+            for i, s in enumerate(career_path[:3]):
+                dot_color, step_icon, _ = step_meta[i] if i < len(step_meta) else ("#3b82f6", "•", "Step")
+                connector_html = (
+                    f"<div style='width:2px; height:24px; background:var(--border); margin:2px auto;'></div>"
+                    if i < n - 1 else ""
+                )
+                # Split on first colon only
+                if ':' in s:
+                    raw_label, raw_content = s.split(':', 1)
+                    label   = raw_label.strip()
+                    content = raw_content.strip()
+                else:
+                    label   = f"Step {i+1}"
+                    content = s.strip()
+
+                st.markdown(f"""
+                <div style="display:flex; gap:0.8rem; align-items:flex-start; margin-bottom:0.2rem;">
+                    <div style="min-width:14px; display:flex; flex-direction:column; align-items:center; padding-top:4px;">
+                        <div style="width:14px; height:14px; background:{dot_color}; border-radius:50%;
+                                    box-shadow:0 0 6px {dot_color}60; flex-shrink:0;"></div>
+                        {connector_html}
+                    </div>
+                    <div style="flex:1; padding:0.6rem 0.9rem; background:var(--bg-card2);
+                                border:1px solid var(--border); border-left:3px solid {dot_color};
+                                border-radius:8px; margin-bottom:0.5rem;">
+                        <div style="font-size:0.7rem; font-weight:700; color:{dot_color};
+                                    letter-spacing:0.05em; text-transform:uppercase; margin-bottom:0.25rem;">
+                            {step_icon} {label}
+                        </div>
+                        <div style="color:var(--text-primary); font-size:0.82rem; line-height:1.55;">{content}</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            st.markdown("</div>", unsafe_allow_html=True)
 
         # Runner Up
         if runner_up:
+            ru_why_html = f"<div style='color:var(--text-secondary); font-size:0.82rem; line-height:1.5;'>{runner_why}</div>" if runner_why else ""
             st.markdown(f"""
-            <div class="result-card" style="border-left: 4px solid var(--accent-purple);">
-                <div style="font-size:0.7rem; font-weight:700; color:var(--text-muted); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.4rem;">🥈 Runner-Up Role</div>
-                <div style="font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; color:var(--text-primary); margin-bottom:0.3rem;">{runner_up}</div>
-                {"<div style='color:var(--text-secondary); font-size:0.82rem; line-height:1.5;'>" + runner_why + "</div>" if runner_why else ""}
-            </div>""", unsafe_allow_html=True)
+            <div class="result-card" style="border-left:4px solid var(--accent-purple);">
+                <div style="font-size:0.68rem; font-weight:700; color:var(--text-muted); letter-spacing:0.1em;
+                            text-transform:uppercase; margin-bottom:0.4rem;">🥈 Runner-Up Role</div>
+                <div style="font-family:'Syne',sans-serif; font-size:1rem; font-weight:700;
+                            color:var(--text-primary); margin-bottom:0.3rem;">{runner_up}</div>
+                {ru_why_html}
+            </div>
+            """, unsafe_allow_html=True)
 
     # AI Chat
     st.markdown(f"""
