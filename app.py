@@ -1329,9 +1329,6 @@ def render_quiz():
         </div>
     """, unsafe_allow_html=True)
 
-    # Import the quiz functions
-    from quiz import get_shuffled_questions, calculate_interest_score, reset_quiz, MAX_SCORE
-
     if st.session_state.quiz_result:
         render_quiz_results()
         st.markdown("---")
