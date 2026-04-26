@@ -1196,10 +1196,19 @@ def render_analysis_results():
 
         # Skill Gaps
         if skill_gaps:
-            gaps_html = "".join(f"""
+            gap_items = []
+            for s in skill_gaps[:5]:
+                if ':' in s:
+                    glabel = s.split(':', 1)[0].strip()
+                    gcontent = s.split(':', 1)[1].strip()
+                    ginner = f"<strong style=\"color:#ef4444;\">⚡ {glabel}</strong>: {gcontent}"
+                else:
+                    ginner = f"<strong style=\"color:#ef4444;\">⚡ {s}</strong>"
+                gap_items.append(f"""
             <div style="padding:0.5rem 0.8rem; background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.2); border-left:3px solid #ef4444; border-radius:8px; margin-bottom:0.5rem; color:var(--text-primary); font-size:0.82rem; line-height:1.5;">
-                <strong style="color:#ef4444;">⚡ {s.split(':')[0]}</strong>{': ' + ':'.join(s.split(':')[1:]) if ':' in s else ''}
-            </div>""" for s in skill_gaps[:5])
+                {ginner}
+            </div>""")
+            gaps_html = "".join(gap_items)
             st.markdown(f"""
             <div class="result-card">
                 <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.7rem; font-size:0.88rem; font-family:'Syne',sans-serif;">🔍 Skill Gaps to Close</div>
@@ -1220,16 +1229,26 @@ def render_analysis_results():
 
         # Career Path
         if career_path:
-            path_html = "".join(f"""
+            path_items = []
+            for i, s in enumerate(career_path[:4]):
+                connector = "<div style='width:2px; flex:1; background:var(--border); margin:3px auto;'></div>" if i < len(career_path) - 1 else ""
+                if ':' in s:
+                    label = s.split(':', 1)[0].strip()
+                    content = s.split(':', 1)[1].strip()
+                    inner = f"<strong style=\"color:var(--accent-blue);\">{label}</strong>: {content}"
+                else:
+                    inner = s
+                path_items.append(f"""
             <div style="display:flex; gap:0.8rem; align-items:flex-start; margin-bottom:0.6rem;">
                 <div style="min-width:10px; display:flex; flex-direction:column; align-items:center;">
                     <div style="width:10px; height:10px; background:var(--accent-blue); border-radius:50%; margin-top:5px;"></div>
-                    {"<div style='width:2px; flex:1; background:var(--border); margin:3px auto;'></div>" if i < len(career_path)-1 else ""}
+                    {connector}
                 </div>
                 <div style="padding:0.5rem 0.8rem; background:var(--bg-card2); border:1px solid var(--border); border-radius:8px; flex:1; color:var(--text-primary); font-size:0.82rem; line-height:1.5; margin-bottom:0.2rem;">
-                    <strong style="color:var(--accent-blue);">{s.split(':')[0]}</strong>{': ' + ':'.join(s.split(':')[1:]) if ':' in s else ''}
+                    {inner}
                 </div>
-            </div>""" for i, s in enumerate(career_path[:4]))
+            </div>""")
+            path_html = "".join(path_items)
             st.markdown(f"""
             <div class="result-card">
                 <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.7rem; font-size:0.88rem; font-family:'Syne',sans-serif;">🗺️ Career Path</div>
