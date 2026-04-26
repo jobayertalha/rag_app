@@ -1,4 +1,4 @@
-"""
+fix me this """
 quiz.py — Career Interest & Aptitude Quiz
 Focus on AI/ML interest alignment, problem-solving, and career preferences.
 Questions shuffle each time to prevent bias.
@@ -335,4 +335,11 @@ def calculate_interest_score(responses: dict, questions_list: list = None) -> di
 
 def reset_quiz():
     """Reset quiz state (to be called from app.py)"""
-    pass  # This will be handled by app.py session state
+    pass  # This will be handled by app.py session state also in etailsed score analysis coming tag Your Score Analysis: 23/30 points
+
+    <strong>What this means:<strong> You have genuine passion for AI/ML concepts, mathematical thinking, and hands-on coding. 
+    Your responses show Hands-on project building interest.
+
+    <strong>Career Recommendation:<strong> Focus 100% on AI/ML career path. You have the right mindset and curiosity.
+    </p>
+</div>
