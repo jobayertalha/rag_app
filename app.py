@@ -1468,6 +1468,7 @@ def render_quiz_results():
 
     bar_width = (score / max_score) * 100 if max_score > 0 else 0
     
+    # Main score card
     st.markdown(f"""
     <div class="result-card" style="text-align:center;">
         <div style="font-size:0.68rem; font-weight:700; color:{color}; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.5rem;">
@@ -1485,18 +1486,78 @@ def render_quiz_results():
         </div>
     </div>
     """, unsafe_allow_html=True)
+    
+    # Detailed Analysis Card
+    st.markdown(f"""
+    <div class="result-card">
+        <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.8rem; font-size:1rem; font-family:'Syne',sans-serif;">
+            📊 Detailed Score Analysis
+        </div>
+        <div style="color:var(--text-secondary); font-size:0.85rem; line-height:1.6;">
+            {rec["detailed_analysis"]}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Score interpretation based on your ranges
+    if score >= 21:
+        st.info("🎯 **Recommendation:** Focus on AI/ML field. You have strong alignment!")
+    elif score >= 10:
+        st.warning("🔍 **Recommendation:** Explore AI/ML alongside other fields. Take an introductory course first.")
+    else:
+        st.error("⚡ **Recommendation:** AI/ML may not be your best fit. Explore other technology paths first.")
 
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("### 🎯 Recommended Roles")
+        st.markdown(f"""
+        <div class="result-card">
+            <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.6rem;">🎯 Recommended Roles</div>
+        """, unsafe_allow_html=True)
         for role in rec["roles"]:
             st.markdown(f"- {role}")
+        st.markdown("</div>", unsafe_allow_html=True)
     
     with col2:
-        st.markdown("### 🚀 Next Steps")
+        st.markdown(f"""
+        <div class="result-card">
+            <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.6rem;">🚀 Next Steps</div>
+        """, unsafe_allow_html=True)
         for step in rec["next_steps"]:
             st.markdown(f"- {step}")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # Category breakdown
+    if result.get("category_scores"):
+        st.markdown("""
+        <div class="result-card">
+            <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.8rem;">📊 Interest Breakdown by Category</div>
+        """, unsafe_allow_html=True)
+        
+        for cat, data in result["category_scores"].items():
+            cat_pct = int((data["score"] / max(data["max_possible"], 1)) * 100) if data["max_possible"] > 0 else 0
+            
+            # Color coding for each category
+            if cat_pct >= 70:
+                cat_color = "#10b981"
+            elif cat_pct >= 40:
+                cat_color = "#f59e0b"
+            else:
+                cat_color = "#ef4444"
+            
+            st.markdown(f"""
+            <div style="margin-bottom:0.8rem;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.2rem;">
+                    <span style="font-size:0.72rem; font-weight:600; color:var(--text-primary);">{cat}</span>
+                    <span style="font-size:0.72rem; color:{cat_color};">{cat_pct}%</span>
+                </div>
+                <div style="background:var(--bg-card2); border-radius:10px; height:6px; overflow:hidden;">
+                    <div style="width:{cat_pct}%; height:100%; background:linear-gradient(90deg, {cat_color}, {cat_color}99); border-radius:10px;"></div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 
