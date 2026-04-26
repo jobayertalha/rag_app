@@ -1362,7 +1362,7 @@ def render_quiz():
         if not st.session_state.quiz_responses:
             st.session_state.quiz_responses = {}
         
-        # Display questions without a form first to capture responses in real-time
+        # Display questions
         for q in questions:
             qid = q["display_id"]
             st.markdown(f"""
@@ -1374,27 +1374,36 @@ def render_quiz():
             # Get previously stored value
             previous_value = st.session_state.quiz_responses.get(qid)
             
-            # Radio button
+            # Use a unique key for each radio button
+            radio_key = f"quiz_q_{qid}"
+            
+            # Radio button with NO pre-selected answer (index=None)
             response = st.radio(
-                f"q{qid}",
+                radio_key,
                 options=q["options"],
-                key=f"quiz_radio_{qid}",
                 label_visibility="collapsed",
-                index=previous_value if previous_value is not None else 0
+                index=None,  # NO pre-selected answer!
+                key=radio_key
             )
             
-            # Store the response index immediately
-            if response:
+            # Store the response index when user selects something
+            if response is not None:
                 selected_index = q["options"].index(response)
-                st.session_state.quiz_responses[qid] = selected_index
+                if st.session_state.quiz_responses.get(qid) != selected_index:
+                    st.session_state.quiz_responses[qid] = selected_index
+                    st.rerun()  # Rerun to update the UI
         
         # Check if all questions answered
         all_answered = len(st.session_state.quiz_responses) == len(questions)
         
         # Show progress
-        st.info(f"📊 Progress: {len(st.session_state.quiz_responses)}/{len(questions)} questions answered")
+        answered_count = len(st.session_state.quiz_responses)
+        if not all_answered:
+            st.warning(f"📊 Progress: {answered_count}/{len(questions)} questions answered")
+        else:
+            st.success(f"✅ All {len(questions)} questions answered! Click 'Get Results' below.")
         
-        # Show button (not in form) that enables when all answered
+        # Center the button
         col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
         with col_btn2:
             if all_answered:
