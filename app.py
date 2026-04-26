@@ -1319,7 +1319,6 @@ def _generate_jd_recommendation(pct: int, result: dict) -> str:
 
 
 # ============================================================quiz
-
 def render_quiz():
     st.markdown("""
     <div class="main-content">
@@ -1340,14 +1339,14 @@ def render_quiz():
                 st.session_state.quiz_result = None
                 st.session_state.quiz_responses = {}
                 st.session_state.current_quiz_questions = None
-                if "quiz_started" in st.session_state:
-                    st.session_state.quiz_started = False
+                st.session_state.quiz_started = False
                 st.rerun()
         with col2:
             if st.button("← Back to Home", use_container_width=True):
                 st.session_state.quiz_result = None
                 st.session_state.quiz_responses = {}
                 st.session_state.current_quiz_questions = None
+                st.session_state.quiz_started = False
                 nav_goto("home")
         st.markdown("</div>", unsafe_allow_html=True)
         return
@@ -1357,8 +1356,12 @@ def render_quiz():
     
     # If quiz is started but not completed - show questions
     if quiz_started and st.session_state.current_quiz_questions is not None:
-        with st.form("quiz_form"):
-            questions = st.session_state.current_quiz_questions
+        questions = st.session_state.current_quiz_questions
+        
+        # Create a form for the quiz
+        with st.form(key="quiz_form"):
+            # Store responses temporarily
+            temp_responses = {}
             
             for q in questions:
                 qid = q["display_id"]
@@ -1368,27 +1371,33 @@ def render_quiz():
                 </div>
                 """, unsafe_allow_html=True)
                 
-                # Get current value (None if not answered)
-                current_val = st.session_state.quiz_responses.get(qid)
+                # Get previously stored value
+                previous_value = st.session_state.quiz_responses.get(qid)
+                previous_index = previous_value if previous_value is not None else None
                 
-                # Radio button with NO pre-selected answer
+                # Radio button - use previous value if exists
                 response = st.radio(
                     f"q{qid}",
                     options=q["options"],
-                    key=f"quiz_{qid}",
+                    key=f"quiz_radio_{qid}",
                     label_visibility="collapsed",
-                    index=None  # No pre-selected answer
+                    index=previous_index
                 )
                 
-                # Store response when selected
-                if response is not None:
-                    st.session_state.quiz_responses[qid] = q["options"].index(response)
+                # Find the index of selected option
+                if response:
+                    selected_index = q["options"].index(response)
+                    temp_responses[qid] = selected_index
+            
+            # Update session state with all responses
+            for qid, value in temp_responses.items():
+                st.session_state.quiz_responses[qid] = value
             
             # Check if all questions answered
-            all_answered = all(st.session_state.quiz_responses.get(q["display_id"]) is not None for q in questions)
+            all_answered = len(st.session_state.quiz_responses) == len(questions)
             
             if not all_answered:
-                answered = sum(1 for q in questions if st.session_state.quiz_responses.get(q["display_id"]) is not None)
+                answered = len(st.session_state.quiz_responses)
                 st.warning(f"⚠️ Please answer all {len(questions)} questions ({answered}/{len(questions)} completed)")
             
             # Submit button - disabled until all answered
