@@ -10,7 +10,7 @@ import re
 
 from agent import extract_cv_text, build_agent, run_agent
 from rag import retrieve_context, match_cv_with_jd, score_ai_ml_readiness
-from quiz import QUESTIONS, calculate_interest_score
+from quiz import calculate_interest_score, get_shuffled_questions, reset_quiz
 
 st.set_page_config(
     page_title="AI Career Platform",
