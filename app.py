@@ -1318,6 +1318,7 @@ def _generate_jd_recommendation(pct: int, result: dict) -> str:
 
 
 # ============================================================quiz
+
 def render_quiz():
     st.markdown("""
     <div class="main-content">
@@ -1327,17 +1328,29 @@ def render_quiz():
         </div>
     """, unsafe_allow_html=True)
 
-    # If quiz results exist, show them
+    # If quiz results exist, show results page
     if st.session_state.quiz_result:
         render_quiz_results()
         st.markdown("---")
-        if st.button("← Back to Home", key="back_home_quiz"):
-            nav_goto("home")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🔄 Take Quiz Again", use_container_width=True):
+                # Reset everything
+                st.session_state.quiz_responses = {}
+                st.session_state.quiz_result = None
+                if "current_quiz_questions" in st.session_state:
+                    del st.session_state.current_quiz_questions
+                st.rerun()
+        with col2:
+            if st.button("← Back to Home", use_container_width=True):
+                st.session_state.quiz_responses = {}
+                st.session_state.quiz_result = None
+                nav_goto("home")
         st.markdown("</div>", unsafe_allow_html=True)
         return
 
-    # If no quiz responses, show start screen
-    if not st.session_state.quiz_responses:
+    # If quiz not started (no responses dict or empty), show start screen
+    if not st.session_state.quiz_responses or len(st.session_state.quiz_responses) == 0:
         col1, col2, col3 = st.columns([1, 1.2, 1])
         with col2:
             st.markdown("""
@@ -1350,9 +1363,10 @@ def render_quiz():
             </div>
             """, unsafe_allow_html=True)
             if st.button("🚀 Start Quiz", use_container_width=True, type="primary"):
-                # Generate shuffled questions and initialize responses
+                # Generate shuffled questions
+                from quiz import get_shuffled_questions
                 st.session_state.current_quiz_questions = get_shuffled_questions()
-                # Initialize responses with None for each question using display_id
+                # Initialize responses with None for each question
                 st.session_state.quiz_responses = {q["display_id"]: None for q in st.session_state.current_quiz_questions}
                 st.rerun()
 
@@ -1362,7 +1376,7 @@ def render_quiz():
         st.markdown("</div>", unsafe_allow_html=True)
         return
 
-    # Display quiz questions
+    # Quiz is active - show questions
     with st.form("quiz_form"):
         questions = st.session_state.current_quiz_questions
         
@@ -1374,18 +1388,19 @@ def render_quiz():
             </div>
             """, unsafe_allow_html=True)
             
-            # Get current value (None if not answered yet)
+            # Get current value (None if not answered)
             current_val = st.session_state.quiz_responses.get(qid)
             
+            # Radio button with NO pre-selected answer (index=None)
             response = st.radio(
                 f"q{qid}",
                 options=q["options"],
                 key=f"quiz_{qid}",
                 label_visibility="collapsed",
-                index=current_val if current_val is not None else None
+                index=None  # NO pre-selected answer!
             )
             
-            # Store response if selected (store the index)
+            # Store response when selected
             if response is not None:
                 st.session_state.quiz_responses[qid] = q["options"].index(response)
 
@@ -1393,19 +1408,19 @@ def render_quiz():
         all_answered = all(st.session_state.quiz_responses.get(q["display_id"]) is not None for q in questions)
         
         if not all_answered:
-            answered_count = sum(1 for q in questions if st.session_state.quiz_responses.get(q["display_id"]) is not None)
-            st.warning(f"⚠️ Please answer all {len(questions)} questions before submitting. ({answered_count}/{len(questions)} answered)")
+            answered = sum(1 for q in questions if st.session_state.quiz_responses.get(q["display_id"]) is not None)
+            st.warning(f"⚠️ Please answer all {len(questions)} questions ({answered}/{len(questions)} completed)")
         
-        if st.form_submit_button("📊 Get Results", use_container_width=True, disabled=not all_answered):
-            if all_answered:
-                result = calculate_interest_score(st.session_state.quiz_responses, st.session_state.current_quiz_questions)
-                st.session_state.quiz_result = result
-                st.rerun()
-            else:
-                st.error("Please answer all questions first!")
+        # Submit button
+        submit_btn = st.form_submit_button("📊 Get Results", use_container_width=True, type="primary", disabled=not all_answered)
+        
+        if submit_btn and all_answered:
+            from quiz import calculate_interest_score
+            result = calculate_interest_score(st.session_state.quiz_responses, st.session_state.current_quiz_questions)
+            st.session_state.quiz_result = result
+            st.rerun()
 
     st.markdown("</div>", unsafe_allow_html=True)
-
 
 def render_quiz_results():
     result = st.session_state.quiz_result
@@ -1424,19 +1439,15 @@ def render_quiz_results():
         <div style="font-size:0.68rem; font-weight:700; color:{color}; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.5rem;">
             {icon} AI/ML Interest Alignment
         </div>
-        <div style="font-family:'Syne',sans-serif; font-size:3.5rem; font-weight:900; line-height:1;
+        <div style="font-family:'Syne',sans-serif; font-size:3rem; font-weight:900; line-height:1;
                     background:linear-gradient(135deg,{color},{color}99);
                     -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
                     filter:drop-shadow(0 0 20px {color}40); margin-bottom:0.3rem;">
             {score}/{max_score}
         </div>
-        <div style="font-size:0.9rem; font-weight:700; color:{color}; margin-bottom:0.5rem;">{pct}% · {level}</div>
-        <div style="background:var(--bg-card2); border:1px solid var(--border); border-radius:30px; height:8px; overflow:hidden; margin:0.5rem 2rem;">
+        <div style="font-size:0.85rem; font-weight:700; color:{color}; margin-bottom:0.5rem;">{pct}% · {level}</div>
+        <div style="background:var(--bg-card2); border:1px solid var(--border); border-radius:30px; height:6px; overflow:hidden; margin:0.5rem 2rem;">
             <div style="width:{bar_width}%; height:100%; background:linear-gradient(90deg, {color}, {color}cc); border-radius:30px;"></div>
-        </div>
-        <div style="margin-top:1rem; padding:1rem; background:{color}10; border-radius:12px;">
-            <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.3rem;">{rec["verdict"]}</div>
-            <div style="color:var(--text-secondary); font-size:0.85rem;">{rec["message"]}</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -1444,45 +1455,14 @@ def render_quiz_results():
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown(f"""
-        <div class="result-card">
-            <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.6rem;">🎯 Recommended Roles</div>
-        """, unsafe_allow_html=True)
+        st.markdown("### 🎯 Recommended Roles")
         for role in rec["roles"]:
             st.markdown(f"- {role}")
-        st.markdown("</div>", unsafe_allow_html=True)
     
     with col2:
-        st.markdown(f"""
-        <div class="result-card">
-            <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.6rem;">🚀 Next Steps</div>
-        """, unsafe_allow_html=True)
+        st.markdown("### 🚀 Next Steps")
         for step in rec["next_steps"]:
             st.markdown(f"- {step}")
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    # Category breakdown
-    if result.get("category_scores"):
-        st.markdown("""
-        <div class="result-card">
-            <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.8rem;">📊 Interest Breakdown</div>
-        """, unsafe_allow_html=True)
-        
-        for cat, data in result["category_scores"].items():
-            cat_pct = int((data["score"] / max(data["max_possible"], 1)) * 100) if data["max_possible"] > 0 else 0
-            st.markdown(f"""
-            <div style="margin-bottom:0.8rem;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:0.2rem;">
-                    <span style="font-size:0.72rem; color:var(--text-secondary);">{cat}</span>
-                    <span style="font-size:0.72rem; color:var(--text-secondary);">{cat_pct}%</span>
-                </div>
-                <div style="background:var(--bg-card2); border-radius:10px; height:4px; overflow:hidden;">
-                    <div style="width:{cat_pct}%; height:100%; background:linear-gradient(90deg, {result['color']}, {result['color']}99); border-radius:10px;"></div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        st.markdown("</div>", unsafe_allow_html=True)
 
 
 
