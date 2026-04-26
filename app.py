@@ -1176,7 +1176,7 @@ def render_analysis_results():
             st.markdown(f"""
             <div class="result-card" style="border-left: 4px solid var(--accent-blue);">
                 <div style="font-size:0.7rem; font-weight:700; color:var(--text-muted); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.4rem;">🤖 AI Career Analysis</div>
-                {"<div style='font-family:Syne,sans-serif; font-size:1.1rem; font-weight:800; color:var(--text-primary); margin-bottom:0.3rem;'>🏆 " + top_role +  ("  <span style='color:var(--accent-blue);font-size:0.9rem;'>(" + match_pct + "% match)</span>" if match_pct else "") + "</div>" if top_role else ""}
+                {"<div style='font-family:Syne,sans-serif; font-size:1.1rem; font-weight:800; color:var(--text-primary); margin-bottom:0.3rem;'>🏆 " + top_role + ("  <span style='color:var(--accent-blue);font-size:0.9rem;'>(" + match_pct + "% match)</span>" if match_pct else "") + "</div>" if top_role else ""}
                 {"<div style='color:var(--text-secondary); font-size:0.85rem; line-height:1.6;'>" + why_right + "</div>" if why_right else ""}
             </div>
             """, unsafe_allow_html=True)
@@ -1218,39 +1218,23 @@ def render_analysis_results():
                 {adds_html}
             </div>""", unsafe_allow_html=True)
 
-        # Career Path - FIXED: Using st.markdown for each item individually
+        # Career Path
         if career_path:
-            st.markdown("""
+            path_html = "".join(f"""
+            <div style="display:flex; gap:0.8rem; align-items:flex-start; margin-bottom:0.6rem;">
+                <div style="min-width:10px; display:flex; flex-direction:column; align-items:center;">
+                    <div style="width:10px; height:10px; background:var(--accent-blue); border-radius:50%; margin-top:5px;"></div>
+                    {"<div style='width:2px; flex:1; background:var(--border); margin:3px auto;'></div>" if i < len(career_path)-1 else ""}
+                </div>
+                <div style="padding:0.5rem 0.8rem; background:var(--bg-card2); border:1px solid var(--border); border-radius:8px; flex:1; color:var(--text-primary); font-size:0.82rem; line-height:1.5; margin-bottom:0.2rem;">
+                    <strong style="color:var(--accent-blue);">{s.split(':')[0]}</strong>{': ' + ':'.join(s.split(':')[1:]) if ':' in s else ''}
+                </div>
+            </div>""" for i, s in enumerate(career_path[:4]))
+            st.markdown(f"""
             <div class="result-card">
                 <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.7rem; font-size:0.88rem; font-family:'Syne',sans-serif;">🗺️ Career Path</div>
-            """, unsafe_allow_html=True)
-            
-            for i, s in enumerate(career_path[:4]):
-                # Clean markdown from the string
-                s_clean = s.replace('**', '').replace('*', '').strip()
-                
-                # Parse title and description
-                if ': ' in s_clean:
-                    title_part = s_clean.split(': ')[0].strip()
-                    desc_part = ': '.join(s_clean.split(': ')[1:]).strip()
-                else:
-                    title_part = s_clean
-                    desc_part = ""
-                
-                # Render each career path item with proper HTML
-                st.markdown(f"""
-                <div style="display:flex; gap:0.8rem; align-items:flex-start; margin-bottom:0.6rem;">
-                    <div style="min-width:10px; display:flex; flex-direction:column; align-items:center;">
-                        <div style="width:10px; height:10px; background:var(--accent-blue); border-radius:50%; margin-top:5px;"></div>
-                        {f"<div style='width:2px; flex:1; background:var(--border); margin:3px auto;'></div>" if i < len(career_path)-1 else ""}
-                    </div>
-                    <div style="padding:0.5rem 0.8rem; background:var(--bg-card2); border:1px solid var(--border); border-radius:8px; flex:1; color:var(--text-primary); font-size:0.82rem; line-height:1.5; margin-bottom:0.2rem;">
-                        <strong style="color:var(--accent-blue);">{title_part}</strong>{f': {desc_part}' if desc_part else ''}
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            st.markdown("</div>", unsafe_allow_html=True)
+                {path_html}
+            </div>""", unsafe_allow_html=True)
 
         # Runner Up
         if runner_up:
