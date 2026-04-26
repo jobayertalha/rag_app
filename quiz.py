@@ -1,152 +1,275 @@
 """
-quiz.py — Career Interest & Aptitude Quiz (No technical questions)
-Focus on thinking style, problem-solving, and career preferences.
+quiz.py — Career Interest & Aptitude Quiz
+Focus on AI/ML interest alignment, problem-solving, and career preferences.
+Questions shuffle each time to prevent bias.
 """
 
-QUESTIONS = [
+import random
+
+# Base questions focused on AI/ML interest alignment
+BASE_QUESTIONS = [
     {
         "id": 1,
-        "question": "How do you feel about solving complex puzzles or logic problems?",
-        "options": ["Love it", "Enjoy it sometimes", "Neutral", "Prefer to avoid"],
-        "scores": [2, 1, 0, -1],
-        "category": "Problem Solving"
+        "question": "How interested are you in building systems that can learn from data?",
+        "options": ["Extremely interested", "Somewhat interested", "Neutral", "Not really interested"],
+        "scores": [3, 2, 1, 0],
+        "category": "ML Interest"
     },
     {
         "id": 2,
-        "question": "When faced with a new technology, your first reaction is:",
-        "options": ["Excited to learn it", "Curious but cautious", "Wait until I need it", "Prefer what I know"],
-        "scores": [2, 1, 0, -1],
-        "category": "Learning Style"
+        "question": "How do you feel about mathematics (linear algebra, calculus, statistics)?",
+        "options": ["Love it and good at it", "Can manage when needed", "Find it challenging", "Prefer to avoid math"],
+        "scores": [3, 2, 1, 0],
+        "category": "Math Comfort"
     },
     {
         "id": 3,
-        "question": "Would you rather build something new or analyze existing data?",
-        "options": ["Build new things", "Analyze data", "Both equally", "Neither"],
-        "scores": [2, 1, 0, -1],
-        "category": "Work Preference"
+        "question": "When you see a news article about AI breakthroughs, you:",
+        "options": ["Read it thoroughly with excitement", "Skim through it", "Just see the headline", "Usually ignore it"],
+        "scores": [3, 2, 1, 0],
+        "category": "AI Curiosity"
     },
     {
         "id": 4,
-        "question": "How comfortable are you with mathematics and numbers?",
-        "options": ["Very comfortable", "Somewhat comfortable", "Neutral", "Not comfortable"],
-        "scores": [2, 1, 0, -1],
-        "category": "Quantitative"
+        "question": "How comfortable are you with writing code (Python, programming in general)?",
+        "options": ["Very comfortable", "Somewhat comfortable", "Learning basics", "Not comfortable at all"],
+        "scores": [3, 2, 1, 0],
+        "category": "Coding Skill"
     },
     {
         "id": 5,
-        "question": "Do you enjoy finding patterns in data or information?",
-        "options": ["Always", "Often", "Sometimes", "Rarely"],
-        "scores": [2, 1, 0, -1],
-        "category": "Pattern Recognition"
+        "question": "Do you enjoy analyzing patterns in data or finding insights from information?",
+        "options": ["Love it", "Enjoy sometimes", "Neutral", "Not my thing"],
+        "scores": [3, 2, 1, 0],
+        "category": "Analytical Thinking"
     },
     {
         "id": 6,
-        "question": "How would you describe your attention to detail?",
-        "options": ["Very detailed", "Detailed enough", "Average", "Prefer big picture"],
-        "scores": [2, 1, 0, -1],
-        "category": "Work Style"
+        "question": "Would you consider spending 6+ months learning AI/ML concepts and tools?",
+        "options": ["Absolutely", "Maybe", "Unlikely", "Definitely not"],
+        "scores": [3, 2, 1, 0],
+        "category": "Learning Commitment"
     },
     {
         "id": 7,
-        "question": "When working on a project, you prefer:",
-        "options": ["Clear structure and guidelines", "Flexibility to explore", "Working with a team", "Working independently"],
-        "scores": [1, 2, 1, 1],
-        "category": "Work Environment"
+        "question": "How curious are you about how ChatGPT, self-driving cars, or facial recognition works?",
+        "options": ["Very curious - I research it", "Somewhat curious", "Mildly curious", "Not curious at all"],
+        "scores": [3, 2, 1, 0],
+        "category": "AI Curiosity"
     },
     {
         "id": 8,
-        "question": "How do you stay updated with technology trends?",
-        "options": ["Follow actively", "Read occasionally", "When needed", "Don't follow"],
-        "scores": [2, 1, 0, -1],
-        "category": "Tech Engagement"
+        "question": "What excites you more in a potential career?",
+        "options": [
+            "Building intelligent systems that learn", 
+            "Working with data and analytics", 
+            "Traditional software development", 
+            "Non-technical roles"
+        ],
+        "scores": [3, 2, 1, 0],
+        "category": "Career Preference"
     },
     {
         "id": 9,
-        "question": "What excites you most about a potential career?",
-        "options": ["Solving challenging problems", "Creating innovative products", "Working with data", "Helping people"],
-        "scores": [2, 2, 1, 1],
-        "category": "Motivation"
+        "question": "How do you feel about keeping up with rapidly changing AI technologies?",
+        "options": ["Excited to learn constantly", "Will learn when needed", "Prefer stable technologies", "Overwhelming"],
+        "scores": [3, 2, 1, 0],
+        "category": "Adaptability"
     },
     {
         "id": 10,
-        "question": "How do you handle ambiguity or unclear requirements?",
-        "options": ["Thrive on it", "Manage well", "Need clarity", "Avoid it"],
-        "scores": [2, 1, 0, -1],
-        "category": "Adaptability"
+        "question": "Have you ever built or wanted to build a chatbot, recommendation system, or image classifier?",
+        "options": ["Built one already", "Want to build", "Maybe someday", "Not interested"],
+        "scores": [3, 2, 1, 0],
+        "category": "Hands-on Interest"
     },
 ]
 
-MAX_SCORE = sum(max(q["scores"]) for q in QUESTIONS)
-
-# Role recommendations based on score ranges
-ROLE_RECOMMENDATIONS = {
-    "high": {
-        "roles": ["🤖 AI/ML Engineer", "🔬 Research Scientist", "🧠 NLP Engineer", "👁️ Computer Vision Engineer"],
-        "message": "You have strong analytical thinking and curiosity — perfect for cutting-edge AI roles!",
-        "explanation": "Your profile shows high interest in problem-solving, learning new technologies, and working with complex systems. You'd thrive in research or development roles."
+# Alternate questions pool (for variety when shuffling)
+ALTERNATE_QUESTIONS = [
+    {
+        "id": 11,
+        "question": "How often do you follow AI/ML researchers or publications (e.g., OpenAI, DeepMind, arXiv)?",
+        "options": ["Regularly", "Occasionally", "Rarely", "Never"],
+        "scores": [3, 2, 1, 0],
+        "category": "AI Curiosity"
     },
-    "medium": {
-        "roles": ["📊 Data Scientist", "📈 Data Analyst", "🛠️ ML Engineer", "📉 Business Intelligence Analyst"],
-        "message": "You have good analytical skills — with some focused learning, you can excel in data roles!",
-        "explanation": "You enjoy working with data and solving problems. With some technical skill development, you'd be great in data-focused roles."
+    {
+        "id": 12,
+        "question": "Are you willing to learn cloud platforms (AWS, GCP, Azure) for deploying ML models?",
+        "options": ["Yes, excited", "Probably yes", "Maybe", "Not interested"],
+        "scores": [3, 2, 1, 0],
+        "category": "Learning Commitment"
     },
-    "low": {
-        "roles": ["💻 Software Developer", "📱 App Developer", "🌐 Web Developer", "🔧 IT Support"],
-        "message": "You might enjoy roles that focus more on building than research — explore development paths!",
-        "explanation": "Your interests lean more toward building and creating rather than pure analysis. Consider software development or engineering roles."
+    {
+        "id": 13,
+        "question": "How do you approach solving a complex problem with no clear solution?",
+        "options": ["Systematically experiment", "Research existing solutions", "Ask for help", "Avoid if possible"],
+        "scores": [3, 2, 1, 0],
+        "category": "Problem Solving"
+    },
+    {
+        "id": 14,
+        "question": "Do you enjoy participating in hackathons, Kaggle competitions, or coding challenges?",
+        "options": ["Love them", "Done a few", "Interested but not yet", "Not interested"],
+        "scores": [3, 2, 1, 0],
+        "category": "Hands-on Interest"
+    },
+    {
+        "id": 15,
+        "question": "How important is it for you to understand the 'why' behind a model's prediction (explainable AI)?",
+        "options": ["Very important", "Somewhat important", "Not very important", "Don't care"],
+        "scores": [3, 2, 1, 0],
+        "category": "Analytical Thinking"
     }
-}
+]
+
+# Maximum possible score
+MAX_SCORE = sum(max(q["scores"]) for q in BASE_QUESTIONS[:10])  # 30 points max
+
+
+def get_shuffled_questions():
+    """Return shuffled questions, randomly selecting from base and alternate pool."""
+    # Take all base questions (10) and add some alternates
+    all_questions = BASE_QUESTIONS.copy()
+    
+    # Add alternate questions if they're not already included
+    existing_ids = {q["id"] for q in all_questions}
+    for alt_q in ALTERNATE_QUESTIONS:
+        if alt_q["id"] not in existing_ids:
+            all_questions.append(alt_q)
+    
+    # Shuffle the questions
+    shuffled = random.sample(all_questions, min(10, len(all_questions)))
+    
+    # Renumber for display
+    for i, q in enumerate(shuffled):
+        q["display_id"] = i + 1
+    
+    return shuffled
 
 
 def calculate_interest_score(responses: dict) -> dict:
     """
-    responses: {question_id: selected_option_index}
+    responses: {question_display_id: selected_option_index}
     Returns score, level, and recommendations.
+    Score range: 0-30 (10 questions × max 3 points each)
     """
     total_score = 0
     category_scores = {}
     
-    for q in QUESTIONS:
-        qid = q["id"]
-        selected = responses.get(qid, 0)
-        score = q["scores"][selected] if selected < len(q["scores"]) else 0
-        total_score += score
-        
-        # Track category scores
-        cat = q["category"]
-        if cat not in category_scores:
-            category_scores[cat] = {"score": 0, "max": max(q["scores"])}
-        category_scores[cat]["score"] += score
+    # Get current questions (store in session state if needed)
+    if "current_quiz_questions" not in st.session_state:
+        st.session_state.current_quiz_questions = get_shuffled_questions()
     
-    # Calculate percentage (normalize to 0-100)
+    questions = st.session_state.current_quiz_questions
+    
+    for q in questions:
+        qid = q["display_id"]
+        selected = responses.get(qid, -1)
+        if selected >= 0 and selected < len(q["scores"]):
+            score = q["scores"][selected]
+            total_score += score
+            
+            # Track category scores
+            cat = q["category"]
+            if cat not in category_scores:
+                category_scores[cat] = {"score": 0, "max_possible": 0}
+            category_scores[cat]["score"] += score
+            category_scores[cat]["max_possible"] += max(q["scores"])
+    
+    # Calculate percentage (0-100)
     max_possible = MAX_SCORE
     pct = int((total_score / max_possible) * 100)
     pct = max(0, min(100, pct))
     
-    # Determine level
-    if pct >= 70:
-        level = "HIGH"
-        tier = "high"
+    # Determine alignment level and recommendations
+    if total_score >= 21:  # 70%+ of 30
+        level = "STRONG ALIGNMENT"
+        alignment = "high"
         color = "#10b981"
-    elif pct >= 45:
-        level = "MEDIUM"
-        tier = "medium"
+        icon = "🚀"
+        recommendation = {
+            "verdict": "You are strongly aligned with AI/ML career paths!",
+            "message": "Your responses show genuine interest, curiosity, and aptitude for AI/ML. You'd likely thrive in this field.",
+            "roles": [
+                "🤖 AI/ML Engineer",
+                "🔬 Research Scientist", 
+                "🧠 NLP Engineer",
+                "👁️ Computer Vision Engineer",
+                "📊 Data Scientist"
+            ],
+            "next_steps": [
+                "Start with Python and ML fundamentals (3 months)",
+                "Build 2-3 portfolio projects (chatbot, image classifier, recommendation system)",
+                "Earn certifications from DeepLearning.ai or Coursera",
+                "Apply for AI/ML internships or junior roles"
+            ]
+        }
+    elif total_score >= 10:  # 33-69%
+        level = "MODERATE ALIGNMENT"
+        alignment = "medium"
         color = "#f59e0b"
-    else:
-        level = "LOW"
-        tier = "low"
+        icon = "🔍"
+        recommendation = {
+            "verdict": "You have some interest in AI/ML, but should explore further.",
+            "message": "You show curiosity in data and technology. AI/ML could be a good fit, but consider exploring adjacent fields too.",
+            "roles": [
+                "📈 Data Analyst",
+                "🛠️ ML Engineer (entry-level)",
+                "💻 Software Developer with ML focus",
+                "📊 Business Intelligence Analyst",
+                "🔧 Data Engineer"
+            ],
+            "next_steps": [
+                "Take an introductory AI/ML course (Andrew Ng's ML course)",
+                "Build one small project to test your interest",
+                "Explore data analysis roles as an alternative",
+                "Talk to professionals in both AI and traditional software roles"
+            ]
+        }
+    else:  # <33%
+        level = "LOW ALIGNMENT"
+        alignment = "low"
         color = "#ef4444"
-    
-    rec = ROLE_RECOMMENDATIONS[tier]
+        icon = "⚡"
+        recommendation = {
+            "verdict": "AI/ML may not be the best fit for you right now.",
+            "message": "Your responses suggest other fields might align better with your interests and strengths.",
+            "roles": [
+                "💻 Software Developer",
+                "📱 Mobile App Developer",
+                "🌐 Web Developer",
+                "🔧 IT Support / System Administrator",
+                "📋 Project Manager (Tech)"
+            ],
+            "next_steps": [
+                "Explore traditional software development paths",
+                "Consider what aspects of tech excite you most",
+                "Try building a simple web or mobile app",
+                "Speak with career counselors about alternative paths"
+            ]
+        }
     
     return {
         "score": total_score,
         "max_score": max_possible,
         "pct": pct,
         "level": level,
+        "alignment": alignment,
         "color": color,
-        "recommended_roles": rec["roles"],
-        "message": rec["message"],
-        "explanation": rec["explanation"],
+        "icon": icon,
+        "recommendation": recommendation,
         "category_scores": category_scores,
+        "questions_used": len(questions)
     }
+
+
+def reset_quiz():
+    """Reset quiz state and generate new shuffled questions."""
+    if "current_quiz_questions" in st.session_state:
+        del st.session_state.current_quiz_questions
+    if "quiz_responses" in st.session_state:
+        st.session_state.quiz_responses = {}
+    if "quiz_result" in st.session_state:
+        st.session_state.quiz_result = None
