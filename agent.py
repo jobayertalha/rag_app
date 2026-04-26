@@ -93,6 +93,15 @@ ALL ROLE MATCHES:
 SKILL GAPS (missing from CV): {', '.join(retrieved['skill_gaps']) or 'None — strong alignment'}
 RESUME SKILLS TO ADD: {', '.join(retrieved['resume_skills']) or 'CV already well-aligned'}
 
+━━━ SCORING CALIBRATION RULES ━━━
+
+Match % must reflect actual CV evidence — not be inflated or generic:
+- Only skills, projects, certs, and experience explicitly present in the CV should raise the score
+- A student with 2-3 projects + 1-2 certs + no work experience: 35–55% match for entry roles
+- A candidate with internship + 3+ projects + multiple certs: 55–72% match
+- A candidate with work experience + strong project portfolio + relevant certs: 70–88% match
+- Never give 90%+ unless the CV explicitly mentions advanced experience matching the role
+
 ━━━ YOUR RESPONSIBILITIES ━━━
 
 1. ROLE RECOMMENDATIONS — reference match % and CV evidence
@@ -104,8 +113,8 @@ RESUME SKILLS TO ADD: {', '.join(retrieved['resume_skills']) or 'CV already well
 
 When generating structured analysis, respond using EXACTLY these tags:
 TOP_ROLE: [role name]
-MATCH_PCT: [number only]
-WHY_RIGHT: [2-3 sentences personalised to this CV]
+MATCH_PCT: [number only — calibrated to CV evidence]
+WHY_RIGHT: [2-3 sentences personalised to this CV — cite specific skills/projects/certs from the CV]
 NEXT_STEPS:
 - [step 1]
 - [step 2]
@@ -115,9 +124,16 @@ SKILL_GAPS:
 RESUME_ADD:
 - Add [X]: unlocks [role] — [reason]
 CAREER_PATH:
-- [Step title]: [description and timeframe]
+- Short-term (0-12 months): [specific actionable milestone based on CV level]
+- Mid-term (1-2 years): [realistic progression role with description]
+- Long-term (3-5 years): [senior/lead level goal with description]
 RUNNER_UP: [second best role]
 RUNNER_UP_WHY: [1-2 sentences]
+
+CRITICAL for CAREER_PATH: Always generate exactly 3 bullet points using the exact labels above.
+Each item must follow the format: "Short-term (0-12 months): description"
+The long-term step should reflect a SENIOR or LEAD level position, not a junior one.
+Never output HTML tags. Never leave a career path item blank or truncated.
 
 Always reference actual CV content. Never give generic advice."""
 
