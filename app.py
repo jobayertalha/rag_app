@@ -1402,7 +1402,7 @@ def render_quiz():
         
         if st.form_submit_button("📊 Get Results", use_container_width=True, disabled=not all_answered):
             if all_answered:
-                result = calculate_interest_score(st.session_state.quiz_responses)
+                result = calculate_interest_score(st.session_state.quiz_responses, st.session_state.current_quiz_questions)
                 st.session_state.quiz_result = result
                 st.rerun()
             else:
