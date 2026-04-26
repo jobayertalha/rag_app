@@ -1329,22 +1329,30 @@ def render_quiz():
         </div>
     """, unsafe_allow_html=True)
 
-    if st.session_state.quiz_result:
+    # If quiz results exist, show them
+    if st.session_state.quiz_result is not None:
         render_quiz_results()
         st.markdown("---")
         col1, col2 = st.columns(2)
         with col1:
             if st.button("🔄 Take New Quiz", use_container_width=True):
-                reset_quiz()
+                # Properly reset quiz state
+                st.session_state.quiz_result = None
+                st.session_state.quiz_responses = {}
+                st.session_state.current_quiz_questions = get_shuffled_questions()
                 st.rerun()
         with col2:
             if st.button("← Back to Home", use_container_width=True):
-                reset_quiz()
+                st.session_state.quiz_result = None
+                st.session_state.quiz_responses = {}
+                if "current_quiz_questions" in st.session_state:
+                    del st.session_state.current_quiz_questions
                 nav_goto("home")
         st.markdown("</div>", unsafe_allow_html=True)
         return
 
-    if not st.session_state.quiz_responses:
+    # If no quiz responses yet, show start screen
+    if not st.session_state.quiz_responses or len(st.session_state.quiz_responses) == 0:
         col1, col2, col3 = st.columns([1, 1.2, 1])
         with col2:
             st.markdown("""
@@ -1356,11 +1364,13 @@ def render_quiz():
                 </div>
             </div>
             """, unsafe_allow_html=True)
-            if st.button("🚀 Start Quiz", use_container_width=True, type="primary"):
-                # Generate shuffled questions
-                from quiz import get_shuffled_questions
+            
+            # Use a simple button WITHOUT a form
+            if st.button("🚀 Start Quiz", key="start_quiz_btn", use_container_width=True):
+                # Generate shuffled questions and reset responses
                 st.session_state.current_quiz_questions = get_shuffled_questions()
                 st.session_state.quiz_responses = {}
+                st.session_state.quiz_result = None
                 st.rerun()
 
         st.markdown("---")
@@ -1370,7 +1380,7 @@ def render_quiz():
         return
 
     # Display quiz questions - NO pre-selected answers
-    with st.form("quiz_form"):
+    with st.form(key="quiz_form"):
         questions = st.session_state.current_quiz_questions
         
         for q in questions:
@@ -1381,13 +1391,16 @@ def render_quiz():
             </div>
             """, unsafe_allow_html=True)
             
+            # Get current value if exists
+            current_val = st.session_state.quiz_responses.get(qid)
+            
             # NO index parameter - so no pre-selected answer
             response = st.radio(
                 f"q{qid}",
                 options=q["options"],
                 key=f"quiz_{qid}",
                 label_visibility="collapsed",
-                index=None  # This ensures NO pre-selected answer
+                index=current_val if current_val is not None else None
             )
             
             # Store response if selected
@@ -1400,15 +1413,18 @@ def render_quiz():
         if not all_answered:
             st.warning(f"⚠️ Please answer all {len(questions)} questions before submitting. ({len(st.session_state.quiz_responses)}/{len(questions)} answered)")
         
-        if st.form_submit_button("📊 Get Results", use_container_width=True, disabled=not all_answered):
-            if all_answered:
-                result = calculate_interest_score(st.session_state.quiz_responses, st.session_state.current_quiz_questions)
-                st.session_state.quiz_result = result
-                st.rerun()
-            else:
-                st.error("Please answer all questions first!")
+        # Submit button
+        submitted = st.form_submit_button("📊 Get Results", use_container_width=True, disabled=not all_answered)
+        
+        if submitted and all_answered:
+            result = calculate_interest_score(st.session_state.quiz_responses, st.session_state.current_quiz_questions)
+            st.session_state.quiz_result = result
+            st.rerun()
+        elif submitted and not all_answered:
+            st.error("Please answer all questions first!")
 
     st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 def render_quiz_results():
