@@ -1362,7 +1362,7 @@ def render_quiz():
         if "quiz_responses" not in st.session_state:
             st.session_state.quiz_responses = {}
         
-        # Create a form for the quiz - NO rerun on selection
+        # Create a form for the quiz
         with st.form(key="quiz_answers_form"):
             # Display questions
             for q in questions:
@@ -1376,22 +1376,27 @@ def render_quiz():
                 # Get current stored answer for this question
                 current_answer = st.session_state.quiz_responses.get(qid)
                 
-                # Radio button - use index to show previously selected answer
+                # Radio button with NO pre-selected answer (index=None)
                 response = st.radio(
                     f"question_{qid}",
                     options=q["options"],
                     label_visibility="collapsed",
-                    index=current_answer if current_answer is not None else 0,
+                    index=None,  # NO pre-selected answer!
                     key=f"radio_{qid}"
                 )
                 
-                # Store in session state (updates immediately within form)
-                selected_index = q["options"].index(response)
-                if current_answer != selected_index:
+                # Store in session state when user selects an answer
+                if response is not None:
+                    selected_index = q["options"].index(response)
                     st.session_state.quiz_responses[qid] = selected_index
             
-            # Calculate how many questions are answered
-            answered_count = len(st.session_state.quiz_responses)
+            # Count ACTUALLY answered questions (where value is not None)
+            answered_count = 0
+            for q in questions:
+                qid = q["display_id"]
+                if st.session_state.quiz_responses.get(qid) is not None:
+                    answered_count += 1
+            
             all_answered = answered_count == len(questions)
             
             # Show progress
@@ -1400,12 +1405,14 @@ def render_quiz():
             else:
                 st.success(f"✅ All {len(questions)} questions answered! Click 'Get Results' below.")
             
-            # Submit button
+            # Submit button - disabled until all questions are actually answered
             submitted = st.form_submit_button("📊 Get Results", use_container_width=True, type="primary", disabled=not all_answered)
             
             if submitted and all_answered:
                 from quiz import calculate_interest_score
-                result = calculate_interest_score(st.session_state.quiz_responses, st.session_state.current_quiz_questions)
+                # Filter out None values before calculating
+                valid_responses = {k: v for k, v in st.session_state.quiz_responses.items() if v is not None}
+                result = calculate_interest_score(valid_responses, st.session_state.current_quiz_questions)
                 st.session_state.quiz_result = result
                 st.rerun()
         
