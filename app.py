@@ -662,8 +662,23 @@ footer {{visibility: hidden;}}
 }}
 
 /* ─── STREAMLIT NATIVE OVERRIDES ─── */
-.stMarkdown p {{ color: var(--text-secondary) !important; }}
-.stMarkdown strong {{ color: var(--text-primary) !important; }}
+.stMarkdown, .stMarkdown p, .element-container .stMarkdown p {{
+    color: var(--text-secondary) !important;
+}}
+.stMarkdown strong, .stMarkdown b {{ color: var(--text-primary) !important; }}
+.stMarkdown h1, .stMarkdown h2, .stMarkdown h3,
+.stMarkdown h4, .stMarkdown h5 {{
+    color: var(--text-primary) !important;
+    font-family: 'Syne', sans-serif !important;
+}}
+.stMarkdown li {{ color: var(--text-secondary) !important; }}
+.stMarkdown code {{
+    background: var(--bg-card2) !important;
+    color: var(--accent-blue) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 4px !important;
+    padding: 0.1rem 0.3rem !important;
+}}
 label {{ color: var(--text-secondary) !important; font-family: 'Space Grotesk', sans-serif !important; }}
 .stRadio label {{ color: var(--text-primary) !important; }}
 
@@ -1128,14 +1143,107 @@ def render_analysis_results():
         """, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # LLM Analysis
+    # LLM Analysis — parse tags and render as themed cards
     if analysis_raw:
-        st.markdown(f"""
-        <div class="result-card">
-            <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.8rem; font-size:0.9rem; font-family:'Syne',sans-serif;">🤖 AI Career Analysis</div>
-        """, unsafe_allow_html=True)
-        st.markdown(analysis_raw)
-        st.markdown("</div>", unsafe_allow_html=True)
+        def parse_tag(text, tag):
+            """Extract content after TAG: until next TAG: or end."""
+            pattern = rf'{tag}:\s*(.*?)(?=\n[A-Z_]+:|$)'
+            m = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
+            return m.group(1).strip() if m else ""
+
+        def parse_list_tag(text, tag):
+            """Extract bullet list after TAG:"""
+            pattern = rf'{tag}:\s*\n(.*?)(?=\n[A-Z_]+:|$)'
+            m = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
+            if not m:
+                return []
+            raw = m.group(1).strip()
+            items = [re.sub(r'^[-•*]\s*', '', l.strip()) for l in raw.split('\n') if l.strip() and re.match(r'^[-•*]', l.strip())]
+            return items
+
+        top_role   = parse_tag(analysis_raw, "TOP_ROLE")
+        match_pct  = parse_tag(analysis_raw, "MATCH_PCT")
+        why_right  = parse_tag(analysis_raw, "WHY_RIGHT")
+        runner_up  = parse_tag(analysis_raw, "RUNNER_UP")
+        runner_why = parse_tag(analysis_raw, "RUNNER_UP_WHY")
+        next_steps = parse_list_tag(analysis_raw, "NEXT_STEPS")
+        skill_gaps = parse_list_tag(analysis_raw, "SKILL_GAPS")
+        resume_add = parse_list_tag(analysis_raw, "RESUME_ADD")
+        career_path= parse_list_tag(analysis_raw, "CAREER_PATH")
+
+        # Hero card
+        if top_role or why_right:
+            st.markdown(f"""
+            <div class="result-card" style="border-left: 4px solid var(--accent-blue);">
+                <div style="font-size:0.7rem; font-weight:700; color:var(--text-muted); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.4rem;">🤖 AI Career Analysis</div>
+                {"<div style='font-family:Syne,sans-serif; font-size:1.1rem; font-weight:800; color:var(--text-primary); margin-bottom:0.3rem;'>🏆 " + top_role + ("  <span style='color:var(--accent-blue);font-size:0.9rem;'>(" + match_pct + "% match)</span>" if match_pct else "") + "</div>" if top_role else ""}
+                {"<div style='color:var(--text-secondary); font-size:0.85rem; line-height:1.6;'>" + why_right + "</div>" if why_right else ""}
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Next Steps
+        if next_steps:
+            steps_html = "".join(f"""
+            <div style="display:flex; gap:0.8rem; align-items:flex-start; margin-bottom:0.6rem; padding:0.5rem 0.8rem; background:var(--bg-card2); border-radius:8px; border:1px solid var(--border);">
+                <span style="background:var(--accent-blue); color:#fff; border-radius:50%; width:22px; height:22px; min-width:22px; display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:700;">{i+1}</span>
+                <span style="color:var(--text-primary); font-size:0.82rem; line-height:1.5;">{s}</span>
+            </div>""" for i, s in enumerate(next_steps[:4]))
+            st.markdown(f"""
+            <div class="result-card">
+                <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.7rem; font-size:0.88rem; font-family:'Syne',sans-serif;">🚀 Next Steps</div>
+                {steps_html}
+            </div>""", unsafe_allow_html=True)
+
+        # Skill Gaps
+        if skill_gaps:
+            gaps_html = "".join(f"""
+            <div style="padding:0.5rem 0.8rem; background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.2); border-left:3px solid #ef4444; border-radius:8px; margin-bottom:0.5rem; color:var(--text-primary); font-size:0.82rem; line-height:1.5;">
+                <strong style="color:#ef4444;">⚡ {s.split(':')[0]}</strong>{': ' + ':'.join(s.split(':')[1:]) if ':' in s else ''}
+            </div>""" for s in skill_gaps[:5])
+            st.markdown(f"""
+            <div class="result-card">
+                <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.7rem; font-size:0.88rem; font-family:'Syne',sans-serif;">🔍 Skill Gaps to Close</div>
+                {gaps_html}
+            </div>""", unsafe_allow_html=True)
+
+        # Resume Additions
+        if resume_add:
+            adds_html = "".join(f"""
+            <div style="padding:0.5rem 0.8rem; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2); border-left:3px solid var(--accent-green); border-radius:8px; margin-bottom:0.5rem; color:var(--text-primary); font-size:0.82rem; line-height:1.5;">
+                ✅ {s}
+            </div>""" for s in resume_add[:5])
+            st.markdown(f"""
+            <div class="result-card">
+                <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.7rem; font-size:0.88rem; font-family:'Syne',sans-serif;">📝 Resume Additions</div>
+                {adds_html}
+            </div>""", unsafe_allow_html=True)
+
+        # Career Path
+        if career_path:
+            path_html = "".join(f"""
+            <div style="display:flex; gap:0.8rem; align-items:flex-start; margin-bottom:0.6rem;">
+                <div style="min-width:10px; display:flex; flex-direction:column; align-items:center;">
+                    <div style="width:10px; height:10px; background:var(--accent-blue); border-radius:50%; margin-top:5px;"></div>
+                    {"<div style='width:2px; flex:1; background:var(--border); margin:3px auto;'></div>" if i < len(career_path)-1 else ""}
+                </div>
+                <div style="padding:0.5rem 0.8rem; background:var(--bg-card2); border:1px solid var(--border); border-radius:8px; flex:1; color:var(--text-primary); font-size:0.82rem; line-height:1.5; margin-bottom:0.2rem;">
+                    <strong style="color:var(--accent-blue);">{s.split(':')[0]}</strong>{': ' + ':'.join(s.split(':')[1:]) if ':' in s else ''}
+                </div>
+            </div>""" for i, s in enumerate(career_path[:4]))
+            st.markdown(f"""
+            <div class="result-card">
+                <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.7rem; font-size:0.88rem; font-family:'Syne',sans-serif;">🗺️ Career Path</div>
+                {path_html}
+            </div>""", unsafe_allow_html=True)
+
+        # Runner Up
+        if runner_up:
+            st.markdown(f"""
+            <div class="result-card" style="border-left: 4px solid var(--accent-purple);">
+                <div style="font-size:0.7rem; font-weight:700; color:var(--text-muted); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.4rem;">🥈 Runner-Up Role</div>
+                <div style="font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; color:var(--text-primary); margin-bottom:0.3rem;">{runner_up}</div>
+                {"<div style='color:var(--text-secondary); font-size:0.82rem; line-height:1.5;'>" + runner_why + "</div>" if runner_why else ""}
+            </div>""", unsafe_allow_html=True)
 
     # AI Chat
     st.markdown(f"""
