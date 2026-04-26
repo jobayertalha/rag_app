@@ -301,16 +301,20 @@ def filter_relevant_experience(cv_text: str) -> tuple:
 
 def score_ai_ml_readiness(cv_text: str) -> dict:
     """
-    Score CV for AI/ML readiness.
-    Fair for beginners: projects + certificates + skills count strongly.
-    Work experience is a bonus, not a gate.
+    Score CV for AI/ML readiness — calibrated for meaningful differentiation.
+    Beginner (no projects/certs): 10-29
+    Developing (some skills/certs/1-2 projects): 30-49
+    Intermediate (solid projects + certs, no formal exp): 50-67
+    Advanced (strong certs + projects + some exp): 68-81
+    Job Ready (industry exp + research/publications + strong skills): 82-97
+    Work experience is a strong bonus; projects + certs carry most weight for students.
     """
     if not cv_text:
         return {
             "total_score": 0,
             "level": "Beginner",
             "recommendation": "Please upload your CV to get analysis.",
-            "breakdown": {"experience": 0, "projects": 0, "certificates": 0, "skills": 0},
+            "breakdown": {"experience": 0, "projects": 0, "certificates": 0, "skills": 0, "achievements": 0},
             "stats": {"ai_skills_found": 0, "projects_found": 0, "certificates_found": 0, "has_ai_experience": False}
         }
 
@@ -320,7 +324,7 @@ def score_ai_ml_readiness(cv_text: str) -> dict:
     skills        = extract_skills(cv_text).lower()
     full_cv       = cv_text.lower()
 
-    # ── AI/ML experience check (generous: also check full CV for internships, research) ──
+    # ── Has AI/ML experience? ──
     exp_keywords = [
         'machine learning', 'data science', 'ai', 'artificial intelligence',
         'data analyst', 'ml engineer', 'data scientist', 'deep learning',
@@ -329,65 +333,122 @@ def score_ai_ml_readiness(cv_text: str) -> dict:
         'data engineer', 'business intelligence', 'analytics', 'research intern',
         'ai intern', 'ml intern', 'research assistant', 'undergraduate research'
     ]
-    has_ai_experience = any(kw in experience or kw in full_cv for kw in exp_keywords)
+    has_ai_experience = any(kw in experience for kw in exp_keywords)
 
-    # ── Experience Score (25%) ──
-    exp_matches = sum(1 for kw in EXPERIENCE_KEYWORDS if kw in experience or kw in full_cv)
-    if has_ai_experience:
-        exp_score = min(1.0, exp_matches / 2) * 25   # easier to get full 25
+    # ── Experience Score (max 25) ──
+    # Formal AI/ML role titles in experience = strong signal
+    exp_matches = sum(1 for kw in EXPERIENCE_KEYWORDS if kw in experience)
+    research_signals = sum(1 for kw in [
+        'research intern', 'ml intern', 'ai intern', 'research assistant',
+        'undergraduate research', 'graduate research', 'internship'
+    ] if kw in full_cv)
+    if exp_matches >= 2:
+        exp_score = 22.0     # Multiple formal AI/ML roles
+    elif exp_matches == 1:
+        exp_score = 15.0     # One formal AI/ML role
+    elif research_signals >= 2:
+        exp_score = 10.0     # Research internship or similar
+    elif research_signals == 1 or has_ai_experience:
+        exp_score = 6.0      # Some relevant context
     else:
-        exp_score = min(1.0, exp_matches / 4) * 10   # partial credit even without formal role
+        exp_score = 0.0
+    exp_score = min(25.0, exp_score)
 
-    # ── Projects Score (30%) — most important for students/freshers ──
+    # ── Projects Score (max 28) — key differentiator for students ──
     proj_matches = sum(1 for kw in PROJECT_KEYWORDS if kw in projects or kw in full_cv)
-    # Bonus: check for GitHub, Kaggle, published work
-    project_bonus = sum(1 for kw in ['github', 'kaggle', 'huggingface', 'arxiv', 'paper', 'publication', 'research']
-                        if kw in full_cv)
-    proj_score = min(1.0, (proj_matches + project_bonus) / 4) * 30
+    project_count = len(re.findall(
+        r'(?i)(?:^|\n)\s*(?:\d+[\.\)]\s+|[-•*]\s+)?(?:project|built|developed|implemented|created|designed)\b',
+        cv_text
+    ))
+    github_signal = 1 if 'github' in full_cv else 0
+    kaggle_signal = 1 if 'kaggle' in full_cv else 0
+    research_pub = sum(1 for kw in ['arxiv', 'paper', 'publication', 'published', 'ieee', 'conference', 'journal']
+                       if kw in full_cv)
+    # Base: project keywords (max 3 = 12pts)
+    proj_base = min(12.0, proj_matches * 4.0)
+    proj_bonus = (github_signal * 3) + (kaggle_signal * 3) + min(10, research_pub * 5)
+    proj_score = min(28.0, proj_base + proj_bonus)
+    if proj_matches == 0 and project_count == 0 and not github_signal:
+        proj_score = 0.0
 
-    # ── Certificates Score (25%) — very important for beginners ──
+    # ── Certificates Score (max 25) ──
     cert_matches = sum(1 for kw in CERT_KEYWORDS if kw in certificates or kw in full_cv)
-    # Bonus: named certification platforms
-    cert_bonus = sum(1 for kw in ['coursera', 'udemy', 'deeplearning.ai', 'fast.ai', 'google', 'microsoft',
-                                   'aws certified', 'tensorflow certificate', 'pytorch', 'nvidia']
-                     if kw in full_cv)
-    cert_score = min(1.0, (cert_matches + cert_bonus) / 3) * 25
+    platform_certs = sum(1 for kw in [
+        'coursera', 'udemy', 'deeplearning.ai', 'fast.ai',
+        'google certificate', 'microsoft certified', 'aws certified',
+        'tensorflow developer', 'pytorch', 'nvidia deep learning',
+        'datacamp', 'edx', 'linkedin learning'
+    ] if kw in full_cv)
+    cert_count = len(re.findall(
+        r'(?i)(?:certificate|certification|certified|course completed|nanodegree)', cv_text
+    ))
+    cert_base = min(12.0, cert_matches * 4.0)
+    cert_platform_bonus = min(8.0, platform_certs * 4.0)
+    cert_count_bonus = min(5.0, max(0.0, (cert_count - 1) * 1.5))
+    cert_score = min(25.0, cert_base + cert_platform_bonus + cert_count_bonus)
+    if cert_matches == 0 and platform_certs == 0:
+        cert_score = 0.0
 
-    # ── Skills Score (20%) ──
+    # ── Skills Score (max 17) ──
     skill_matches = sum(1 for kw in CORE_AI_ML_SKILLS if kw in skills or kw in full_cv)
-    skill_score = min(1.0, skill_matches / 6) * 20   # easier threshold (was 8)
+    if skill_matches >= 10:
+        skill_score = 17.0
+    elif skill_matches >= 7:
+        skill_score = 13.0
+    elif skill_matches >= 5:
+        skill_score = 10.0
+    elif skill_matches >= 3:
+        skill_score = 7.0
+    elif skill_matches >= 1:
+        skill_score = 3.0
+    else:
+        skill_score = 0.0
 
-    total_score = exp_score + proj_score + cert_score + skill_score
+    # ── Achievements bonus (max 5) ──
+    achievement_signals = sum(1 for kw in [
+        'award', 'winner', 'champion', 'hackathon', 'competition', 'rank',
+        'scholarship', 'honor', 'distinction', 'cum laude', 'dean', 'merit',
+        'first place', 'second place', 'top', 'finalist', 'selected'
+    ] if kw in full_cv)
+    achievement_score = min(5.0, achievement_signals * 1.5)
 
-    # ── Minimum floor: any CV with ≥2 AI skills + 1 project/cert gets at least 30 ──
-    if skill_matches >= 2 and (proj_matches >= 1 or cert_matches >= 1):
-        total_score = max(total_score, 30)
+    total_score = exp_score + proj_score + cert_score + skill_score + achievement_score
 
-    total_score = round(min(99, total_score), 1)
+    # ── Floors: prevent wildly low scores for candidates with real content ──
+    if skill_matches >= 3 and cert_matches >= 1 and proj_matches >= 1:
+        total_score = max(total_score, 35.0)   # solid beginner floor
+    elif skill_matches >= 2 or cert_matches >= 1:
+        total_score = max(total_score, 20.0)   # basic floor
+
+    total_score = round(min(97, total_score), 1)
 
     # ── Levels ──
-    if total_score < 35:
+    if total_score < 30:
         level = "Beginner"
         rec = "Start with Python + ML fundamentals. Build 1-2 small AI projects and earn a free Coursera certificate."
-    elif total_score < 55:
+    elif total_score < 50:
         level = "Developing"
-        rec = "Good foundation! Deepen your skills with real projects, contribute to GitHub, and target internships."
-    elif total_score < 75:
+        rec = "Good foundation! Deepen skills with real AI projects, contribute to GitHub, and target internships."
+    elif total_score < 68:
         level = "Intermediate"
         rec = "Strong profile! Target junior AI/ML roles and research internships in Bangladesh's growing tech scene."
+    elif total_score < 82:
+        level = "Advanced"
+        rec = "Very strong AI/ML profile! Apply confidently to mid-level AI Engineer and Data Scientist roles."
     else:
         level = "Job Ready"
-        rec = "Excellent AI/ML profile! Apply confidently to AI Engineer, Data Scientist, and ML Research roles."
+        rec = "Excellent profile! Apply for senior AI/ML Engineer, Research Scientist, and team lead roles."
 
     return {
         "total_score": total_score,
         "level": level,
         "recommendation": rec,
         "breakdown": {
-            "experience": round(exp_score, 1),
-            "projects":   round(proj_score, 1),
+            "experience":   round(exp_score, 1),
+            "projects":     round(proj_score, 1),
             "certificates": round(cert_score, 1),
-            "skills":     round(skill_score, 1)
+            "skills":       round(skill_score, 1),
+            "achievements": round(achievement_score, 1),
         },
         "stats": {
             "ai_skills_found":    skill_matches,
