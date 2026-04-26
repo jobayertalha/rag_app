@@ -1335,18 +1335,16 @@ def render_quiz():
         col1, col2 = st.columns(2)
         with col1:
             if st.button("🔄 Take Quiz Again", use_container_width=True):
-                # Reset everything to show start screen
-                st.session_state.quiz_result = None
-                st.session_state.quiz_responses = {}
-                st.session_state.current_quiz_questions = None
-                st.session_state.quiz_started = False
+                # COMPLETELY reset everything
+                for key in ["quiz_result", "quiz_responses", "current_quiz_questions", "quiz_started"]:
+                    if key in st.session_state:
+                        del st.session_state[key]
                 st.rerun()
         with col2:
             if st.button("← Back to Home", use_container_width=True):
-                st.session_state.quiz_result = None
-                st.session_state.quiz_responses = {}
-                st.session_state.current_quiz_questions = None
-                st.session_state.quiz_started = False
+                for key in ["quiz_result", "quiz_responses", "current_quiz_questions", "quiz_started"]:
+                    if key in st.session_state:
+                        del st.session_state[key]
                 nav_goto("home")
         st.markdown("</div>", unsafe_allow_html=True)
         return
@@ -1355,11 +1353,11 @@ def render_quiz():
     quiz_started = st.session_state.get("quiz_started", False)
     
     # If quiz is started but not completed - show questions
-    if quiz_started and st.session_state.current_quiz_questions is not None:
+    if quiz_started and st.session_state.get("current_quiz_questions") is not None:
         questions = st.session_state.current_quiz_questions
         
-        # Initialize responses dict if empty
-        if not st.session_state.quiz_responses:
+        # Initialize or get responses
+        if "quiz_responses" not in st.session_state:
             st.session_state.quiz_responses = {}
         
         # Display questions
@@ -1371,33 +1369,38 @@ def render_quiz():
             </div>
             """, unsafe_allow_html=True)
             
-            # Get previously stored value
-            previous_value = st.session_state.quiz_responses.get(qid)
+            # Get current stored answer for this question
+            current_answer = st.session_state.quiz_responses.get(qid)
             
-            # Use a unique key for each radio button
-            radio_key = f"quiz_q_{qid}"
+            # Create a unique key for this radio button
+            radio_key = f"quiz_q_{qid}_{qid}"
             
-            # Radio button with NO pre-selected answer (index=None)
+            # Radio button with NO pre-selected value
             response = st.radio(
                 radio_key,
                 options=q["options"],
                 label_visibility="collapsed",
-                index=None,  # NO pre-selected answer!
+                index=None,  # NO pre-selected!
                 key=radio_key
             )
             
-            # Store the response index when user selects something
+            # Store answer if user selected something
             if response is not None:
                 selected_index = q["options"].index(response)
-                if st.session_state.quiz_responses.get(qid) != selected_index:
+                if current_answer != selected_index:
                     st.session_state.quiz_responses[qid] = selected_index
-                    st.rerun()  # Rerun to update the UI
+                    st.rerun()
         
-        # Check if all questions answered
-        all_answered = len(st.session_state.quiz_responses) == len(questions)
+        # Calculate how many questions are actually answered (not None)
+        answered_count = 0
+        for q in questions:
+            qid = q["display_id"]
+            if st.session_state.quiz_responses.get(qid) is not None:
+                answered_count += 1
+        
+        all_answered = answered_count == len(questions)
         
         # Show progress
-        answered_count = len(st.session_state.quiz_responses)
         if not all_answered:
             st.warning(f"📊 Progress: {answered_count}/{len(questions)} questions answered")
         else:
@@ -1433,16 +1436,22 @@ def render_quiz():
         
         if st.button("🚀 Start Quiz", use_container_width=True, type="primary"):
             from quiz import get_shuffled_questions
-            # Generate shuffled questions
+            # Clean start - remove any old state
+            for key in ["quiz_responses", "quiz_result", "current_quiz_questions", "quiz_started"]:
+                if key in st.session_state:
+                    del st.session_state[key]
+            # Generate new shuffled questions
             st.session_state.current_quiz_questions = get_shuffled_questions()
-            # Initialize empty responses
-            st.session_state.quiz_responses = {}
-            st.session_state.quiz_result = None
+            st.session_state.quiz_responses = {}  # Empty dict!
             st.session_state.quiz_started = True
+            st.session_state.quiz_result = None
             st.rerun()
 
     st.markdown("---")
     if st.button("← Back to Home", key="back_home_quiz_start"):
+        for key in ["quiz_result", "quiz_responses", "current_quiz_questions", "quiz_started"]:
+            if key in st.session_state:
+                del st.session_state[key]
         nav_goto("home")
 
     st.markdown("</div>", unsafe_allow_html=True)
