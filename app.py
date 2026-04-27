@@ -34,7 +34,7 @@ _defaults = {
     "quiz_responses": {},
     "quiz_result": None,
     "current_quiz_questions": None,
-    "quiz_started": False,  # ADD THIS LINE
+    "quiz_started": False,
     "dark_mode": True,
 }
 for k, v in _defaults.items():
@@ -142,6 +142,43 @@ html, body, [class*="css"] {{ font-family: 'Space Grotesk', sans-serif !importan
 footer {{visibility: hidden;}}
 .stDeployButton {{display: none;}}
 
+/* Fix for input field - remove red outline, keep theme-consistent blue */
+.stTextInput > div > div > input,
+.stTextArea > div > div > textarea,
+input, textarea {{
+    background: var(--input-bg) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+    color: var(--text-primary) !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+    outline: none !important;
+    box-shadow: none !important;
+}}
+
+.stTextInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus,
+input:focus, textarea:focus {{
+    border-color: var(--accent-blue) !important;
+    box-shadow: 0 0 0 3px var(--glow-blue) !important;
+    outline: none !important;
+}}
+
+/* Remove red validation borders */
+input:invalid, input:required, textarea:invalid, textarea:required,
+.stTextInput > div > div > input:invalid,
+.stTextInput > div > div > input:required {{
+    border-color: var(--border) !important;
+    box-shadow: none !important;
+    outline: none !important;
+}}
+
+input:invalid:focus, input:required:focus,
+.stTextInput > div > div > input:invalid:focus {{
+    border-color: var(--accent-blue) !important;
+    box-shadow: 0 0 0 3px var(--glow-blue) !important;
+}}
+
 [data-testid="stSidebar"] {{
     background: {T['sidebar_bg']} !important;
     border-right: 1px solid var(--border) !important;
@@ -235,15 +272,6 @@ footer {{visibility: hidden;}}
 
 .skill-chip {{ display: inline-block; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 20px; padding: 0.22rem 0.65rem; font-size: 0.68rem; color: var(--text-secondary); margin: 0.2rem; font-weight: 500; }}
 .gap-chip {{ border-color: #7f1d1d; color: #fca5a5; background: rgba(127,29,29,0.15); }}
-
-.stTextInput > div > div > input, .stTextArea > div > div > textarea {{
-    background: var(--input-bg) !important; border: 1px solid var(--border) !important; border-radius: 12px !important;
-    color: var(--text-primary) !important; font-family: 'Space Grotesk', sans-serif !important;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
-}}
-.stTextInput > div > div > input:focus, .stTextArea > div > div > textarea:focus {{
-    border-color: var(--accent-blue) !important; box-shadow: 0 0 0 3px var(--glow-blue) !important;
-}}
 
 .contact-card, .about-card {{ background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 1.6rem; }}
 .contact-item {{ display: flex; align-items: center; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }}
