@@ -142,12 +142,10 @@ html, body, [class*="css"] {{ font-family: 'Space Grotesk', sans-serif !importan
 footer {{visibility: hidden;}}
 .stDeployButton {{display: none;}}
 
-/* Fixed input styles - no red outline, only theme blue */
+/* Fix for input field - remove red outline, keep theme-consistent blue */
 .stTextInput > div > div > input,
 .stTextArea > div > div > textarea,
-.stTextArea textarea,
-input, 
-textarea {{
+input, textarea {{
     background: var(--input-bg) !important;
     border: 1px solid var(--border) !important;
     border-radius: 12px !important;
@@ -160,34 +158,23 @@ textarea {{
 
 .stTextInput > div > div > input:focus,
 .stTextArea > div > div > textarea:focus,
-.stTextArea textarea:focus,
-input:focus, 
-textarea:focus {{
+input:focus, textarea:focus {{
     border-color: var(--accent-blue) !important;
     box-shadow: 0 0 0 3px var(--glow-blue) !important;
     outline: none !important;
 }}
 
-/* Remove red validation borders from all inputs */
-input:invalid, 
-input:required, 
-textarea:invalid, 
-textarea:required,
+/* Remove red validation borders */
+input:invalid, input:required, textarea:invalid, textarea:required,
 .stTextInput > div > div > input:invalid,
-.stTextInput > div > div > input:required,
-.stTextArea > div > div > textarea:invalid,
-.stTextArea > div > div > textarea:required {{
+.stTextInput > div > div > input:required {{
     border-color: var(--border) !important;
     box-shadow: none !important;
     outline: none !important;
 }}
 
-input:invalid:focus, 
-input:required:focus,
-textarea:invalid:focus,
-textarea:required:focus,
-.stTextInput > div > div > input:invalid:focus,
-.stTextArea > div > div > textarea:invalid:focus {{
+input:invalid:focus, input:required:focus,
+.stTextInput > div > div > input:invalid:focus {{
     border-color: var(--accent-blue) !important;
     box-shadow: 0 0 0 3px var(--glow-blue) !important;
 }}
@@ -1446,7 +1433,7 @@ def render_quiz():
             # Get current stored answer for this question
             current_answer = st.session_state.quiz_responses.get(qid)
             
-            # Radio button with unique key           
+            # Radio button with unique key
             radio_key = f"quiz_radio_{qid}"
             
             # Radio button - shows current selection, index=None for no pre-selection
