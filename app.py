@@ -34,7 +34,7 @@ _defaults = {
     "quiz_responses": {},
     "quiz_result": None,
     "current_quiz_questions": None,
-    "quiz_started": False,  # ADD THIS LINE
+    "quiz_started": False,
     "dark_mode": True,
 }
 for k, v in _defaults.items():
@@ -142,6 +142,43 @@ html, body, [class*="css"] {{ font-family: 'Space Grotesk', sans-serif !importan
 footer {{visibility: hidden;}}
 .stDeployButton {{display: none;}}
 
+/* Fix for input field - remove red outline, keep theme-consistent blue */
+.stTextInput > div > div > input,
+.stTextArea > div > div > textarea,
+input, textarea {{
+    background: var(--input-bg) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+    color: var(--text-primary) !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+    outline: none !important;
+    box-shadow: none !important;
+}}
+
+.stTextInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus,
+input:focus, textarea:focus {{
+    border-color: var(--accent-blue) !important;
+    box-shadow: 0 0 0 3px var(--glow-blue) !important;
+    outline: none !important;
+}}
+
+/* Remove red validation borders */
+input:invalid, input:required, textarea:invalid, textarea:required,
+.stTextInput > div > div > input:invalid,
+.stTextInput > div > div > input:required {{
+    border-color: var(--border) !important;
+    box-shadow: none !important;
+    outline: none !important;
+}}
+
+input:invalid:focus, input:required:focus,
+.stTextInput > div > div > input:invalid:focus {{
+    border-color: var(--accent-blue) !important;
+    box-shadow: 0 0 0 3px var(--glow-blue) !important;
+}}
+
 [data-testid="stSidebar"] {{
     background: {T['sidebar_bg']} !important;
     border-right: 1px solid var(--border) !important;
@@ -196,13 +233,6 @@ footer {{visibility: hidden;}}
     background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)) !important;
     color: #ffffff !important; transform: translateX(2px) !important;
 }}
-/* Keep active nav looking blue even when disabled */
-[data-testid="stSidebar"] .stButton > button[kind="primary"]:disabled,
-[data-testid="stSidebar"] .stButton > button[kind="primary"][disabled] {{
-    background: linear-gradient(135deg, var(--accent-blue-dark), var(--accent-blue)) !important;
-    color: #ffffff !important; opacity: 1 !important; cursor: default !important;
-    border: 2px solid transparent !important; box-shadow: 0 4px 18px var(--glow-blue) !important;
-}}
 
 .main-content {{ padding: 0.5rem 2rem 2rem 2rem; }}
 .main-header {{ margin-bottom: 1.5rem; padding-bottom: 0.8rem; position: relative; }}
@@ -243,41 +273,6 @@ footer {{visibility: hidden;}}
 .skill-chip {{ display: inline-block; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 20px; padding: 0.22rem 0.65rem; font-size: 0.68rem; color: var(--text-secondary); margin: 0.2rem; font-weight: 500; }}
 .gap-chip {{ border-color: #7f1d1d; color: #fca5a5; background: rgba(127,29,29,0.15); }}
 
-.stTextInput > div > div > input, .stTextArea > div > div > textarea {{
-    background: var(--input-bg) !important; border: 1px solid var(--border) !important; border-radius: 12px !important;
-    color: var(--text-primary) !important; font-family: 'Space Grotesk', sans-serif !important;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
-    outline: none !important;
-}}
-.stTextInput > div > div > input:focus, .stTextArea > div > div > textarea:focus {{
-    border-color: var(--accent-blue) !important; box-shadow: 0 0 0 3px var(--glow-blue) !important;
-    outline: none !important;
-}}
-/* Kill all red/error outlines on text inputs — keep only blue */
-.stTextInput > div > div {{
-    border: none !important; outline: none !important; box-shadow: none !important;
-}}
-.stTextInput [data-baseweb="input"] {{
-    border: none !important; outline: none !important; box-shadow: none !important;
-}}
-.stTextInput [data-baseweb="base-input"] {{
-    border-color: var(--border) !important; outline: none !important;
-}}
-.stTextInput [aria-invalid="true"] > input,
-.stTextInput input[aria-invalid="true"] {{
-    border-color: var(--accent-blue) !important;
-    box-shadow: 0 0 0 2px var(--glow-blue) !important;
-    outline: none !important;
-}}
-/* Streamlit wraps inputs in a div that gets a red border on invalid — override */
-div[data-testid="stTextInput"] > div > div > div {{
-    border-color: var(--border) !important;
-}}
-div[data-testid="stTextInput"] > div > div > div:focus-within {{
-    border-color: var(--accent-blue) !important;
-    box-shadow: 0 0 0 3px var(--glow-blue) !important;
-}}
-
 .contact-card, .about-card {{ background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 1.6rem; }}
 .contact-item {{ display: flex; align-items: center; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }}
 .contact-item:last-child {{ border-bottom: none; }}
@@ -317,9 +312,27 @@ div[data-testid="stTextInput"] > div > div > div:focus-within {{
 .quiz-question:hover {{ border-color: var(--accent-blue-bright); border-left-color: var(--accent-cyan); }}
 .quiz-question-text {{ font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; font-size: 0.88rem; line-height: 1.4; }}
 
-.stButton > button {{ font-family: 'Space Grotesk', sans-serif !important; font-weight: 600 !important; border-radius: 10px !important; transition: all 0.25s ease !important; }}
-.stButton > button[kind="primary"] {{ background: linear-gradient(135deg, var(--accent-blue-dark), var(--accent-blue)) !important; border: none !important; color: #ffffff !important; box-shadow: 0 4px 20px var(--glow-blue) !important; }}
-.stButton > button[kind="primary"]:hover {{ background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)) !important; box-shadow: 0 8px 32px var(--glow-blue) !important; transform: translateY(-2px) !important; }}
+/* Centered button styling for primary buttons */
+.stButton > button[kind="primary"] {{
+    background: linear-gradient(135deg, var(--accent-blue-dark), var(--accent-blue)) !important;
+    border: none !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 20px var(--glow-blue) !important;
+    transition: all 0.25s ease !important;
+    font-weight: 700 !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    padding: 0.6rem 2rem !important;
+    font-size: 0.9rem !important;
+    border-radius: 10px !important;
+    width: auto !important;
+    min-width: 200px !important;
+}}
+
+.stButton > button[kind="primary"]:hover {{
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)) !important;
+    box-shadow: 0 8px 32px var(--glow-blue) !important;
+    transform: translateY(-2px) !important;
+}}
 
 .stMarkdown, .stMarkdown p, .element-container .stMarkdown p {{ color: var(--text-secondary) !important; }}
 .stMarkdown strong, .stMarkdown b {{ color: var(--text-primary) !important; }}
@@ -372,8 +385,9 @@ hr {{ border-color: var(--border) !important; }}
 # NAVIGATION
 # ============================================================
 def nav_goto(page):
-    st.session_state.page = page
-    st.rerun()
+    if st.session_state.page != page:
+        st.session_state.page = page
+        st.rerun()
 
 
 def sign_out():
@@ -449,12 +463,10 @@ def render_sidebar():
 
         for label, page_key in nav_items:
             if current_page == page_key:
-                # Active page — render as primary, clicking does nothing (avoids wasted rerun)
-                st.button(label, key=f"nav_{page_key}", use_container_width=True, type="primary", disabled=False)
+                st.button(label, key=f"nav_{page_key}", use_container_width=True, type="primary")
             else:
                 if st.button(label, key=f"nav_{page_key}", use_container_width=True):
-                    st.session_state.page = page_key
-                    st.rerun()
+                    nav_goto(page_key)
 
         st.markdown('<div class="signout-wrap">', unsafe_allow_html=True)
         if st.button("⏻  Sign Out", key="signout_btn", use_container_width=True):
@@ -578,87 +590,18 @@ def render_analyze():
         </div>
     """, unsafe_allow_html=True)
 
-    # ── If no CV analyzed yet, show CTA landing card ──
-    if not st.session_state.retrieved:
-        col1, col2, col3 = st.columns([1, 1.2, 1])
-        with col2:
-            st.markdown("""
-            <div style="text-align:center; margin-bottom:1.2rem;">
-                <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:20px;
-                            padding:1.6rem 1.4rem; box-shadow:0 8px 32px var(--glow-blue); position:relative; overflow:hidden;">
-                    <div style="position:absolute; top:0; left:0; right:0; height:3px;
-                                background:linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));"></div>
-                    <div style="font-size:2.4rem; margin-bottom:0.6rem; filter:drop-shadow(0 0 10px var(--glow-blue));">📄</div>
-                    <div style="font-family:'Syne',sans-serif; font-size:1rem; font-weight:800;
-                                color:var(--text-primary); margin-bottom:0.4rem; letter-spacing:-0.01em;">
-                        Analyze Your CV
-                    </div>
-                    <div style="color:var(--text-secondary); font-size:0.76rem; line-height:1.55; margin-bottom:1.1rem;">
-                        FAISS vector search matches your CV against real job descriptions.<br>
-                        Get role matches, skill gaps, salary insights &amp; a personalized career path.
-                    </div>
-                    <div style="display:flex; justify-content:center; gap:0.6rem; flex-wrap:wrap; margin-bottom:0.9rem;">
-                        <span style="background:var(--glow-blue); border:1px solid var(--border-glow); border-radius:20px;
-                                     padding:0.2rem 0.7rem; font-size:0.62rem; color:var(--accent-blue-bright); font-weight:700;">
-                            🎯 Role Match
-                        </span>
-                        <span style="background:var(--glow-blue); border:1px solid var(--border-glow); border-radius:20px;
-                                     padding:0.2rem 0.7rem; font-size:0.62rem; color:var(--accent-blue-bright); font-weight:700;">
-                            🔍 Skill Gaps
-                        </span>
-                        <span style="background:var(--glow-blue); border:1px solid var(--border-glow); border-radius:20px;
-                                     padding:0.2rem 0.7rem; font-size:0.62rem; color:var(--accent-blue-bright); font-weight:700;">
-                            💰 Salary Intel
-                        </span>
-                        <span style="background:var(--glow-blue); border:1px solid var(--border-glow); border-radius:20px;
-                                     padding:0.2rem 0.7rem; font-size:0.62rem; color:var(--accent-blue-bright); font-weight:700;">
-                            🗺️ Career Path
-                        </span>
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-            uploaded = st.file_uploader("Upload CV (PDF)", type=["pdf"], label_visibility="collapsed", key="cv_uploader_main")
-            if uploaded:
-                if st.button("🔬 Start Analysis →", use_container_width=True, type="primary", key="cv_analyze_btn"):
-                    with st.spinner("Analyzing your CV with FAISS vector search..."):
-                        try:
-                            tmp_path = None
-                            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-                                tmp.write(uploaded.read())
-                                tmp_path = tmp.name
-                            cv_text = extract_cv_text(tmp_path)
-                            os.unlink(tmp_path)
-
-                            if not cv_text or len(cv_text.strip()) < 20:
-                                st.error("⚠️ Could not extract text from your PDF. Please ensure it's a text-based PDF (not scanned image).")
-                            else:
-                                st.session_state.cv_text = cv_text
-                                st.session_state.retrieved = retrieve_context(cv_text, "", k=5)
-                                st.session_state.agent = build_agent(cv_text, "", st.session_state.candidate_name)
-                                st.session_state.chat_history = []
-                                st.session_state.analysis_raw = run_agent(
-                                    st.session_state.agent,
-                                    "Analyse this CV. Follow tags: TOP_ROLE, MATCH_PCT, WHY_RIGHT, SKILL_GAPS, RESUME_ADD, CAREER_PATH"
-                                )
-                                st.rerun()
-                        except Exception as e:
-                            if tmp_path and os.path.exists(tmp_path):
-                                os.unlink(tmp_path)
-                            st.error(f"⚠️ Error reading PDF: {str(e)[:200]}. Please try a different PDF file.")
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        uploaded = st.file_uploader("Upload CV (PDF)", type=["pdf"], label_visibility="collapsed")
+        
+        # Centered button - always visible
+        st.markdown('<div style="display: flex; justify-content: center; margin-top: 1rem;">', unsafe_allow_html=True)
+        
+        if st.button("🚀 Analyze My CV", use_container_width=False, type="primary"):
+            if uploaded is None:
+                st.error("⚠️ Please upload your CV first!")
             else:
-                st.markdown("""
-                <div style="text-align:center; padding:0.5rem 0; color:var(--text-muted); font-size:0.75rem;">
-                    ↑ Upload your PDF CV to unlock analysis
-                </div>
-                """, unsafe_allow_html=True)
-    else:
-        # Results already loaded — show uploader compactly for re-analysis
-        with st.expander("🔄 Re-analyze with a different CV"):
-            uploaded = st.file_uploader("Upload new CV (PDF)", type=["pdf"], label_visibility="collapsed", key="cv_reupload")
-            if uploaded and st.button("🔬 Re-Analyze →", use_container_width=True, type="primary", key="cv_reanalyze_btn"):
-                with st.spinner("Re-analyzing your CV..."):
+                with st.spinner("Analyzing your CV..."):
                     try:
                         tmp_path = None
                         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
@@ -666,8 +609,9 @@ def render_analyze():
                             tmp_path = tmp.name
                         cv_text = extract_cv_text(tmp_path)
                         os.unlink(tmp_path)
+
                         if not cv_text or len(cv_text.strip()) < 20:
-                            st.error("⚠️ Could not extract text from your PDF.")
+                            st.error("⚠️ Could not extract text from your PDF. Please ensure it's a text-based PDF (not scanned image).")
                         else:
                             st.session_state.cv_text = cv_text
                             st.session_state.retrieved = retrieve_context(cv_text, "", k=5)
@@ -681,7 +625,11 @@ def render_analyze():
                     except Exception as e:
                         if tmp_path and os.path.exists(tmp_path):
                             os.unlink(tmp_path)
-                        st.error(f"⚠️ Error reading PDF: {str(e)[:200]}")
+                        st.error(f"⚠️ Error reading PDF: {str(e)[:200]}. Please try a different PDF file.")
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    if st.session_state.retrieved:
         render_analysis_results()
 
     st.markdown("---")
@@ -957,7 +905,6 @@ def render_analysis_results():
             </div>
             """, unsafe_allow_html=True)
 
-        # ── FIX 1: Next Steps — build all HTML in one string, render once ──
         if next_steps:
             _ns_items = "".join(
                 '<div style="display:flex; gap:0.8rem; align-items:flex-start; margin-bottom:0.6rem;'
@@ -976,7 +923,6 @@ def render_analysis_results():
                 unsafe_allow_html=True
             )
 
-        # ── FIX 2: Skill Gaps — build all HTML in one string, render once ──
         if skill_gaps:
             def _gap_inner(s):
                 if ':' in s:
@@ -997,7 +943,6 @@ def render_analysis_results():
                 unsafe_allow_html=True
             )
 
-        # ── FIX 3: Resume Additions — build all HTML in one string, render once ──
         if resume_add:
             _ra_items = "".join(
                 '<div style="padding:0.5rem 0.8rem; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2);'
@@ -1012,7 +957,6 @@ def render_analysis_results():
                 unsafe_allow_html=True
             )
 
-        # ── FIX 4: Career Path — build all HTML in one string, render once ──
         if career_path:
             n = min(len(career_path), 3)
             step_meta = [
@@ -1117,117 +1061,47 @@ def render_jd_match():
         </div>
     """, unsafe_allow_html=True)
 
-    # ── Landing CTA card when no result yet ──
-    if not st.session_state.jd_match_result:
-        col_land1, col_land2, col_land3 = st.columns([1, 1.4, 1])
-        with col_land2:
-            st.markdown("""
-            <div style="text-align:center; margin-bottom:1.4rem;">
-                <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:20px;
-                            padding:1.6rem 1.4rem; box-shadow:0 8px 32px var(--glow-blue); position:relative; overflow:hidden;">
-                    <div style="position:absolute; top:0; left:0; right:0; height:3px;
-                                background:linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));"></div>
-                    <div style="font-size:2.4rem; margin-bottom:0.6rem; filter:drop-shadow(0 0 10px var(--glow-blue));">🎯</div>
-                    <div style="font-family:'Syne',sans-serif; font-size:1rem; font-weight:800;
-                                color:var(--text-primary); margin-bottom:0.4rem;">
-                        Match My CV with a Job Description
-                    </div>
-                    <div style="color:var(--text-secondary); font-size:0.76rem; line-height:1.55; margin-bottom:1rem;">
-                        Paste any JD from LinkedIn, Indeed, or any career site.<br>
-                        We'll score your fit &amp; show exactly what to improve.
-                    </div>
-                    <div style="display:flex; justify-content:center; gap:0.6rem; flex-wrap:wrap;">
-                        <span style="background:var(--glow-blue); border:1px solid var(--border-glow); border-radius:20px;
-                                     padding:0.2rem 0.7rem; font-size:0.62rem; color:var(--accent-blue-bright); font-weight:700;">
-                            📊 Match %
-                        </span>
-                        <span style="background:var(--glow-blue); border:1px solid var(--border-glow); border-radius:20px;
-                                     padding:0.2rem 0.7rem; font-size:0.62rem; color:var(--accent-blue-bright); font-weight:700;">
-                            🔍 Skill Gaps
-                        </span>
-                        <span style="background:var(--glow-blue); border:1px solid var(--border-glow); border-radius:20px;
-                                     padding:0.2rem 0.7rem; font-size:0.62rem; color:var(--accent-blue-bright); font-weight:700;">
-                            🏢 Similar Roles
-                        </span>
-                        <span style="background:var(--glow-blue); border:1px solid var(--border-glow); border-radius:20px;
-                                     padding:0.2rem 0.7rem; font-size:0.62rem; color:var(--accent-blue-bright); font-weight:700;">
-                            🤖 AI Insights
-                        </span>
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+    col1, col2 = st.columns(2)
+    with col1:
+        uploaded = st.file_uploader("Your CV (PDF)", type=["pdf"], key="jd_cv_upload")
+    with col2:
+        jd_text = st.text_area("Job Description", height=200, placeholder="Paste the full job description here...")
 
-        # Inputs below the card
-        col1, col2 = st.columns(2)
-        with col1:
-            uploaded = st.file_uploader("Your CV (PDF)", type=["pdf"], key="jd_cv_upload")
-        with col2:
-            jd_text = st.text_area("Job Description", height=200, placeholder="Paste the full job description here...")
-
-        both_ready = uploaded and jd_text and jd_text.strip()
-        if both_ready:
-            col_b1, col_b2, col_b3 = st.columns([1, 2, 1])
-            with col_b2:
-                if st.button("🎯 Match My CV with this JD →", use_container_width=True, type="primary", key="jd_match_btn"):
-                    with st.spinner("Calculating match and analyzing with FAISS..."):
-                        try:
-                            tmp_path = None
-                            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-                                tmp.write(uploaded.read())
-                                tmp_path = tmp.name
-                            cv_text = extract_cv_text(tmp_path)
-                            os.unlink(tmp_path)
-
-                            if not cv_text or len(cv_text.strip()) < 20:
-                                st.error("⚠️ Could not extract text from your PDF. Please ensure it's a text-based PDF (not scanned image).")
-                            else:
-                                st.session_state.cv_text = cv_text
-                                st.session_state.jd_text_for_match = jd_text
-                                if not st.session_state.agent:
-                                    st.session_state.agent = build_agent(cv_text, jd_text, st.session_state.candidate_name)
-                                st.session_state.jd_match_result = match_cv_with_jd(cv_text, jd_text)
-                                st.rerun()
-                        except Exception as e:
-                            if tmp_path and os.path.exists(tmp_path):
-                                os.unlink(tmp_path)
-                            st.error(f"⚠️ Error reading PDF: {str(e)[:200]}. Please try a different PDF file.")
+    # Centered button - always visible
+    st.markdown('<div style="display: flex; justify-content: center; margin-top: 1rem;">', unsafe_allow_html=True)
+    
+    if st.button("🎯 Match My JD", use_container_width=False, type="primary"):
+        if uploaded is None:
+            st.error("⚠️ Please upload your CV first!")
+        elif not jd_text or not jd_text.strip():
+            st.error("⚠️ Please paste a job description first!")
         else:
-            st.markdown("""
-            <div style="text-align:center; padding:0.6rem 0; color:var(--text-muted); font-size:0.75rem;">
-                ↑ Upload your CV <strong>and</strong> paste a Job Description to unlock matching
-            </div>
-            """, unsafe_allow_html=True)
+            with st.spinner("Calculating match and analyzing..."):
+                try:
+                    tmp_path = None
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                        tmp.write(uploaded.read())
+                        tmp_path = tmp.name
+                    cv_text = extract_cv_text(tmp_path)
+                    os.unlink(tmp_path)
 
-    else:
-        # Results exist — show re-run option compactly
-        with st.expander("🔄 Run a new JD match"):
-            col1, col2 = st.columns(2)
-            with col1:
-                uploaded = st.file_uploader("Your CV (PDF)", type=["pdf"], key="jd_cv_reupload")
-            with col2:
-                jd_text = st.text_area("Job Description", height=150, placeholder="Paste new job description...", key="jd_text_rerun")
-            if uploaded and jd_text and st.button("🎯 Re-Match →", use_container_width=True, type="primary", key="jd_rematch_btn"):
-                with st.spinner("Re-calculating match..."):
-                    try:
-                        tmp_path = None
-                        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-                            tmp.write(uploaded.read())
-                            tmp_path = tmp.name
-                        cv_text = extract_cv_text(tmp_path)
-                        os.unlink(tmp_path)
-                        if not cv_text or len(cv_text.strip()) < 20:
-                            st.error("⚠️ Could not extract text from your PDF.")
-                        else:
-                            st.session_state.cv_text = cv_text
-                            st.session_state.jd_text_for_match = jd_text
+                    if not cv_text or len(cv_text.strip()) < 20:
+                        st.error("⚠️ Could not extract text from your PDF. Please ensure it's a text-based PDF (not scanned image).")
+                    else:
+                        st.session_state.cv_text = cv_text
+                        st.session_state.jd_text_for_match = jd_text
+                        if not st.session_state.agent:
                             st.session_state.agent = build_agent(cv_text, jd_text, st.session_state.candidate_name)
-                            st.session_state.jd_match_result = match_cv_with_jd(cv_text, jd_text)
-                            st.rerun()
-                    except Exception as e:
-                        if tmp_path and os.path.exists(tmp_path):
-                            os.unlink(tmp_path)
-                        st.error(f"⚠️ Error: {str(e)[:200]}")
+                        st.session_state.jd_match_result = match_cv_with_jd(cv_text, jd_text)
+                        st.rerun()
+                except Exception as e:
+                    if tmp_path and os.path.exists(tmp_path):
+                        os.unlink(tmp_path)
+                    st.error(f"⚠️ Error reading PDF: {str(e)[:200]}. Please try a different PDF file.")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    if st.session_state.jd_match_result:
         render_jd_match_results()
 
     st.markdown("---")
@@ -1411,8 +1285,8 @@ def render_jd_match_results():
             """, unsafe_allow_html=True)
         
         st.markdown("</div>", unsafe_allow_html=True)
-    
-    # LLM Analysis if available
+
+    # Actionable Recommendations
     st.markdown(f"""
     <div class="result-card" style="border-left:4px solid {color};">
         <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.6rem; font-size:0.88rem; font-family:'Syne',sans-serif;">
@@ -1477,7 +1351,11 @@ def render_jd_match_results():
             """, unsafe_allow_html=True)
         
         st.markdown("</div>", unsafe_allow_html=True)
-
+    
+    # Back button
+    st.markdown("---")
+    if st.button("← Back to Home", key="back_home_jd"):
+        nav_goto("home")
 
 def _generate_jd_recommendation(pct: int, result: dict) -> str:
     """Generate contextual recommendations based on match score."""
@@ -1499,8 +1377,9 @@ def _generate_jd_recommendation(pct: int, result: dict) -> str:
         Consider reaching out to current employees for referral — you have strong alignment.""" 
 
 
-
-# ============================================================quiz
+# ============================================================
+# QUIZ PAGE
+# ============================================================
 def render_quiz():
     st.markdown("""
     <div class="main-content">
@@ -1743,8 +1622,6 @@ def render_quiz_results():
             """, unsafe_allow_html=True)
         
         st.markdown("</div>", unsafe_allow_html=True)
-
-
 
 
 # ============================================================
