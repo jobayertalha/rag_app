@@ -608,7 +608,10 @@ def render_analyze():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         uploaded = st.file_uploader("Upload CV (PDF)", type=["pdf"], label_visibility="collapsed")
-        if uploaded and st.button("🚀 Start Analysis", use_container_width=True, type="primary"):
+        start_clicked = st.button("🚀 Start Analysis", use_container_width=True, type="primary")
+        if start_clicked and not uploaded:
+            st.warning("⚠️ Please upload your CV first.")
+        if uploaded and start_clicked:
             with st.spinner("Analyzing your CV..."):
                 try:
                     tmp_path = None
@@ -1077,7 +1080,12 @@ def render_jd_match():
     with col2:
         jd_text = st.text_area("Job Description", height=200, placeholder="Paste the full job description here...")
 
-    if uploaded and jd_text and st.button("🎯 Calculate Match", use_container_width=True, type="primary"):
+    match_clicked = st.button("🎯 Calculate Match", use_container_width=True, type="primary")
+    if match_clicked and not uploaded:
+        st.warning("⚠️ Please upload your CV first.")
+    elif match_clicked and not jd_text.strip():
+        st.warning("⚠️ Please paste a Job Description first.")
+    if uploaded and jd_text and match_clicked:
         with st.spinner("Calculating match and analyzing..."):
             try:
                 tmp_path = None
@@ -1479,6 +1487,13 @@ def render_quiz():
                     st.rerun()
             else:
                 st.button("📊 Get Results", use_container_width=True, disabled=True, type="primary")
+
+        st.markdown("---")
+        if st.button("← Back to Home", key="back_home_quiz_inprogress"):
+            for key in ["quiz_result", "quiz_responses", "current_quiz_questions", "quiz_started"]:
+                if key in st.session_state:
+                    del st.session_state[key]
+            nav_goto("home")
         
         st.markdown("</div>", unsafe_allow_html=True)
         return
