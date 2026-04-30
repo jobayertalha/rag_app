@@ -397,6 +397,68 @@ hr {{ border-color: var(--border) !important; }}
 
 
 # ============================================================
+# SHARE HELPERS
+# ============================================================
+def build_share_url(text: str, platform: str) -> str:
+    """Build a social share URL for the given platform."""
+    import urllib.parse
+    encoded = urllib.parse.quote(text)
+    if platform == "linkedin":
+        return f"https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fcareervector.app&summary={encoded}"
+    elif platform == "twitter":
+        return f"https://twitter.com/intent/tweet?text={encoded}"
+    elif platform == "whatsapp":
+        return f"https://wa.me/?text={encoded}"
+    return "#"
+
+
+def render_share_buttons(share_text: str):
+    """Render LinkedIn, Twitter and WhatsApp share buttons inline."""
+    import urllib.parse
+    encoded = urllib.parse.quote(share_text)
+    linkedin_url = f"https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fcareervector.app&summary={encoded}"
+    twitter_url  = f"https://twitter.com/intent/tweet?text={encoded}"
+    whatsapp_url = f"https://wa.me/?text={encoded}"
+
+    T = get_theme()
+    st.markdown(f"""
+    <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; margin-bottom:0.5rem;">
+        <span style="font-size:0.75rem; font-weight:600; color:{T['text_secondary']};">📤 Share your result:</span>
+        <a href="{linkedin_url}" target="_blank" style="
+            display:inline-flex; align-items:center; gap:0.35rem;
+            background:#0077b5; color:#ffffff; border-radius:8px;
+            padding:0.35rem 0.85rem; font-size:0.72rem; font-weight:700;
+            text-decoration:none; transition:opacity 0.2s;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+            LinkedIn
+        </a>
+        <a href="{twitter_url}" target="_blank" style="
+            display:inline-flex; align-items:center; gap:0.35rem;
+            background:#000000; color:#ffffff; border-radius:8px;
+            padding:0.35rem 0.85rem; font-size:0.72rem; font-weight:700;
+            text-decoration:none; transition:opacity 0.2s;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+            X / Twitter
+        </a>
+        <a href="{whatsapp_url}" target="_blank" style="
+            display:inline-flex; align-items:center; gap:0.35rem;
+            background:#25d366; color:#ffffff; border-radius:8px;
+            padding:0.35rem 0.85rem; font-size:0.72rem; font-weight:700;
+            text-decoration:none; transition:opacity 0.2s;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+            WhatsApp
+        </a>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+# ============================================================
 # NAVIGATION
 # ============================================================
 def nav_goto(page):
@@ -640,6 +702,28 @@ def render_analyze():
 
     if st.session_state.retrieved:
         render_analysis_results()
+
+        # Share buttons — only shown when results exist
+        retrieved = st.session_state.retrieved
+        top_match = retrieved.get("top_match", {})
+        readiness = retrieved.get("readiness", {})
+        faiss_pct = top_match.get("match_pct", 0)
+        ready_score = readiness.get("total_score", 0)
+        unified_score = max(5, min(97, round(faiss_pct * 0.55 + ready_score * 0.45)))
+        role_title = top_match.get("title", top_match.get("role", "AI Professional"))
+        skill_gaps = retrieved.get("skill_gaps", [])
+        gaps_text = "\n".join(f"• {g}" for g in skill_gaps[:3]) if skill_gaps else "• None detected"
+        name = st.session_state.candidate_name
+        share_text = (
+            f"🎯 Just analyzed my CV on CareerVector!\n\n"
+            f"📊 AI/ML Profile Score: {unified_score}%\n"
+            f"🏆 Top Role Match: {role_title}\n"
+            f"📈 Level: {'Very Strong' if unified_score >= 80 else 'Strong' if unified_score >= 60 else 'Developing' if unified_score >= 40 else 'Beginner'}\n\n"
+            f"Skill gaps I'm closing:\n{gaps_text}\n\n"
+            f"Analyzed with CareerVector — Powered by RAG + LLM 🚀\n"
+            f"#CareerVector #AICareer #MachineLearning #DataScience"
+        )
+        render_share_buttons(share_text)
 
     st.markdown("---")
     if st.button("← Back to Home", key="back_home_analyze"):
@@ -1113,6 +1197,23 @@ def render_jd_match():
     if st.session_state.jd_match_result:
         render_jd_match_results()
 
+        # Share buttons — only shown when results exist
+        result = st.session_state.jd_match_result
+        pct = result.get("match_pct", 0)
+        similar = result.get("similar_roles", [{}])
+        top_role = similar[0].get("title", similar[0].get("role", "AI Role")) if similar else "AI Role"
+        status = "Excellent Match" if pct >= 80 else "Good Match" if pct >= 60 else "Partial Match" if pct >= 30 else "Low Match"
+        share_text = (
+            f"🎯 Just matched my CV to a Job Description on CareerVector!\n\n"
+            f"📊 JD Match Score: {pct}%\n"
+            f"✅ Status: {status}\n"
+            f"🏆 Closest Role: {top_role}\n\n"
+            f"Know your fit before you apply 💡\n"
+            f"Powered by CareerVector — RAG + LLM\n"
+            f"#CareerVector #JobSearch #AICareer #DataScience"
+        )
+        render_share_buttons(share_text)
+
     st.markdown("---")
     if st.button("← Back to Home", key="back_home_jd"):
         nav_goto("home")
@@ -1400,6 +1501,26 @@ def render_quiz():
     # Check if quiz has results (completed) - SHOW RESULTS FIRST, NO QUESTIONS
     if st.session_state.quiz_result is not None:
         render_quiz_results()
+
+        # Share buttons — only shown when results exist
+        qr = st.session_state.quiz_result
+        q_score = qr.get("score", 0)
+        q_max = qr.get("max_score", 30)
+        q_pct = qr.get("pct", 0)
+        q_level = qr.get("level", "")
+        q_roles = qr.get("recommendation", {}).get("roles", [])
+        roles_text = ", ".join(q_roles[:3]) if q_roles else "AI/ML roles"
+        share_text = (
+            f"🧠 Just took the AI/ML Career Interest Quiz on CareerVector!\n\n"
+            f"📊 Score: {q_score}/{q_max} ({q_pct}%)\n"
+            f"🎯 Alignment: {q_level}\n"
+            f"💼 Best roles for me: {roles_text}\n\n"
+            f"Discover your AI/ML career fit 🚀\n"
+            f"Powered by CareerVector — RAG + LLM\n"
+            f"#CareerVector #AICareer #MachineLearning #CareerQuiz"
+        )
+        render_share_buttons(share_text)
+
         st.markdown("---")
         col1, col2 = st.columns(2)
         with col1:
