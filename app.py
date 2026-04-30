@@ -413,8 +413,9 @@ def build_share_url(text: str, platform: str) -> str:
 
 
 def render_share_buttons(share_text: str):
-    """Render share buttons: LinkedIn (copy+open), X/Twitter (pre-filled), Facebook."""
+    """Render share buttons via components.html to bypass markdown parser."""
     import urllib.parse
+    import streamlit.components.v1 as components
 
     def js_escape(s):
         return (s
@@ -429,74 +430,68 @@ def render_share_buttons(share_text: str):
     encoded_tw   = urllib.parse.quote(share_text)
     encoded_fb_u = urllib.parse.quote("https://careervector.app")
     encoded_fb_q = urllib.parse.quote(share_text)
-
     twitter_url  = f"https://twitter.com/intent/tweet?text={encoded_tw}"
     facebook_url = f"https://www.facebook.com/sharer/sharer.php?u={encoded_fb_u}&quote={encoded_fb_q}"
 
     T = get_theme()
+    is_dark = st.session_state.get("dark_mode", True)
 
-    st.markdown(f"""
-    <div style="
-        background:{T['bg_card']};
-        border:1px solid {T['border']};
-        border-left:3px solid {T['accent_blue']};
-        border-radius:12px;
-        padding:0.85rem 1rem;
-        margin-bottom:0.5rem;
-    ">
-        <div style="font-size:0.75rem; font-weight:600; color:{T['text_secondary']}; margin-bottom:0.6rem; letter-spacing:0.02em;">
-            Share your result
-        </div>
-        <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.55rem;">
+    html = f"""<!DOCTYPE html>
+<html>
+<head><style>
+  body {{ margin:0; padding:0; font-family:'Space Grotesk',sans-serif; background:transparent; }}
+  .wrap {{
+    background:{T['bg_card']};
+    border:1px solid {T['border']};
+    border-left:3px solid {T['accent_blue']};
+    border-radius:12px;
+    padding:0.85rem 1rem;
+  }}
+  .label {{ font-size:0.75rem; font-weight:600; color:{T['text_secondary']}; margin-bottom:0.6rem; letter-spacing:0.02em; }}
+  .btns {{ display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.5rem; }}
+  .hint {{ font-size:0.62rem; color:{T['text_muted']}; line-height:1.5; }}
+  .btn-li {{
+    background:{T['accent_blue']}; color:#fff; border:none; border-radius:7px;
+    padding:0.38rem 0.85rem; font-size:0.72rem; font-weight:600;
+    cursor:pointer; font-family:inherit; letter-spacing:0.01em;
+  }}
+  .btn-tw, .btn-fb {{
+    background:{T['bg_card2']}; color:{T['text_primary']};
+    border:1px solid {T['border']}; border-radius:7px;
+    padding:0.38rem 0.85rem; font-size:0.72rem; font-weight:600;
+    text-decoration:none; letter-spacing:0.01em; display:inline-block;
+  }}
+</style></head>
+<body>
+<div class="wrap">
+  <div class="label">Share your result</div>
+  <div class="btns">
+    <button class="btn-li" id="li-btn" onclick="(function(){{
+      var txt = '{js_text}';
+      navigator.clipboard.writeText(txt).then(function(){{
+        var btn = document.getElementById('li-btn');
+        var orig = btn.innerText;
+        btn.innerText = 'Copied — LinkedIn opening';
+        btn.style.opacity='0.75';
+        setTimeout(function(){{
+          window.open('https://www.linkedin.com/feed/', '_blank');
+          btn.innerText = orig;
+          btn.style.opacity='1';
+        }}, 1000);
+      }}).catch(function(){{
+        var btn = document.getElementById('li-btn');
+        btn.innerText = 'Allow clipboard in browser';
+        setTimeout(function(){{ btn.innerText = 'LinkedIn'; }}, 2500);
+      }});
+    }})()">LinkedIn</button>
+    <a class="btn-tw" href="{twitter_url}" target="_blank">X / Twitter</a>
+    <a class="btn-fb" href="{facebook_url}" target="_blank">Facebook</a>
+  </div>
+  <div class="hint">LinkedIn copies your result to clipboard — paste into your post after it opens. Twitter and Facebook open pre-filled.</div>
+</div>
+</body></html>"""
 
-            <button onclick="(function(){{
-                var txt = '{js_text}';
-                navigator.clipboard.writeText(txt).then(function(){{
-                    var btn = document.getElementById('li-btn');
-                    var orig = btn.innerText;
-                    btn.innerText = 'Copied — LinkedIn opening';
-                    btn.style.opacity='0.75';
-                    setTimeout(function(){{
-                        window.open('https://www.linkedin.com/feed/', '_blank');
-                        btn.innerText = orig;
-                        btn.style.opacity='1';
-                    }}, 1000);
-                }}).catch(function(){{
-                    var btn = document.getElementById('li-btn');
-                    btn.innerText = 'Allow clipboard in browser';
-                    setTimeout(function(){{ btn.innerText = 'LinkedIn'; }}, 2500);
-                }});
-            }})()" id="li-btn" style="
-                background:{T['accent_blue']}; color:#ffffff; border:none;
-                border-radius:7px; padding:0.38rem 0.85rem;
-                font-size:0.72rem; font-weight:600; cursor:pointer;
-                font-family:inherit; letter-spacing:0.01em;">
-                LinkedIn
-            </button>
-
-            <a href="{twitter_url}" target="_blank" style="
-                background:{T['bg_card2']}; color:{T['text_primary']};
-                border:1px solid {T['border']}; border-radius:7px;
-                padding:0.38rem 0.85rem; font-size:0.72rem; font-weight:600;
-                text-decoration:none; letter-spacing:0.01em;">
-                X / Twitter
-            </a>
-
-            <a href="{facebook_url}" target="_blank" style="
-                background:{T['bg_card2']}; color:{T['text_primary']};
-                border:1px solid {T['border']}; border-radius:7px;
-                padding:0.38rem 0.85rem; font-size:0.72rem; font-weight:600;
-                text-decoration:none; letter-spacing:0.01em;">
-                Facebook
-            </a>
-
-        </div>
-        <div style="font-size:0.62rem; color:{T['text_muted']}; line-height:1.5;">
-            LinkedIn copies your result to clipboard — paste into your post after it opens. Twitter and Facebook open pre-filled.
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
+    components.html(html, height=115, scrolling=False)
 
 # ============================================================
 # NAVIGATION
