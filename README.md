@@ -1,6 +1,6 @@
 # 🎯 CareerVector — AI Career Match
 
-> A RAG-powered career advisor that tells you exactly how well your CV matches real AI/ML roles — built on FAISS vector search, HuggingFace embeddings, and Groq's LLaMA-3.3-70b.
+> A RAG-powered career advisor that tells you exactly how well your CV matches real AI/ML roles  built on FAISS vector search, HuggingFace embeddings, and Groq's LLaMA-3.3-70b.
 
 **Live app →** https://ragapp-mmuhxs8autgvtc7vzxwbcz.streamlit.app/ 
 **Built with** Python 3.10 · Streamlit · LangChain · FAISS · HuggingFace · Groq
