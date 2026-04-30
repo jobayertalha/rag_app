@@ -34,7 +34,7 @@ _defaults = {
     "quiz_responses": {},
     "quiz_result": None,
     "current_quiz_questions": None,
-    "quiz_started": False,  # ADD THIS LINE
+    "quiz_started": False,
     "dark_mode": True,
 }
 for k, v in _defaults.items():
@@ -265,14 +265,12 @@ footer {{visibility: hidden;}}
     border-color: var(--accent-blue) !important; box-shadow: 0 0 0 3px var(--glow-blue) !important;
     outline: none !important;
 }}
-/* Kill ALL red/invalid states — browser, BaseWeb, and Streamlit */
 .stTextInput > div > div > input:invalid,
 .stTextInput > div > div > input[aria-invalid],
 .stTextArea > div > div > textarea:invalid,
 .stTextArea > div > div > textarea[aria-invalid] {{
     border-color: var(--border) !important; box-shadow: none !important; outline: none !important;
 }}
-/* BaseWeb wrapper divs that get red borders */
 [data-baseweb="input"], [data-baseweb="textarea"],
 [data-baseweb="base-input"] {{
     border-color: var(--border) !important; outline: none !important; box-shadow: none !important;
@@ -282,19 +280,16 @@ footer {{visibility: hidden;}}
 [data-baseweb="base-input"]:focus-within {{
     border-color: var(--accent-blue) !important; box-shadow: 0 0 0 3px var(--glow-blue) !important;
 }}
-/* Streamlit wraps inputs in a styled div that also gets a red ring — override it */
 div[data-testid="stTextInput"] > div > div,
 div[data-testid="stTextArea"] > div > div {{
     border: none !important; outline: none !important; box-shadow: none !important;
 }}
-/* The actual BaseWeb Input container (this is what shows the red double-border) */
 .stTextInput [class*="InputContainer"], .stTextArea [class*="InputContainer"] {{
     border-color: var(--border) !important; box-shadow: none !important;
 }}
 .stTextInput [class*="InputContainer"]:focus-within, .stTextArea [class*="InputContainer"]:focus-within {{
     border-color: var(--accent-blue) !important; box-shadow: 0 0 0 3px var(--glow-blue) !important;
 }}
-/* Nuclear option: any element inside text input/area stacks that has a red-ish border */
 .stTextInput *, .stTextArea * {{
     outline-color: var(--accent-blue) !important;
 }}
@@ -399,118 +394,85 @@ hr {{ border-color: var(--border) !important; }}
 # ============================================================
 # SHARE HELPERS
 # ============================================================
-def build_share_url(text: str, platform: str) -> str:
-    """Build a social share URL for the given platform."""
-    import urllib.parse
-    encoded = urllib.parse.quote(text)
-    if platform == "linkedin":
-        return f"https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fcareervector.app&summary={encoded}"
-    elif platform == "twitter":
-        return f"https://twitter.com/intent/tweet?text={encoded}"
-    elif platform == "whatsapp":
-        return f"https://wa.me/?text={encoded}"
-    return "#"
-
-
 def render_share_buttons(share_text: str):
-    import urllib.parse
     import streamlit.components.v1 as components
 
-    def js_escape(s):
-        return (s
-            .replace("\\", "\\\\")
-            .replace("'", "\\'")
-            .replace('"', '\\"')
-            .replace("\n", "\\n")
-            .replace("\r", "\\r")
-        )
-
-    js_text     = js_escape(share_text)
-    encoded_tw  = urllib.parse.quote(share_text)
-    twitter_url = f"https://twitter.com/intent/tweet?text={encoded_tw}"
+    # Escape for safe embedding inside HTML textarea value
+    safe_text = (share_text
+                 .replace("&", "&amp;")
+                 .replace("<", "&lt;")
+                 .replace(">", "&gt;")
+                 .replace('"', "&quot;"))
 
     T = get_theme()
 
     html = f"""<!DOCTYPE html>
 <html>
 <head><style>
-  * {{ box-sizing:border-box; margin:0; padding:0; }}
-  body {{ font-family:'Space Grotesk',sans-serif; background:transparent; }}
-  .wrap {{
-    background:{T['bg_card']};
-    border:1px solid {T['border']};
-    border-left:3px solid {T['accent_blue']};
-    border-radius:12px;
-    padding:0.85rem 1rem;
-  }}
-  .label {{ font-size:0.73rem; font-weight:600; color:{T['text_secondary']}; margin-bottom:0.6rem; letter-spacing:0.02em; }}
-  .btns {{ display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.5rem; }}
-  .hint {{ font-size:0.61rem; color:{T['text_muted']}; line-height:1.5; }}
-  .btn {{
-    background:{T['bg_card2']}; color:{T['accent_blue']};
-    border:2px solid {T['accent_blue']}; border-radius:8px;
-    padding:0.38rem 1rem; font-size:0.72rem; font-weight:700;
-    cursor:pointer; font-family:inherit; letter-spacing:0.02em;
-    text-decoration:none; display:inline-block;
-    transition:background 0.18s, color 0.18s;
-  }}
-  .btn:hover {{ background:{T['accent_blue']}; color:#ffffff; }}
+* {{ box-sizing:border-box; margin:0; padding:0; }}
+body {{ font-family:'Space Grotesk',sans-serif; background:transparent; }}
+.wrap {{
+  background:{T['bg_card']};
+  border:1px solid {T['border']};
+  border-left:3px solid {T['accent_blue']};
+  border-radius:12px;
+  padding:0.85rem 1rem;
+}}
+.label {{ font-size:0.73rem; font-weight:600; color:{T['text_secondary']}; margin-bottom:0.5rem; letter-spacing:0.02em; }}
+textarea {{
+  width:100%;
+  background:{T['bg_card2']};
+  color:{T['text_primary']};
+  border:1px solid {T['border']};
+  border-radius:8px;
+  padding:0.5rem 0.65rem;
+  font-size:0.68rem;
+  font-family:monospace;
+  resize:none;
+  height:88px;
+  line-height:1.55;
+  margin-bottom:0.55rem;
+}}
+.btns {{ display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.45rem; }}
+.btn {{
+  background:{T['bg_card2']};
+  color:{T['accent_blue']};
+  border:2px solid {T['accent_blue']};
+  border-radius:8px;
+  padding:0.38rem 1rem;
+  font-size:0.72rem;
+  font-weight:700;
+  cursor:pointer;
+  font-family:inherit;
+  letter-spacing:0.02em;
+  text-decoration:none;
+  display:inline-block;
+  transition:background 0.15s, color 0.15s;
+}}
+.btn:hover {{ background:{T['accent_blue']}; color:#ffffff; }}
+.hint {{ font-size:0.61rem; color:{T['text_muted']}; line-height:1.5; }}
 </style></head>
 <body>
 <div class="wrap">
   <div class="label">Share your result</div>
+  <textarea id="st" readonly>{safe_text}</textarea>
   <div class="btns">
-
-    <button class="btn" id="li-btn" onclick="(function(){{
-      var txt = '{js_text}';
-      navigator.clipboard.writeText(txt).then(function(){{
-        var b = document.getElementById('li-btn');
-        var orig = b.innerText;
-        b.innerText = 'Copied - opening LinkedIn';
-        b.style.background = '{T['accent_blue']}';
-        b.style.color = '#ffffff';
-        setTimeout(function(){{
-          window.open('https://www.linkedin.com/shareArticle?mini=true&url=https://careervector.app&title=CareerVector+Result', '_blank');
-          b.innerText = orig;
-          b.style.background = '{T['bg_card2']}';
-          b.style.color = '{T['accent_blue']}';
-        }}, 1000);
-      }}).catch(function(){{
-        var b = document.getElementById('li-btn');
-        b.innerText = 'Enable clipboard in browser settings';
-        setTimeout(function(){{ b.innerText = 'LinkedIn'; }}, 3000);
-      }});
-    }})()">LinkedIn</button>
-
-    <a class="btn" href="{twitter_url}" target="_blank">X / Twitter</a>
-
-    <button class="btn" id="fb-btn" onclick="(function(){{
-      var txt = '{js_text}';
-      navigator.clipboard.writeText(txt).then(function(){{
-        var b = document.getElementById('fb-btn');
-        var orig = b.innerText;
-        b.innerText = 'Copied - opening Facebook';
-        b.style.background = '{T['accent_blue']}';
-        b.style.color = '#ffffff';
-        setTimeout(function(){{
-          window.open('https://www.facebook.com/', '_blank');
-          b.innerText = orig;
-          b.style.background = '{T['bg_card2']}';
-          b.style.color = '{T['accent_blue']}';
-        }}, 1000);
-      }}).catch(function(){{
-        var b = document.getElementById('fb-btn');
-        b.innerText = 'Enable clipboard in browser settings';
-        setTimeout(function(){{ b.innerText = 'Facebook'; }}, 3000);
-      }});
-    }})()">Facebook</button>
-
+    <button class="btn" id="cp" onclick="
+      var t = document.getElementById('st');
+      t.select();
+      document.execCommand('copy');
+      var b = document.getElementById('cp');
+      b.textContent = '✓ Copied!';
+      setTimeout(function(){{ b.textContent = 'Copy text'; }}, 2000);
+    ">Copy text</button>
+    <a class="btn" href="https://www.linkedin.com/feed/" target="_blank">LinkedIn</a>
+    <a class="btn" href="https://www.facebook.com/" target="_blank">Facebook</a>
   </div>
-  <div class="hint">Click any button - your result text is copied to clipboard automatically. Paste it into your post after the platform opens.</div>
+  <div class="hint">Click "Copy text" → open LinkedIn or Facebook → create a new post → paste.</div>
 </div>
 </body></html>"""
 
-    components.html(html, height=115, scrolling=False)
+    components.html(html, height=195, scrolling=False)
 
 
 # ============================================================
@@ -758,7 +720,6 @@ def render_analyze():
     if st.session_state.retrieved:
         render_analysis_results()
 
-        # Share buttons — only shown when results exist
         retrieved = st.session_state.retrieved
         top_match = retrieved.get("top_match", {})
         readiness = retrieved.get("readiness", {})
@@ -840,7 +801,6 @@ def render_analysis_results():
 
     bar_pct = unified_score
 
-    # ── HERO: Unified Score Card ──
     st.markdown(f"""
     <div class="result-card" style="text-align:center; padding:2rem 1.5rem 1.5rem;">
         <div style="font-size:0.68rem; font-weight:700; color:{tier_color}; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.5rem;">
@@ -872,7 +832,6 @@ def render_analysis_results():
     </div>
     """, unsafe_allow_html=True)
 
-    # ── Scoreboard / Field Fit Scale ──
     st.markdown(f"""
     <div class="result-card">
         <div style="font-weight:700; color:var(--text-primary); margin-bottom:1rem; font-size:0.88rem; font-family:'Syne',sans-serif;">
@@ -1053,7 +1012,6 @@ def render_analysis_results():
             </div>
             """, unsafe_allow_html=True)
 
-        # ── FIX 1: Next Steps — build all HTML in one string, render once ──
         if next_steps:
             _ns_items = "".join(
                 '<div style="display:flex; gap:0.8rem; align-items:flex-start; margin-bottom:0.6rem;'
@@ -1072,7 +1030,6 @@ def render_analysis_results():
                 unsafe_allow_html=True
             )
 
-        # ── FIX 2: Skill Gaps — build all HTML in one string, render once ──
         if skill_gaps:
             def _gap_inner(s):
                 if ':' in s:
@@ -1093,7 +1050,6 @@ def render_analysis_results():
                 unsafe_allow_html=True
             )
 
-        # ── FIX 3: Resume Additions — build all HTML in one string, render once ──
         if resume_add:
             _ra_items = "".join(
                 '<div style="padding:0.5rem 0.8rem; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2);'
@@ -1108,7 +1064,6 @@ def render_analysis_results():
                 unsafe_allow_html=True
             )
 
-        # ── FIX 4: Career Path — build all HTML in one string, render once ──
         if career_path:
             n = min(len(career_path), 3)
             step_meta = [
@@ -1239,7 +1194,6 @@ def render_jd_match():
                 else:
                     st.session_state.cv_text = cv_text
                     st.session_state.jd_text_for_match = jd_text
-                    # Initialize agent if not already done
                     if not st.session_state.agent:
                         st.session_state.agent = build_agent(cv_text, jd_text, st.session_state.candidate_name)
                     st.session_state.jd_match_result = match_cv_with_jd(cv_text, jd_text)
@@ -1252,7 +1206,6 @@ def render_jd_match():
     if st.session_state.jd_match_result:
         render_jd_match_results()
 
-        # Share buttons — only shown when results exist
         result = st.session_state.jd_match_result
         pct = result.get("match_pct", 0)
         similar = result.get("similar_roles", [{}])
@@ -1280,8 +1233,7 @@ def render_jd_match_results():
     pct = result.get("match_pct", 0)
     cv_text = st.session_state.get("cv_text", "")
     jd_text = st.session_state.get("jd_text_for_match", "")
-    
-    # Get detailed analysis from the agent if available
+
     if cv_text and jd_text and st.session_state.agent:
         with st.spinner("Analyzing JD match in detail..."):
             jd_analysis = run_agent(
@@ -1299,7 +1251,6 @@ def render_jd_match_results():
     else:
         jd_analysis = ""
 
-    # Determine match quality colors and messages
     if pct < 30:
         color, status, icon, message = "#ef4444", "Low Match", "⚠️", "This role may require significant skill development before applying."
         bg_intensity = "rgba(239,68,68,0.08)"
@@ -1317,7 +1268,6 @@ def render_jd_match_results():
         bg_intensity = "rgba(59,130,246,0.08)"
         border_color = "rgba(59,130,246,0.3)"
 
-    # Main score card with detailed context
     st.markdown(f"""
     <div class="result-card" style="text-align:center; padding:2rem 1.5rem;">
         <div style="font-size:0.68rem; font-weight:700; color:{color}; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.5rem;">
@@ -1342,18 +1292,17 @@ def render_jd_match_results():
     </div>
     """, unsafe_allow_html=True)
 
-    # Skill Match Breakdown
     if cv_text and result.get("similar_roles"):
         cv_lower = cv_text.lower()
         all_required_skills = []
         for role in result["similar_roles"][:3]:
             all_required_skills.extend(role.get("skills", []))
         unique_skills = list(dict.fromkeys(all_required_skills))[:12]
-        
+
         matched_skills = []
         missing_skills = []
         partial_skills = []
-        
+
         for skill in unique_skills:
             skill_lower = skill.lower()
             if skill_lower in cv_lower:
@@ -1362,9 +1311,7 @@ def render_jd_match_results():
                 partial_skills.append(skill)
             else:
                 missing_skills.append(skill)
-        
-        match_ratio = len(matched_skills) / max(len(unique_skills), 1)
-        
+
         st.markdown(f"""
         <div class="result-card">
             <div style="font-weight:700; color:var(--text-primary); margin-bottom:1rem; font-size:0.9rem; font-family:'Syne',sans-serif;">
@@ -1385,7 +1332,7 @@ def render_jd_match_results():
                 </div>
             </div>
         """, unsafe_allow_html=True)
-        
+
         if matched_skills:
             skills_chips = "".join(f"<span class='skill-chip' style='background:rgba(16,185,129,0.15); border-color:#10b981;'>✓ {s}</span>" for s in matched_skills[:8])
             st.markdown(f"""
@@ -1394,7 +1341,7 @@ def render_jd_match_results():
                 <div style="display:flex; flex-wrap:wrap; gap:0.3rem;">{skills_chips}</div>
             </div>
             """, unsafe_allow_html=True)
-        
+
         if missing_skills:
             missing_chips = "".join(f"<span class='skill-chip gap-chip'>✗ {s}</span>" for s in missing_skills[:8])
             st.markdown(f"""
@@ -1403,10 +1350,9 @@ def render_jd_match_results():
                 <div style="display:flex; flex-wrap:wrap; gap:0.3rem;">{missing_chips}</div>
             </div>
             """, unsafe_allow_html=True)
-        
+
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # Similar Roles with context
     if result.get("similar_roles"):
         st.markdown("""
         <div class="result-card">
@@ -1414,7 +1360,7 @@ def render_jd_match_results():
                 📊 Similar Roles You May Qualify For
             </div>
         """, unsafe_allow_html=True)
-        
+
         for i, role in enumerate(result["similar_roles"][:4]):
             role_title = role.get('title', role.get('role', 'Role'))
             role_company = role.get('company', 'Various')
@@ -1422,8 +1368,7 @@ def render_jd_match_results():
             sal_min = role.get('salary_min', 0)
             sal_max = role.get('salary_max', 0)
             sal_str = f"৳{sal_min:,}–৳{sal_max:,}/mo" if sal_min else "Salary not specified"
-            
-            # Determine if this role is better match than current JD
+
             comparison = ""
             if role_score > pct + 10:
                 comparison = f"<span style='color:#10b981; font-size:0.65rem;'>▲ Better fit than this JD</span>"
@@ -1431,9 +1376,9 @@ def render_jd_match_results():
                 comparison = f"<span style='color:#f59e0b; font-size:0.65rem;'>▲ Slightly better fit</span>"
             elif role_score < pct - 10:
                 comparison = f"<span style='color:#ef4444; font-size:0.65rem;'>▼ This JD fits you better</span>"
-            
+
             st.markdown(f"""
-            <div style="margin-bottom:0.7rem; padding:0.8rem 1rem; background:var(--bg-card2); border:1px solid var(--border); 
+            <div style="margin-bottom:0.7rem; padding:0.8rem 1rem; background:var(--bg-card2); border:1px solid var(--border);
                         border-left:3px solid {'#10b981' if role_score > pct else '#3b82f6'}; border-radius:10px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
                     <div>
@@ -1448,10 +1393,9 @@ def render_jd_match_results():
                 {f"<div style='margin-top:0.4rem;'>{comparison}</div>" if comparison else ""}
             </div>
             """, unsafe_allow_html=True)
-        
+
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # Actionable Recommendations
     st.markdown(f"""
     <div class="result-card" style="border-left:4px solid {color};">
         <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.6rem; font-size:0.88rem; font-family:'Syne',sans-serif;">
@@ -1463,7 +1407,6 @@ def render_jd_match_results():
     </div>
     """, unsafe_allow_html=True)
 
-    # LLM Analysis if available
     if jd_analysis:
         st.markdown("""
         <div class="result-card">
@@ -1471,18 +1414,17 @@ def render_jd_match_results():
                 🤖 AI Career Advisor Insights
             </div>
         """, unsafe_allow_html=True)
-        
-        # Parse and display LLM analysis
+
         def parse_jd_tag(text, tag):
             pattern = rf'{tag}:\s*(.*?)(?=\n[A-Z_]+:|$)'
             m = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
             return m.group(1).strip() if m else ""
-        
+
         strengths = parse_jd_tag(jd_analysis, "JD_MATCH_STRENGTH")
         gaps = parse_jd_tag(jd_analysis, "JD_GAPS")
         action_plan = parse_jd_tag(jd_analysis, "JD_ACTION_PLAN")
         verdict = parse_jd_tag(jd_analysis, "JD_VERDICT")
-        
+
         if strengths:
             st.markdown(f"""
             <div style="margin-bottom:0.8rem;">
@@ -1490,7 +1432,7 @@ def render_jd_match_results():
                 <div style="color:var(--text-secondary); font-size:0.82rem; line-height:1.5;">{strengths}</div>
             </div>
             """, unsafe_allow_html=True)
-        
+
         if gaps:
             st.markdown(f"""
             <div style="margin-bottom:0.8rem;">
@@ -1498,7 +1440,7 @@ def render_jd_match_results():
                 <div style="color:var(--text-secondary); font-size:0.82rem; line-height:1.5;">{gaps}</div>
             </div>
             """, unsafe_allow_html=True)
-        
+
         if action_plan:
             st.markdown(f"""
             <div style="margin-bottom:0.8rem;">
@@ -1506,7 +1448,7 @@ def render_jd_match_results():
                 <div style="color:var(--text-secondary); font-size:0.82rem; line-height:1.5;">{action_plan}</div>
             </div>
             """, unsafe_allow_html=True)
-        
+
         if verdict:
             st.markdown(f"""
             <div style="margin-top:0.5rem; padding-top:0.5rem; border-top:1px solid var(--border);">
@@ -1514,36 +1456,32 @@ def render_jd_match_results():
                 <div style="color:var(--text-primary); font-size:0.85rem; line-height:1.5;">{verdict}</div>
             </div>
             """, unsafe_allow_html=True)
-        
+
         st.markdown("</div>", unsafe_allow_html=True)
-    
-    # Back button
-    st.markdown("---")
-    if st.button("← Back to Home", key="back_home_jd"):
-        nav_goto("home")
+
 
 def _generate_jd_recommendation(pct: int, result: dict) -> str:
-    """Generate contextual recommendations based on match score."""
     if pct < 30:
-        return """**Hold off on applying** — Focus on building foundational skills first. 
-        Complete 2-3 relevant projects and earn certifications in the required technologies. 
+        return """<strong>Hold off on applying</strong> — Focus on building foundational skills first.
+        Complete 2-3 relevant projects and earn certifications in the required technologies.
         Consider applying for internships or junior roles to gain experience."""
     elif pct < 60:
-        return """**Apply with tailored approach** — Your application needs customization. 
-        Highlight the skills you do have prominently. Create a portfolio project addressing their specific needs. 
+        return """<strong>Apply with tailored approach</strong> — Your application needs customization.
+        Highlight the skills you do have prominently. Create a portfolio project addressing their specific needs.
         Use the skill gaps above as a learning roadmap for the next 2-3 months."""
     elif pct < 80:
-        return """**Strong candidate — Apply now!** Customize your CV to emphasize matching skills. 
-        Write a targeted cover letter addressing how your experience solves their problems. 
+        return """<strong>Strong candidate — Apply now!</strong> Customize your CV to emphasize matching skills.
+        Write a targeted cover letter addressing how your experience solves their problems.
         Prepare specific examples from your past work that relate to their requirements."""
     else:
-        return """**Excellent fit — Priority application!** You're highly qualified. 
-        Apply immediately and follow up within a week. Prepare for interviews by reviewing their tech stack. 
-        Consider reaching out to current employees for referral — you have strong alignment.""" 
+        return """<strong>Excellent fit — Priority application!</strong> You're highly qualified.
+        Apply immediately and follow up within a week. Prepare for interviews by reviewing their tech stack.
+        Consider reaching out to current employees for referral — you have strong alignment."""
 
 
-
-# ============================================================quiz
+# ============================================================
+# QUIZ PAGE
+# ============================================================
 def render_quiz():
     st.markdown("""
     <div class="main-content">
@@ -1553,11 +1491,9 @@ def render_quiz():
         </div>
     """, unsafe_allow_html=True)
 
-    # Check if quiz has results (completed) - SHOW RESULTS FIRST, NO QUESTIONS
     if st.session_state.quiz_result is not None:
         render_quiz_results()
 
-        # Share buttons — only shown when results exist
         qr = st.session_state.quiz_result
         q_score = qr.get("score", 0)
         q_max = qr.get("max_score", 30)
@@ -1580,7 +1516,6 @@ def render_quiz():
         col1, col2 = st.columns(2)
         with col1:
             if st.button("🔄 Take Quiz Again", use_container_width=True):
-                # COMPLETELY reset everything
                 for key in ["quiz_result", "quiz_responses", "current_quiz_questions", "quiz_started"]:
                     if key in st.session_state:
                         del st.session_state[key]
@@ -1594,18 +1529,14 @@ def render_quiz():
         st.markdown("</div>", unsafe_allow_html=True)
         return
 
-    # Check if quiz has been started (has questions generated)
     quiz_started = st.session_state.get("quiz_started", False)
-    
-    # If quiz is started but not completed - show questions
+
     if quiz_started and st.session_state.get("current_quiz_questions") is not None:
         questions = st.session_state.current_quiz_questions
-        
-        # Initialize responses if not exists
+
         if "quiz_responses" not in st.session_state:
             st.session_state.quiz_responses = {}
-        
-        # Display questions
+
         for q in questions:
             qid = q["display_id"]
             st.markdown(f"""
@@ -1613,14 +1544,10 @@ def render_quiz():
                 <div class="quiz-question-text">{qid}. {q["question"]}</div>
             </div>
             """, unsafe_allow_html=True)
-            
-            # Get current stored answer for this question
+
             current_answer = st.session_state.quiz_responses.get(qid)
-            
-            # Radio button with unique key
             radio_key = f"quiz_radio_{qid}"
-            
-            # Radio button - shows current selection, index=None for no pre-selection
+
             response = st.radio(
                 radio_key,
                 options=q["options"],
@@ -1628,30 +1555,26 @@ def render_quiz():
                 index=current_answer if current_answer is not None else None,
                 key=radio_key
             )
-            
-            # Store answer immediately when selected
+
             if response is not None:
                 selected_index = q["options"].index(response)
                 if current_answer != selected_index:
                     st.session_state.quiz_responses[qid] = selected_index
                     st.rerun()
-        
-        # Count ACTUALLY answered questions
+
         answered_count = 0
         for q in questions:
             qid = q["display_id"]
             if st.session_state.quiz_responses.get(qid) is not None:
                 answered_count += 1
-        
+
         all_answered = answered_count == len(questions)
-        
-        # Show progress
+
         if not all_answered:
             st.warning(f"📊 Progress: {answered_count}/{len(questions)} questions answered")
         else:
             st.success(f"✅ All {len(questions)} questions answered! Click 'Get Results' below.")
-        
-        # Center the button
+
         col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
         with col_btn2:
             if all_answered:
@@ -1670,11 +1593,10 @@ def render_quiz():
                 if key in st.session_state:
                     del st.session_state[key]
             nav_goto("home")
-        
+
         st.markdown("</div>", unsafe_allow_html=True)
         return
 
-    # Show Start Quiz screen (default state)
     col1, col2, col3 = st.columns([1, 1.2, 1])
     with col2:
         st.markdown("""
@@ -1686,10 +1608,9 @@ def render_quiz():
             </div>
         </div>
         """, unsafe_allow_html=True)
-        
+
         if st.button("🚀 Start Quiz", use_container_width=True, type="primary"):
             from quiz import get_shuffled_questions
-            # Clean start
             for key in ["quiz_responses", "quiz_result", "current_quiz_questions", "quiz_started"]:
                 if key in st.session_state:
                     del st.session_state[key]
@@ -1707,7 +1628,8 @@ def render_quiz():
         nav_goto("home")
 
     st.markdown("</div>", unsafe_allow_html=True)
-    
+
+
 def render_quiz_results():
     result = st.session_state.quiz_result
     score = result["score"]
@@ -1719,8 +1641,7 @@ def render_quiz_results():
     rec = result["recommendation"]
 
     bar_width = (score / max_score) * 100 if max_score > 0 else 0
-    
-    # Main score card
+
     st.markdown(f"""
     <div class="result-card" style="text-align:center;">
         <div style="font-size:0.68rem; font-weight:700; color:{color}; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.5rem;">
@@ -1738,30 +1659,26 @@ def render_quiz_results():
         </div>
     </div>
     """, unsafe_allow_html=True)
-    
-    # Simple text recommendation (no HTML formatting issues)
+
     if score >= 21:
         st.success(f"🎯 Recommendation: Focus on AI/ML field. Score: {score}/30")
     elif score >= 10:
         st.warning(f"🔍 Recommendation: Explore AI/ML alongside other fields. Score: {score}/30")
     else:
         st.error(f"⚡ Recommendation: AI/ML may not be your best fit. Score: {score}/30")
-    
-    # Detailed Analysis - Using st.write for plain text (no HTML issues)
+
     st.markdown("""
     <div class="result-card">
         <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.8rem; font-size:1rem;">📊 Detailed Score Analysis</div>
         <div style="color:var(--text-secondary); font-size:0.88rem; line-height:1.8;">
     """, unsafe_allow_html=True)
-    
-    # Use st.write for plain text - avoids HTML escaping issues
+
     st.write(rec["detailed_analysis"])
-    
+
     st.markdown("</div></div>", unsafe_allow_html=True)
 
-    # Two columns for roles and next steps
     col1, col2 = st.columns(2)
-    
+
     with col1:
         st.markdown("""
         <div class="result-card">
@@ -1770,7 +1687,7 @@ def render_quiz_results():
         for role in rec["roles"]:
             st.markdown(f"- {role}")
         st.markdown("</div>", unsafe_allow_html=True)
-    
+
     with col2:
         st.markdown("""
         <div class="result-card">
@@ -1780,23 +1697,22 @@ def render_quiz_results():
             st.markdown(f"- {step}")
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # Category breakdown
     if result.get("category_scores"):
         st.markdown("""
         <div class="result-card">
             <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.8rem;">📊 Interest Breakdown by Category</div>
         """, unsafe_allow_html=True)
-        
+
         for cat, data in result["category_scores"].items():
             cat_pct = int((data["score"] / max(data["max_possible"], 1)) * 100) if data["max_possible"] > 0 else 0
-            
+
             if cat_pct >= 70:
                 cat_color = "#10b981"
             elif cat_pct >= 40:
                 cat_color = "#f59e0b"
             else:
                 cat_color = "#ef4444"
-            
+
             st.markdown(f"""
             <div style="margin-bottom:1rem;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:0.3rem;">
@@ -1811,10 +1727,8 @@ def render_quiz_results():
                 </div>
             </div>
             """, unsafe_allow_html=True)
-        
+
         st.markdown("</div>", unsafe_allow_html=True)
-
-
 
 
 # ============================================================
