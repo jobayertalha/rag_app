@@ -416,7 +416,6 @@ def render_share_buttons(share_text: str):
     """Render share buttons: LinkedIn (copy+open), X/Twitter (pre-filled), Facebook."""
     import urllib.parse
 
-    # Properly escape for JS string — handle all special chars
     def js_escape(s):
         return (s
             .replace("\\", "\\\\")
@@ -435,81 +434,65 @@ def render_share_buttons(share_text: str):
     facebook_url = f"https://www.facebook.com/sharer/sharer.php?u={encoded_fb_u}&quote={encoded_fb_q}"
 
     T = get_theme()
-    card_bg     = T["bg_card"]
-    card_border = T["border"]
-    label_color = T["text_secondary"]
-    hint_color  = T["text_muted"]
-    accent      = T["accent_blue"]
-    accent_glow = T["glow_blue"]
 
     st.markdown(f"""
     <div style="
-        background:{card_bg};
-        border:1px solid {card_border};
-        border-left:3px solid {accent};
-        border-radius:14px;
-        padding:0.9rem 1.1rem;
+        background:{T['bg_card']};
+        border:1px solid {T['border']};
+        border-left:3px solid {T['accent_blue']};
+        border-radius:12px;
+        padding:0.85rem 1rem;
         margin-bottom:0.5rem;
-        box-shadow:0 2px 12px {accent_glow};
     ">
-        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.65rem;">
-            <span style="font-size:0.8rem; font-weight:700; color:{accent}; letter-spacing:0.03em;">📤 Share Your Result</span>
+        <div style="font-size:0.75rem; font-weight:600; color:{T['text_secondary']}; margin-bottom:0.6rem; letter-spacing:0.02em;">
+            Share your result
         </div>
-        <div style="display:flex; align-items:center; gap:0.55rem; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.55rem;">
 
             <button onclick="(function(){{
                 var txt = '{js_text}';
                 navigator.clipboard.writeText(txt).then(function(){{
                     var btn = document.getElementById('li-btn');
-                    var orig = btn.innerHTML;
-                    btn.innerHTML = '✅ Copied! Opening...';
-                    btn.style.background='#005f8f';
+                    var orig = btn.innerText;
+                    btn.innerText = 'Copied — LinkedIn opening';
+                    btn.style.opacity='0.75';
                     setTimeout(function(){{
                         window.open('https://www.linkedin.com/feed/', '_blank');
-                        btn.innerHTML = orig;
-                        btn.style.background='#0077b5';
+                        btn.innerText = orig;
+                        btn.style.opacity='1';
                     }}, 1000);
                 }}).catch(function(){{
                     var btn = document.getElementById('li-btn');
-                    btn.innerHTML = '❌ Allow clipboard access';
-                    setTimeout(function(){{ btn.innerHTML = 'LinkedIn'; }}, 2000);
+                    btn.innerText = 'Allow clipboard in browser';
+                    setTimeout(function(){{ btn.innerText = 'LinkedIn'; }}, 2500);
                 }});
             }})()" id="li-btn" style="
-                display:inline-flex; align-items:center; gap:0.35rem;
-                background:#0077b5; color:#ffffff; border:none; border-radius:8px;
-                padding:0.4rem 0.9rem; font-size:0.72rem; font-weight:700;
-                cursor:pointer; font-family:inherit; transition:all 0.2s;">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                </svg>
+                background:{T['accent_blue']}; color:#ffffff; border:none;
+                border-radius:7px; padding:0.38rem 0.85rem;
+                font-size:0.72rem; font-weight:600; cursor:pointer;
+                font-family:inherit; letter-spacing:0.01em;">
                 LinkedIn
             </button>
 
             <a href="{twitter_url}" target="_blank" style="
-                display:inline-flex; align-items:center; gap:0.35rem;
-                background:#000000; color:#ffffff; border-radius:8px;
-                padding:0.4rem 0.9rem; font-size:0.72rem; font-weight:700;
-                text-decoration:none; transition:opacity 0.2s;">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                </svg>
+                background:{T['bg_card2']}; color:{T['text_primary']};
+                border:1px solid {T['border']}; border-radius:7px;
+                padding:0.38rem 0.85rem; font-size:0.72rem; font-weight:600;
+                text-decoration:none; letter-spacing:0.01em;">
                 X / Twitter
             </a>
 
             <a href="{facebook_url}" target="_blank" style="
-                display:inline-flex; align-items:center; gap:0.35rem;
-                background:#1877f2; color:#ffffff; border-radius:8px;
-                padding:0.4rem 0.9rem; font-size:0.72rem; font-weight:700;
-                text-decoration:none; transition:opacity 0.2s;">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
+                background:{T['bg_card2']}; color:{T['text_primary']};
+                border:1px solid {T['border']}; border-radius:7px;
+                padding:0.38rem 0.85rem; font-size:0.72rem; font-weight:600;
+                text-decoration:none; letter-spacing:0.01em;">
                 Facebook
             </a>
 
         </div>
-        <div style="margin-top:0.5rem; font-size:0.62rem; color:{hint_color}; line-height:1.4;">
-            💡 <strong style="color:{label_color};">LinkedIn:</strong> your result is copied to clipboard — paste it into your post after LinkedIn opens. Twitter &amp; Facebook open pre-filled.
+        <div style="font-size:0.62rem; color:{T['text_muted']}; line-height:1.5;">
+            LinkedIn copies your result to clipboard — paste into your post after it opens. Twitter and Facebook open pre-filled.
         </div>
     </div>
     """, unsafe_allow_html=True)
