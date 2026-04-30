@@ -465,10 +465,14 @@ textarea {{
       b.textContent = '✓ Copied!';
       setTimeout(function(){{ b.textContent = 'Copy text'; }}, 2000);
     ">Copy text</button>
-    <a class="btn" https://www.linkedin.com/post/new"_blank">LinkedIn</a>
+    <button class="btn" onclick="
+      document.getElementById('st').select();
+      document.execCommand('copy');
+      setTimeout(function(){{ window.open('https://www.linkedin.com/feed/?shareActive=true', '_blank'); }}, 400);
+    ">LinkedIn</button>
     <a class="btn" href="https://www.facebook.com/sharer/sharer.php" target="_blank">Facebook</a>
   </div>
-  <div class="hint">Click "Copy text" → open LinkedIn or Facebook → create a new post → paste.</div>
+  <div class="hint">LinkedIn: auto-copies text then opens post dialog — just paste. &nbsp;|&nbsp; Facebook: click → paste in share box.</div>
 </div>
 </body></html>"""
 
