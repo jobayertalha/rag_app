@@ -243,6 +243,7 @@ To deploy your own fork:
 Built by  Talha Jobayer Zihan,final semester CSE student exploring the intersection of NLP, RAG pipelines, and practical career tooling.
 
 LinkedIn: https://www.linkedin.com/in/talha-jobayer-696a74237/
+
 GitHub: https://github.com/jobayertalha
 
 ---
