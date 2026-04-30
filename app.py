@@ -591,13 +591,13 @@ def render_welcome():
             <p class="welcome-subtitle">CareerVector, your AI career assistant.<br>Match your CV to the best AI/ML roles in seconds.</p>
             <div class="welcome-card">
                 <div style="font-size:0.82rem; font-weight:600; margin-bottom:0.9rem; color:var(--text-primary);">
-                    👋 Welcome! What's your name?
+                      Welcome! What's your name?
                 </div>
         """, unsafe_allow_html=True)
 
         with st.form(key="welcome_form"):
             name = st.text_input("Name", placeholder="e.g. Talha", label_visibility="collapsed")
-            submit = st.form_submit_button("✨ Get Started →", use_container_width=True, type="primary")
+            submit = st.form_submit_button(" Get Started →", use_container_width=True, type="primary")
             if submit:
                 if name and name.strip():
                     st.session_state.candidate_name = name.strip()
@@ -740,7 +740,7 @@ def render_analyze():
             f"🏆 Top Role Match: {role_title}\n"
             f"📈 Level: {'Very Strong' if unified_score >= 80 else 'Strong' if unified_score >= 60 else 'Developing' if unified_score >= 40 else 'Beginner'}\n\n"
             f"Skill gaps I'm closing:\n{gaps_text}\n\n"
-            f"Analyzed with CareerVector — Powered by RAG + LLM 🚀\n"
+            f"Analyzed with CareerVector — Powered by RAG + LLM \n"
             f"#CareerVector #AICareer #MachineLearning #DataScience"
         )
         render_share_buttons(share_text)
@@ -1058,7 +1058,7 @@ def render_analysis_results():
             _ra_items = "".join(
                 '<div style="padding:0.5rem 0.8rem; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2);'
                 'border-left:3px solid var(--accent-green); border-radius:8px; margin-bottom:0.5rem;'
-                f'color:var(--text-primary); font-size:0.82rem; line-height:1.5;">✅ {_s}</div>'
+                f'color:var(--text-primary); font-size:0.82rem; line-height:1.5;">{_s}</div>'
                 for _s in resume_add[:5]
             )
             st.markdown(
@@ -1264,7 +1264,7 @@ def render_jd_match_results():
         bg_intensity = "rgba(245,158,11,0.08)"
         border_color = "rgba(245,158,11,0.3)"
     elif pct < 80:
-        color, status, icon, message = "#10b981", "Good Match", "✅", "Strong alignment! Tailor your application to highlight matching skills."
+        color, status, icon, message = "#10b981", "Good Match", "Strong alignment! Tailor your application to highlight matching skills."
         bg_intensity = "rgba(16,185,129,0.08)"
         border_color = "rgba(16,185,129,0.3)"
     else:
@@ -1341,7 +1341,7 @@ def render_jd_match_results():
             skills_chips = "".join(f"<span class='skill-chip' style='background:rgba(16,185,129,0.15); border-color:#10b981;'>✓ {s}</span>" for s in matched_skills[:8])
             st.markdown(f"""
             <div style="margin-top:0.8rem;">
-                <div style="font-size:0.72rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.4rem;">✅ Skills You Have</div>
+                <div style="font-size:0.72rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.4rem;">Skills You Have</div>
                 <div style="display:flex; flex-wrap:wrap; gap:0.3rem;">{skills_chips}</div>
             </div>
             """, unsafe_allow_html=True)
