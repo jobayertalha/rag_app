@@ -1,5 +1,5 @@
 """
-app.py — AI Career Platform
+app.py — CareerVector
 Enhanced Theme: Blue-accent branding + Dark/Light mode toggle
 """
 
@@ -13,7 +13,7 @@ from rag import retrieve_context, match_cv_with_jd, score_ai_ml_readiness
 from quiz import calculate_interest_score, get_shuffled_questions, reset_quiz
 
 st.set_page_config(
-    page_title="AI Career Platform",
+    page_title="CareerVector AI Career Assistant",
     page_icon="🎯",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -451,8 +451,8 @@ def render_sidebar():
     with st.sidebar:
         st.markdown(f"""
         <div class="sidebar-brand">
-            <span class="sidebar-brand-logo">🎯</span>
-            <div class="sidebar-brand-name">AI <span>Career</span> Platform</div>
+            <span class="sidebar-brand-logo">⚡</span>
+            <div class="sidebar-brand-name">Career<span>Vector</span></div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -490,7 +490,7 @@ def render_sidebar():
 
         st.markdown(f"""
         <div style="text-align:center; margin-top:0.6rem; font-size:0.6rem; color: {T['text_muted']};">
-            © 2025 AI Career Platform
+            © 2025 CareerVector
         </div>
         """, unsafe_allow_html=True)
 
@@ -503,9 +503,9 @@ def render_welcome():
     with col2:
         st.markdown("""
         <div class="welcome-container">
-            <div class="welcome-badge hero-badge">✦ Powered by AI &amp; FAISS</div>
-            <div class="welcome-title">AI <span class="welcome-gradient">Career</span><br>Platform</div>
-            <p class="welcome-subtitle">Your AI-powered career companion.<br>Match your CV to the best AI/ML roles in seconds.</p>
+            <div class="welcome-badge hero-badge">✦ Powered by RAG + LLM</div>
+            <div class="welcome-title">Career<span class="welcome-gradient">Vector</span></div>
+            <p class="welcome-subtitle">CareerVector, your AI career assistant.<br>Match your CV to the best AI/ML roles in seconds.</p>
             <div class="welcome-card">
                 <div style="font-size:0.82rem; font-weight:600; margin-bottom:0.9rem; color:var(--text-primary);">
                     👋 Welcome! What's your name?
@@ -537,7 +537,7 @@ def render_home():
     <div class="main-content">
         <div class="main-header">
             <h1>Hello, {first}! 👋</h1>
-            <p>Welcome to your AI-powered career companion. Let's find your perfect role in AI/ML.</p>
+            <p>Welcome to CareerVector, your AI career assistant. Let's find your perfect role in AI/ML.</p>
         </div>
     """, unsafe_allow_html=True)
 
@@ -1683,7 +1683,7 @@ def render_about():
     st.markdown('<div class="section-header">🚀 About This Platform</div>', unsafe_allow_html=True)
     st.markdown("""
     <p style="color:var(--text-secondary); line-height:1.6; margin-bottom:1rem; font-size:0.85rem;">
-        AI Career Platform is an intelligent career matching system designed to help job seekers in Bangladesh
+        CareerVector is an intelligent AI career assistant designed to help job seekers in Bangladesh
         find the best AI/ML roles based on their CV content, skills, and career preferences.
     </p>
     """, unsafe_allow_html=True)
