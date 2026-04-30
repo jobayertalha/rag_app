@@ -415,20 +415,26 @@ def build_share_url(text: str, platform: str) -> str:
 def render_share_buttons(share_text: str):
     """Render share buttons: LinkedIn (copy+open), X/Twitter (pre-filled), Facebook."""
     import urllib.parse
-    import json
 
-    encoded_twitter  = urllib.parse.quote(share_text)
-    encoded_facebook = urllib.parse.quote("https://careervector.app")
+    # Properly escape for JS string — handle all special chars
+    def js_escape(s):
+        return (s
+            .replace("\\", "\\\\")
+            .replace("'", "\\'")
+            .replace('"', '\\"')
+            .replace("\n", "\\n")
+            .replace("\r", "\\r")
+        )
 
-    twitter_url  = f"https://twitter.com/intent/tweet?text={encoded_twitter}"
-    facebook_url = f"https://www.facebook.com/sharer/sharer.php?u={encoded_facebook}&quote={encoded_twitter}"
+    js_text      = js_escape(share_text)
+    encoded_tw   = urllib.parse.quote(share_text)
+    encoded_fb_u = urllib.parse.quote("https://careervector.app")
+    encoded_fb_q = urllib.parse.quote(share_text)
 
-    # Escape share_text for safe embedding in JS string
-    js_text = json.dumps(share_text)
+    twitter_url  = f"https://twitter.com/intent/tweet?text={encoded_tw}"
+    facebook_url = f"https://www.facebook.com/sharer/sharer.php?u={encoded_fb_u}&quote={encoded_fb_q}"
 
     T = get_theme()
-    is_dark = st.session_state.get("dark_mode", True)
-
     card_bg     = T["bg_card"]
     card_border = T["border"]
     label_color = T["text_secondary"]
@@ -451,9 +457,9 @@ def render_share_buttons(share_text: str):
         </div>
         <div style="display:flex; align-items:center; gap:0.55rem; flex-wrap:wrap;">
 
-            <!-- LinkedIn: copies text to clipboard then opens LinkedIn -->
-            <button onclick="
-                navigator.clipboard.writeText({js_text}).then(function(){{
+            <button onclick="(function(){{
+                var txt = '{js_text}';
+                navigator.clipboard.writeText(txt).then(function(){{
                     var btn = document.getElementById('li-btn');
                     var orig = btn.innerHTML;
                     btn.innerHTML = '✅ Copied! Opening...';
@@ -462,9 +468,13 @@ def render_share_buttons(share_text: str):
                         window.open('https://www.linkedin.com/feed/', '_blank');
                         btn.innerHTML = orig;
                         btn.style.background='#0077b5';
-                    }}, 900);
+                    }}, 1000);
+                }}).catch(function(){{
+                    var btn = document.getElementById('li-btn');
+                    btn.innerHTML = '❌ Allow clipboard access';
+                    setTimeout(function(){{ btn.innerHTML = 'LinkedIn'; }}, 2000);
                 }});
-            " id="li-btn" style="
+            }})()" id="li-btn" style="
                 display:inline-flex; align-items:center; gap:0.35rem;
                 background:#0077b5; color:#ffffff; border:none; border-radius:8px;
                 padding:0.4rem 0.9rem; font-size:0.72rem; font-weight:700;
@@ -475,7 +485,6 @@ def render_share_buttons(share_text: str):
                 LinkedIn
             </button>
 
-            <!-- X / Twitter: pre-filled text works natively -->
             <a href="{twitter_url}" target="_blank" style="
                 display:inline-flex; align-items:center; gap:0.35rem;
                 background:#000000; color:#ffffff; border-radius:8px;
@@ -487,7 +496,6 @@ def render_share_buttons(share_text: str):
                 X / Twitter
             </a>
 
-            <!-- Facebook sharer -->
             <a href="{facebook_url}" target="_blank" style="
                 display:inline-flex; align-items:center; gap:0.35rem;
                 background:#1877f2; color:#ffffff; border-radius:8px;
@@ -501,7 +509,7 @@ def render_share_buttons(share_text: str):
 
         </div>
         <div style="margin-top:0.5rem; font-size:0.62rem; color:{hint_color}; line-height:1.4;">
-            💡 LinkedIn: your result text is <strong style="color:{label_color};">copied to clipboard</strong> — just paste it into your post after LinkedIn opens.
+            💡 <strong style="color:{label_color};">LinkedIn:</strong> your result is copied to clipboard — paste it into your post after LinkedIn opens. Twitter &amp; Facebook open pre-filled.
         </div>
     </div>
     """, unsafe_allow_html=True)
