@@ -413,7 +413,6 @@ def build_share_url(text: str, platform: str) -> str:
 
 
 def render_share_buttons(share_text: str):
-    """Render share buttons via components.html to bypass markdown parser."""
     import urllib.parse
     import streamlit.components.v1 as components
 
@@ -426,20 +425,17 @@ def render_share_buttons(share_text: str):
             .replace("\r", "\\r")
         )
 
-    js_text      = js_escape(share_text)
-    encoded_tw   = urllib.parse.quote(share_text)
-    encoded_fb_u = urllib.parse.quote("https://careervector.app")
-    encoded_fb_q = urllib.parse.quote(share_text)
-    twitter_url  = f"https://twitter.com/intent/tweet?text={encoded_tw}"
-    facebook_url = f"https://www.facebook.com/sharer/sharer.php?u={encoded_fb_u}&quote={encoded_fb_q}"
+    js_text     = js_escape(share_text)
+    encoded_tw  = urllib.parse.quote(share_text)
+    twitter_url = f"https://twitter.com/intent/tweet?text={encoded_tw}"
 
     T = get_theme()
-    is_dark = st.session_state.get("dark_mode", True)
 
     html = f"""<!DOCTYPE html>
 <html>
 <head><style>
-  body {{ margin:0; padding:0; font-family:'Space Grotesk',sans-serif; background:transparent; }}
+  * {{ box-sizing:border-box; margin:0; padding:0; }}
+  body {{ font-family:'Space Grotesk',sans-serif; background:transparent; }}
   .wrap {{
     background:{T['bg_card']};
     border:1px solid {T['border']};
@@ -447,51 +443,75 @@ def render_share_buttons(share_text: str):
     border-radius:12px;
     padding:0.85rem 1rem;
   }}
-  .label {{ font-size:0.75rem; font-weight:600; color:{T['text_secondary']}; margin-bottom:0.6rem; letter-spacing:0.02em; }}
+  .label {{ font-size:0.73rem; font-weight:600; color:{T['text_secondary']}; margin-bottom:0.6rem; letter-spacing:0.02em; }}
   .btns {{ display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.5rem; }}
-  .hint {{ font-size:0.62rem; color:{T['text_muted']}; line-height:1.5; }}
-  .btn-li {{
-    background:{T['accent_blue']}; color:#fff; border:none; border-radius:7px;
-    padding:0.38rem 0.85rem; font-size:0.72rem; font-weight:600;
-    cursor:pointer; font-family:inherit; letter-spacing:0.01em;
+  .hint {{ font-size:0.61rem; color:{T['text_muted']}; line-height:1.5; }}
+  .btn {{
+    background:{T['bg_card2']}; color:{T['accent_blue']};
+    border:2px solid {T['accent_blue']}; border-radius:8px;
+    padding:0.38rem 1rem; font-size:0.72rem; font-weight:700;
+    cursor:pointer; font-family:inherit; letter-spacing:0.02em;
+    text-decoration:none; display:inline-block;
+    transition:background 0.18s, color 0.18s;
   }}
-  .btn-tw, .btn-fb {{
-    background:{T['bg_card2']}; color:{T['text_primary']};
-    border:1px solid {T['border']}; border-radius:7px;
-    padding:0.38rem 0.85rem; font-size:0.72rem; font-weight:600;
-    text-decoration:none; letter-spacing:0.01em; display:inline-block;
-  }}
+  .btn:hover {{ background:{T['accent_blue']}; color:#ffffff; }}
 </style></head>
 <body>
 <div class="wrap">
   <div class="label">Share your result</div>
   <div class="btns">
-    <button class="btn-li" id="li-btn" onclick="(function(){{
+
+    <button class="btn" id="li-btn" onclick="(function(){{
       var txt = '{js_text}';
       navigator.clipboard.writeText(txt).then(function(){{
-        var btn = document.getElementById('li-btn');
-        var orig = btn.innerText;
-        btn.innerText = 'Copied — LinkedIn opening';
-        btn.style.opacity='0.75';
+        var b = document.getElementById('li-btn');
+        var orig = b.innerText;
+        b.innerText = 'Copied - opening LinkedIn';
+        b.style.background = '{T['accent_blue']}';
+        b.style.color = '#ffffff';
         setTimeout(function(){{
-          window.open('https://www.linkedin.com/feed/', '_blank');
-          btn.innerText = orig;
-          btn.style.opacity='1';
+          window.open('https://www.linkedin.com/shareArticle?mini=true&url=https://careervector.app&title=CareerVector+Result', '_blank');
+          b.innerText = orig;
+          b.style.background = '{T['bg_card2']}';
+          b.style.color = '{T['accent_blue']}';
         }}, 1000);
       }}).catch(function(){{
-        var btn = document.getElementById('li-btn');
-        btn.innerText = 'Allow clipboard in browser';
-        setTimeout(function(){{ btn.innerText = 'LinkedIn'; }}, 2500);
+        var b = document.getElementById('li-btn');
+        b.innerText = 'Enable clipboard in browser settings';
+        setTimeout(function(){{ b.innerText = 'LinkedIn'; }}, 3000);
       }});
     }})()">LinkedIn</button>
-    <a class="btn-tw" href="{twitter_url}" target="_blank">X / Twitter</a>
-    <a class="btn-fb" href="{facebook_url}" target="_blank">Facebook</a>
+
+    <a class="btn" href="{twitter_url}" target="_blank">X / Twitter</a>
+
+    <button class="btn" id="fb-btn" onclick="(function(){{
+      var txt = '{js_text}';
+      navigator.clipboard.writeText(txt).then(function(){{
+        var b = document.getElementById('fb-btn');
+        var orig = b.innerText;
+        b.innerText = 'Copied - opening Facebook';
+        b.style.background = '{T['accent_blue']}';
+        b.style.color = '#ffffff';
+        setTimeout(function(){{
+          window.open('https://www.facebook.com/', '_blank');
+          b.innerText = orig;
+          b.style.background = '{T['bg_card2']}';
+          b.style.color = '{T['accent_blue']}';
+        }}, 1000);
+      }}).catch(function(){{
+        var b = document.getElementById('fb-btn');
+        b.innerText = 'Enable clipboard in browser settings';
+        setTimeout(function(){{ b.innerText = 'Facebook'; }}, 3000);
+      }});
+    }})()">Facebook</button>
+
   </div>
-  <div class="hint">LinkedIn copies your result to clipboard — paste into your post after it opens. Twitter and Facebook open pre-filled.</div>
+  <div class="hint">Click any button - your result text is copied to clipboard automatically. Paste it into your post after the platform opens.</div>
 </div>
 </body></html>"""
 
     components.html(html, height=115, scrolling=False)
+
 
 # ============================================================
 # NAVIGATION
